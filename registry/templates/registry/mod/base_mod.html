@@ -1,0 +1,46 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}Mod Dashboard — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row g-4">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2">
+      <div class="list-group shadow-sm">
+        <a href="{% url 'registry:mod_dashboard' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_dashboard' %}active{% endif %}">
+          <span class="fw-bold">Overview</span>
+        </a>
+        <a href="{% url 'registry:mod_reports' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_reports' %}active{% endif %}">
+          <span>Reports</span>
+          {% if pending_reports %}<span class="badge bg-danger rounded-pill">{{ pending_reports }}</span>{% endif %}
+        </a>
+        <a href="{% url 'registry:mod_specs' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_specs' %}active{% endif %}">
+          <span>Spec Suggestions</span>
+          {% if pending_specs %}<span class="badge bg-danger rounded-pill">{{ pending_specs }}</span>{% endif %}
+        </a>
+        <a href="{% url 'registry:mod_fixes' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_fixes' %}active{% endif %}">
+          <span>Driver Fixes</span>
+          {% if pending_fixes %}<span class="badge bg-danger rounded-pill">{{ pending_fixes }}</span>{% endif %}
+        </a>
+        <a href="{% url 'registry:mod_trust' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_trust' %}active{% endif %}">
+          <span>Trust Penalties</span>
+          {% if pending_trust_events %}<span class="badge bg-danger rounded-pill">{{ pending_trust_events }}</span>{% endif %}
+        </a>
+        <a href="{% url 'registry:mod_groups' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_groups' %}active{% endif %}">
+          <span>Help Groups</span>
+        </a>
+        <a href="{% url 'registry:mod_users' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_users' %}active{% endif %}">
+          <span>Users</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-md-9 col-lg-10">
+      {% block mod_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

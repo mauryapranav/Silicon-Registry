@@ -1,0 +1,209 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}{{ machine.vendor }} {{ machine.model_name }} — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-4">
+      <li class="breadcrumb-item"><a href="{% url 'registry:homepage' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'registry:machine_list' %}">Machines</a></li>
+      <li class="breadcrumb-item active">{{ machine.vendor }} {{ machine.model_name }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="fw-bold mb-1">{{ machine.vendor }} {{ machine.model_name }}</h1>
+      <div class="d-flex gap-2">
+        {% if machine.form_factor %}
+          <span class="badge bg-light text-dark border mono">{{ machine.get_form_factor_display }}</span>
+        {% endif %}
+        {% if compat == 'gold' %}
+          <span class="badge badge-gold">Gold Compatibility</span>
+        {% elif compat == 'mostly_gold' %}
+          <span class="badge" style="background: #0d9488; color: #fff;">Mostly Gold</span>
+        {% elif compat == 'mixed' %}
+          <span class="badge bg-warning text-dark">Mixed Compatibility</span>
+        {% elif compat == 'broken' %}
+          <span class="badge badge-broken">Broken Compatibility</span>
+        {% else %}
+          <span class="badge bg-secondary">No Reports Yet</span>
+        {% endif %}
+      </div>
+    </div>
+    <a href="{% url 'registry:report_submit' %}?machine={{ machine.id }}" class="btn btn-dark">Submit report</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <!-- Specs card -->
+      <div class="sr-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Hardware Specifications</h5>
+          {% if spec and spec.is_verified %}
+            <span class="badge bg-success-subtle text-success border border-success-subtle">Verified specs</span>
+          {% endif %}
+        </div>
+        
+        {% if spec %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Processor</small>
+                <div class="mono">{{ spec.cpu_name|default:"Unknown CPU" }}</div>
+                {% if spec.cpu_series_tier or spec.cpu_generation %}
+                  <div class="mt-1">
+                    {% if spec.cpu_series_tier %}<span class="badge bg-light text-dark border mono me-1">{{ spec.get_cpu_series_tier_display }}</span>{% endif %}
+                    {% if spec.cpu_generation %}<small class="text-muted">{{ spec.cpu_generation }}</small>{% endif %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Graphics</small>
+                <div class="mono">{{ spec.gpu_name|default:"Integrated Graphics" }}</div>
+                <small class="text-muted">{{ spec.get_gpu_type_display|default:"" }} • {{ spec.gpu_manufacturer|default:"" }}</small>
+              </div>
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Display</small>
+                <div>{{ spec.display_size_inches|default:"-" }}" {{ spec.display_resolution|default:"" }}</div>
+                <small class="text-muted">{{ spec.get_display_panel_type_display|default:"" }}</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Memory (RAM)</small>
+                <div class="mono">{{ spec.ram_base_gb|default:"-" }}GB / {{ spec.ram_max_gb|default:"-" }}GB max</div>
+                <small class="text-muted">{{ spec.get_ram_type_display|default:"" }} • {{ spec.ram_speed_mhz|default:"" }} MHz</small>
+              </div>
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Storage</small>
+                <div class="mono">{{ spec.storage_base_gb|default:"-" }}GB {{ spec.get_storage_type_display|default:"" }}</div>
+                <small class="text-muted">Max: {{ spec.storage_max_gb|default:"Soldered" }}GB</small>
+              </div>
+              <div class="mb-3">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Battery</small>
+                <div>{{ spec.battery_wh|default:"-" }} Wh</div>
+              </div>
+            </div>
+          </div>
+          {% if not spec.is_verified %}
+            <div class="mt-3 p-2 bg-warning-subtle rounded border border-warning-subtle">
+              <small class="text-warning-emphasis">Unverified specs — <a href="{% url 'registry:suggest_spec' machine.pk %}" class="fw-bold">Suggest a correction</a></small>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-4">
+            <p class="text-muted mb-2">No specs yet.</p>
+            {% if user.is_authenticated %}
+              <a href="{% url 'registry:suggest_spec' machine.pk %}" class="btn btn-sm btn-outline-dark">Suggest specs</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Component summary -->
+      {% if comp_summary %}
+      <div class="sr-card mb-4">
+        <h5 class="fw-bold mb-3">Component Summary</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Component</th>
+                <th>Type</th>
+                <th class="text-center">Working</th>
+                <th class="text-center">Issues</th>
+                <th class="text-center">Broken</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cid, data in comp_summary.items %}
+              <tr>
+                <td class="fw-medium">{{ data.name }}</td>
+                <td><span class="text-muted small text-uppercase">{{ data.type }}</span></td>
+                <td class="text-center"><span class="comp-working">{% if data.working %}{{ data.working }}{% else %}-{% endif %}</span></td>
+                <td class="text-center"><span class="comp-issues">{% if data.issues %}{{ data.issues }}{% else %}-{% endif %}</span></td>
+                <td class="text-center"><span class="comp-broken">{% if data.broken %}{{ data.broken }}{% else %}-{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Reports list -->
+      <h5 class="fw-bold mb-3 mt-5">Reports ({{ report_count }})</h5>
+      <div class="mb-4 d-flex gap-2 overflow-auto pb-2">
+        <a href="?" class="badge bg-dark text-white text-decoration-none">All distros</a>
+        {% for report in reports|dictsort:"distro.name" %}
+          {% if changed %}<!-- logic for unique distros is better in view but here is a simple hack -->{% endif %}
+        {% endfor %}
+      </div>
+
+      {% for report in reports %}
+      <div class="sr-card mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h6 class="fw-bold mb-0"><a href="{% url 'registry:report_detail' report.pk %}" class="text-decoration-none text-dark">{{ report.title }}</a></h6>
+          <span class="badge {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %}">
+            {{ report.get_boot_status_display|truncatechars:10 }}
+          </span>
+        </div>
+        <div class="d-flex gap-2 mb-3">
+          <span class="mono small bg-light px-2 py-1 rounded border">{{ report.distro.name }} {{ report.distro.version }}</span>
+          {% if report.kernel_version %}
+            <span class="mono small text-muted px-2 py-1">kernel {{ report.kernel_version }}</span>
+          {% endif %}
+        </div>
+        <div class="d-flex flex-wrap gap-1 mb-3">
+          {% for cs in report.comp_statuses.all %}
+            <span class="badge border bg-white {% if cs.status == 'WORKING' %}text-success{% elif cs.status == 'ISSUES' %}text-warning{% else %}text-danger{% endif %}" style="font-size:10px">
+              {{ cs.component.name }}
+            </span>
+          {% endfor %}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+          <small class="text-muted">by <a href="{% url 'registry:user_profile' report.user.username %}" class="fw-medium">{{ report.user.username }}</a></small>
+          <small class="text-muted">{{ report.created_at|date:"M d, Y" }}</small>
+        </div>
+      </div>
+      {% empty %}
+        <p class="text-muted">No approved reports yet.</p>
+      {% endfor %}
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Related machines -->
+      {% if related %}
+      <div class="mb-4">
+        <h6 class="fw-bold mb-3">Other {{ machine.series }} models</h6>
+        {% for rm in related %}
+        <div class="sr-card mb-2 py-2">
+          <a href="{% url 'registry:machine_detail' rm.pk %}" class="text-decoration-none text-dark small fw-bold d-block">{{ rm.vendor }} {{ rm.model_name }}</a>
+          <small class="text-muted">{{ rm.report_count }} reports</small>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Driver fixes -->
+      {% if driver_fixes %}
+      <div class="mb-4">
+        <h6 class="fw-bold mb-3">Driver fixes</h6>
+        {% for fix in driver_fixes %}
+        <div class="sr-card mb-2 py-2">
+          <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:9px">{{ fix.component.name }}</small>
+          <h6 class="small fw-bold mb-1">{{ fix.title }}</h6>
+          {% if fix.external_url %}
+            <a href="{{ fix.external_url }}" target="_blank" class="small text-decoration-none">View fix →</a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}Submit Report — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <!-- Step Indicator -->
+      <div class="d-flex justify-content-between mb-5 position-relative">
+        <div class="position-absolute top-50 start-0 end-0 translate-middle-y border-top" style="z-index: 1;"></div>
+        {% for i in "1234" %}
+          <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" 
+               style="width: 40px; height: 40px; z-index: 2; background: {% if step >= i|add:0 %}var(--sr-blue){% else %}#fff{% endif %}; color: {% if step >= i|add:0 %}#fff{% else %}var(--sr-muted){% endif %}; border: 2px solid {% if step >= i|add:0 %}var(--sr-blue){% else %}var(--sr-border){% endif %};">
+            {{ i }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="sr-card shadow-sm">
+        <h2 class="fw-bold mb-4">
+          {% if step == 1 %}Step 1: Report Type & Machine
+          {% elif step == 2 %}Step 2: OS & Components
+          {% elif step == 3 %}Step 3: Hardware Details
+          {% elif step == 4 %}Step 4: Review & Submit
+          {% endif %}
+        </h2>
+
+        <form method="POST">
+          {% csrf_token %}
+          
+          {% if step == 1 %}
+            <div class="mb-4">
+              <label class="form-label fw-bold">What are you reporting?</label>
+              <select name="report_type" class="form-select py-2" required>
+                {% for val, label in report_types %}
+                  <option value="{{ val }}" {% if wizard_data.report_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Machine (optional for some report types)</label>
+              <select name="machine_id" class="form-select py-2">
+                <option value="">-- Select Machine --</option>
+                {% for machine in machines %}
+                  <option value="{{ machine.id }}" {% if wizard_data.machine_id == machine.id|stringformat:"s" %}selected{% endif %}>{{ machine.vendor }} {{ machine.model_name }}</option>
+                {% endfor %}
+              </select>
+              <div class="form-text">Search and select the hardware model.</div>
+            </div>
+
+          {% elif step == 2 %}
+            <div class="mb-4">
+              <label class="form-label fw-bold">Linux Distribution</label>
+              <select name="distro_id" class="form-select py-2">
+                <option value="">-- Select Distro --</option>
+                {% for distro in distros %}
+                  <option value="{{ distro.id }}" {% if wizard_data.distro_id == distro.id|stringformat:"s" %}selected{% endif %}>{{ distro.name }} {{ distro.version }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Kernel Version</label>
+              <input type="text" name="kernel_version" class="form-control mono py-2" value="{{ wizard_data.kernel_version }}" placeholder="e.g. 6.8.0-generic">
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Specific Component (if applicable)</label>
+              <select name="component_id" class="form-select py-2">
+                <option value="">-- Select Component --</option>
+                {% for comp in components %}
+                  <option value="{{ comp.id }}" {% if wizard_data.component_id == comp.id|stringformat:"s" %}selected{% endif %}>[{{ comp.get_type_display }}] {{ comp.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+          {% elif step == 3 %}
+            <div class="mb-4">
+              <label class="form-label fw-bold">Overall Boot Status</label>
+              <select name="boot_status" class="form-select py-2">
+                <option value="">-- Select Status --</option>
+                {% for val, label in boot_statuses %}
+                  <option value="{{ val }}" {% if wizard_data.boot_status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Report Title</label>
+              <input type="text" name="title" class="form-control py-2 fw-bold" value="{{ wizard_data.title }}" placeholder="e.g. Ubuntu 24.04 on ThinkPad X1 Carbon Gen 11" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Detailed Description</label>
+              <textarea name="description" class="form-control" rows="6" placeholder="Share your experience, what works, what doesn't, any tweaks needed..." required>{{ wizard_data.description }}</textarea>
+            </div>
+
+          {% elif step == 4 %}
+            <div class="mb-4 bg-light p-3 rounded border">
+              <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size:11px">Summary</h6>
+              <div class="row g-2">
+                <div class="col-4 text-muted small">Type:</div>
+                <div class="col-8 small fw-bold">{{ wizard_data.report_type }}</div>
+                <div class="col-4 text-muted small">Machine ID:</div>
+                <div class="col-8 small">{{ wizard_data.machine_id|default:"None" }}</div>
+                <div class="col-4 text-muted small">Distro ID:</div>
+                <div class="col-8 small">{{ wizard_data.distro_id|default:"None" }}</div>
+                <div class="col-4 text-muted small">Boot Status:</div>
+                <div class="col-8 small fw-bold">{{ wizard_data.boot_status }}</div>
+              </div>
+            </div>
+            <p class="text-muted small mb-4">By submitting, you agree that your report will be publicly visible after maintainer approval.</p>
+          {% endif %}
+
+          <div class="d-flex justify-content-between mt-5">
+            {% if step > 1 %}
+              <a href="?step={{ step|add:"-1" }}" class="btn btn-outline-secondary px-4">Back</a>
+            {% else %}
+              <div></div>
+            {% endif %}
+            
+            {% if step < 4 %}
+              <button type="submit" class="btn btn-primary px-5 fw-bold">Next Step</button>
+            {% else %}
+              <button type="submit" class="btn btn-success px-5 fw-bold">Submit Report</button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

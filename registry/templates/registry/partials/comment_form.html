@@ -1,0 +1,11 @@
+<form hx-post="{% url 'registry:add_comment' report.pk %}" 
+      hx-target="#comment-form-container" 
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="mb-3">
+    <textarea name="content" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
+  </div>
+  <div class="text-end">
+    <button type="submit" class="btn btn-sm btn-dark">Post Comment</button>
+  </div>
+</form>

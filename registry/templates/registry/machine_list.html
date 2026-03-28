@@ -1,0 +1,72 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}Machines — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Machines <span class="badge bg-light text-dark border ms-2" style="font-size:14px">{{ total_count }}</span></h2>
+    <a href="{% url 'registry:machine_add' %}" class="btn btn-sm btn-dark">Add machine</a>
+  </div>
+
+  <div class="sr-card mb-4">
+    <form method="GET" action="{% url 'registry:machine_list' %}" class="row g-2 align-items-center">
+      <div class="col-md-3">
+        <input type="text" 
+               name="q" 
+               value="{{ q }}" 
+               class="form-control form-control-sm" 
+               placeholder="Search..."
+               hx-get="{% url 'registry:machine_list' %}"
+               hx-trigger="input changed delay:400ms"
+               hx-target="#machine-grid"
+               hx-include="closest form">
+      </div>
+      <div class="col-md-2">
+        <select name="form_factor" class="form-select form-select-sm" hx-get="{% url 'registry:machine_list' %}" hx-target="#machine-grid" hx-trigger="change">
+          <option value="">Form Factor</option>
+          {% for val, label in form_factors %}
+            <option value="{{ val }}" {% if form_factor == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="cpu_manufacturer" class="form-select form-select-sm" hx-get="{% url 'registry:machine_list' %}" hx-target="#machine-grid" hx-trigger="change">
+          <option value="">CPU Mfg</option>
+          <option value="INTEL" {% if cpu_mfr == 'INTEL' %}selected{% endif %}>Intel</option>
+          <option value="AMD" {% if cpu_mfr == 'AMD' %}selected{% endif %}>AMD</option>
+          <option value="APPLE" {% if cpu_mfr == 'APPLE' %}selected{% endif %}>Apple</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="cpu_series_tier" class="form-select form-select-sm" hx-get="{% url 'registry:machine_list' %}" hx-target="#machine-grid" hx-trigger="change">
+          <option value="">CPU Tier</option>
+          {% for val, label in cpu_tiers %}
+            <option value="{{ val }}" {% if cpu_tier == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="distro" class="form-select form-select-sm" hx-get="{% url 'registry:machine_list' %}" hx-target="#machine-grid" hx-trigger="change">
+          <option value="">Distro</option>
+          {% for d in distros %}
+            <option value="{{ d.id }}" {% if distro_id == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1 text-end">
+        <select name="sort" class="form-select form-select-sm" hx-get="{% url 'registry:machine_list' %}" hx-target="#machine-grid" hx-trigger="change">
+          <option value="-report_count" {% if sort == '-report_count' %}selected{% endif %}>Pop</option>
+          <option value="-gold_count" {% if sort == '-gold_count' %}selected{% endif %}>Gold</option>
+          <option value="vendor" {% if sort == 'vendor' %}selected{% endif %}>A-Z</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div id="machine-grid" class="row g-3">
+    {% include 'registry/partials/machine_cards.html' %}
+  </div>
+</div>
+{% endblock %}

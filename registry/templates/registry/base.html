@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Silicon Registry{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'registry/css/silicon.css' %}">
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+</head>
+<body>
+
+<!-- Sticky navbar -->
+<nav class="navbar navbar-expand-lg sr-navbar px-3">
+  <a class="navbar-brand" href="{% url 'registry:homepage' %}">silicon-registry</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="nav">
+    <!-- Live navbar search -->
+    <div class="mx-auto" style="width:320px;position:relative">
+      <input class="form-control form-control-sm"
+             type="text"
+             placeholder="Search machines..."
+             name="q"
+             autocomplete="off"
+             hx-get="{% url 'registry:partial_navbar_search' %}"
+             hx-trigger="input changed delay:300ms"
+             hx-target="#navbar-results"
+             hx-indicator="#navbar-spinner">
+      <div id="navbar-results" style="position:absolute;top:36px;left:0;right:0;z-index:999;background:#fff;border:1px solid var(--sr-border);border-radius:8px;display:none"></div>
+      <span id="navbar-spinner" class="htmx-indicator spinner-border spinner-border-sm" style="position:absolute;right:8px;top:8px"></span>
+    </div>
+    <ul class="navbar-nav ms-3 gap-2">
+      <li class="nav-item"><a class="nav-link" href="{% url 'registry:machine_list' %}">Machines</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'registry:search' %}">Search</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'registry:about' %}">About</a></li>
+      {% if user.is_authenticated %}
+        {% if user.role_type == 'MAINTAINER' or user.role_type == 'ADMIN' %}
+          <li class="nav-item"><a class="nav-link text-warning" href="{% url 'registry:mod_dashboard' %}">Mod</a></li>
+        {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            {% if user.avatar %}<img src="{{ user.avatar.url }}" width="24" height="24" class="rounded-circle me-1">{% endif %}
+            {{ user.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'registry:user_profile' user.username %}">Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'registry:profile_edit' %}">Edit profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'registry:report_submit' %}">Submit report</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'account_logout' %}">Logout</a></li>
+          </ul>
+        </li>
+      {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+        <li class="nav-item"><a class="btn btn-sm btn-dark ms-1" href="{% url 'account_signup' %}">Sign up</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<!-- Flash messages -->
+<div class="sr-toast-container" id="toast-container">
+  {% for message in messages %}
+  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Main content -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- Footer -->
+<footer class="border-top mt-5 py-4" style="background:#fff">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span class="mono text-muted">silicon-registry</span>
+    <span class="text-muted" style="font-size:12px">Crowdsourced Linux hardware compatibility</span>
+    <div class="d-flex gap-3" style="font-size:12px">
+      <a href="{% url 'registry:about' %}" class="text-muted text-decoration-none">About</a>
+      <a href="{% url 'registry:search' %}" class="text-muted text-decoration-none">Search</a>
+      <a href="{% url 'registry:machine_list' %}" class="text-muted text-decoration-none">Machines</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Auto-hide toasts after 4s
+setTimeout(() => {
+  document.querySelectorAll('.alert').forEach(el => {
+    new bootstrap.Alert(el).close();
+  });
+}, 4000);
+// Show navbar results div when content loads
+document.body.addEventListener('htmx:afterSwap', e => {
+  if (e.target.id === 'navbar-results') {
+    e.target.style.display = e.target.innerHTML.trim() ? 'block' : 'none';
+  }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#navbar-results') && !e.target.closest('input[name=q]')) {
+    document.getElementById('navbar-results').style.display = 'none';
+  }
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

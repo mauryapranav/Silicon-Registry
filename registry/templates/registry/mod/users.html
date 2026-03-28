@@ -1,0 +1,53 @@
+{% extends 'registry/mod/base_mod.html' %}
+
+{% block mod_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold mb-0">Users</h3>
+</div>
+
+<div class="sr-card">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="bg-light">
+        <tr>
+          <th>Username</th>
+          <th>Trust Ratio</th>
+          <th>Joined</th>
+          <th class="text-end">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center">
+              {% if u.avatar %}
+                <img src="{{ u.avatar.url }}" width="24" height="24" class="rounded-circle me-2">
+              {% endif %}
+              <a href="{% url 'registry:user_profile' u.username %}" class="fw-bold text-dark text-decoration-none">{{ u.username }}</a>
+            </div>
+          </td>
+          <td>
+            <span class="{% if u.trust_ratio > 70 %}text-success{% elif u.trust_ratio > 40 %}text-warning{% else %}text-danger{% endif %} fw-bold">
+              {{ u.trust_ratio }}%
+            </span>
+          </td>
+          <td class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</td>
+          <td class="text-end">
+            <form method="POST" action="{% url 'registry:mod_users' %}" class="d-flex justify-content-end">
+              {% csrf_token %}
+              <input type="hidden" name="user_id" value="{{ u.pk }}">
+              <select name="role_type" class="form-select form-select-sm w-auto d-inline-block" onchange="this.form.submit()">
+                {% for val, label in roles %}
+                  <option value="{{ val }}" {% if u.role_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

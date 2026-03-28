@@ -1,0 +1,66 @@
+{% extends 'registry/mod/base_mod.html' %}
+
+{% block mod_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold mb-0">Moderation Overview</h3>
+</div>
+
+<div class="row g-3 mb-5">
+  <div class="col-md-4">
+    <div class="stat-card shadow-sm border-danger" style="border-left-width: 4px;">
+      <div class="stat-num text-danger">{{ pending_reports|add:pending_specs|add:pending_fixes|add:open_flags|add:pending_trust_events }}</div>
+      <div class="stat-lbl text-uppercase fw-bold">Total Action Items</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card shadow-sm border-primary" style="border-left-width: 4px;">
+      <div class="stat-num text-primary">{{ total_users }}</div>
+      <div class="stat-lbl text-uppercase fw-bold">Total Users</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card shadow-sm border-success" style="border-left-width: 4px;">
+      <div class="stat-num text-success">{{ total_reports }}</div>
+      <div class="stat-lbl text-uppercase fw-bold">Total Reports</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="sr-card h-100">
+      <h5 class="fw-bold mb-4">Pending Approvals</h5>
+      <div class="list-group list-group-flush">
+        <a href="{% url 'registry:mod_reports' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+          Reports
+          <span class="badge {% if pending_reports %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ pending_reports }}</span>
+        </a>
+        <a href="{% url 'registry:mod_specs' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+          Spec Suggestions
+          <span class="badge {% if pending_specs %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ pending_specs }}</span>
+        </a>
+        <a href="{% url 'registry:mod_fixes' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+          Driver Fixes
+          <span class="badge {% if pending_fixes %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ pending_fixes }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="sr-card h-100">
+      <h5 class="fw-bold mb-4">Urgent Attention</h5>
+      <div class="list-group list-group-flush">
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+          Open Flags
+          <span class="badge {% if open_flags %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ open_flags }}</span>
+        </div>
+        <a href="{% url 'registry:mod_trust' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+          Trust Penalties
+          <span class="badge {% if pending_trust_events %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ pending_trust_events }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

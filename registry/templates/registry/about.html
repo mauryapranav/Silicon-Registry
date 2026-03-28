@@ -1,0 +1,149 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}About — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h1 class="fw-bold mb-4">About Silicon Registry</h1>
+      <p class="lead text-muted mb-5">Silicon Registry is a crowdsourced database for tracking Linux hardware compatibility across laptops, desktops, and individual components.</p>
+
+      <div class="mb-5">
+        <h3 class="fw-bold mb-3">How Reports Work</h3>
+        <p>Every report submitted by the community gets assigned an overall boot status. Here is what they mean:</p>
+        <ul class="list-group list-group-flush mb-4">
+          <li class="list-group-item d-flex align-items-center py-3">
+            <span class="badge badge-gold me-3" style="width: 80px;">Gold</span>
+            <span>Flawless out-of-the-box experience. Everything works without any tweaking or manual intervention.</span>
+          </li>
+          <li class="list-group-item d-flex align-items-center py-3">
+            <span class="badge badge-silver me-3" style="width: 80px;">Silver</span>
+            <span>Works well, but requires minor tweaks (e.g., adding a kernel parameter, installing a specific driver).</span>
+          </li>
+          <li class="list-group-item d-flex align-items-center py-3">
+            <span class="badge badge-bronze me-3" style="width: 80px;">Bronze</span>
+            <span>Boots and functions, but has persistent issues with non-critical components (e.g., fingerprint reader, webcam).</span>
+          </li>
+          <li class="list-group-item d-flex align-items-center py-3">
+            <span class="badge badge-broken me-3" style="width: 80px;">Broken</span>
+            <span>Critical issues. Fails to boot, kernel panics, or core functionality (Wi-Fi, display) is completely broken.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="fw-bold mb-3">The Trust System</h3>
+        <div class="sr-card bg-light border-0 p-4">
+          <p class="mb-3">To ensure high-quality data, we use a community trust system:</p>
+          <div class="row g-3 text-center">
+            <div class="col-md-4">
+              <div class="h3 fw-bold text-success mb-0">+5</div>
+              <div class="small text-muted text-uppercase fw-bold">Report Approved</div>
+            </div>
+            <div class="col-md-4">
+              <div class="h3 fw-bold text-success mb-0">+10</div>
+              <div class="small text-muted text-uppercase fw-bold">Driver Fix Accepted</div>
+            </div>
+            <div class="col-md-4">
+              <div class="h3 fw-bold text-danger mb-0">-15</div>
+              <div class="small text-muted text-uppercase fw-bold">Spam Penalty</div>
+            </div>
+          </div>
+          <hr class="my-4">
+          <p class="small text-muted mb-0">Your Trust Ratio is calculated based on your positive and negative points. Users with a high trust ratio gain additional privileges in the community.</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="fw-bold mb-3">Frequently Asked Questions</h3>
+        <div class="accordion" id="faqAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                How are reports verified?
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Every report is manually reviewed by a volunteer Maintainer before it becomes publicly visible. Maintainers check for clarity, completeness, and obvious errors.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Can I edit my report?
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Currently, reports cannot be edited after submission. If you need to make a critical correction, please use the "Report a problem" flag button on your report page, and a moderator will assist you.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                My machine isn't listed. How do I add it?
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                You can add a new machine directly from the Machines page using the "Add machine" button. Once added, you can immediately submit a report for it.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                How do I become a Maintainer?
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Maintainer status is granted to community members with a consistently high Trust Ratio and a history of quality contributions. Admins periodically review active contributors for promotion.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                Is this project open source?
+              </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Yes, Silicon Registry is built with Django and is open source. You can find our repository on GitHub to contribute code or report bugs.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSix">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                Do you have an API?
+              </button>
+            </h2>
+            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Yes, we provide a basic read-only JSON API for accessing machine, report, component, and distro data. Endpoint documentation is coming soon.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-5">
+        <h4 class="fw-bold mb-3">Ready to contribute?</h4>
+        {% if user.is_authenticated %}
+          <a href="{% url 'registry:report_submit' %}" class="btn btn-dark px-4 py-2 fw-bold">Submit a Report</a>
+        {% else %}
+          <a href="{% url 'account_signup' %}" class="btn btn-dark px-4 py-2 fw-bold">Join the Community</a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

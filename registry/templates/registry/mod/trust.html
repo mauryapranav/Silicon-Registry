@@ -1,0 +1,52 @@
+{% extends 'registry/mod/base_mod.html' %}
+
+{% block mod_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold mb-0">Trust Penalties</h3>
+</div>
+
+<div class="sr-card">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="bg-light">
+        <tr>
+          <th>User</th>
+          <th>Penalty Type</th>
+          <th>Points Delta</th>
+          <th>Date</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td>
+            <a href="{% url 'registry:user_profile' event.user.username %}" class="fw-bold text-dark text-decoration-none d-block">{{ event.user.username }}</a>
+            <span class="small text-muted">Trust: {{ event.user.trust_ratio }}%</span>
+          </td>
+          <td>
+            <span class="badge bg-danger">{{ event.get_event_type_display }}</span>
+            <div class="small text-muted mt-1">{{ event.notes }}</div>
+          </td>
+          <td>
+            <span class="fw-bold text-danger">{{ event.points_delta }}</span>
+          </td>
+          <td class="small text-muted">{{ event.created_at|date:"M d, Y" }}</td>
+          <td class="text-end">
+            <form method="POST" action="{% url 'registry:mod_trust' %}">
+              {% csrf_token %}
+              <input type="hidden" name="event_id" value="{{ event.pk }}">
+              <button type="submit" class="btn btn-sm btn-danger fw-bold">Approve Penalty</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center py-4 text-muted">No pending trust penalties.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

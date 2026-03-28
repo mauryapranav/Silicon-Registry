@@ -1,0 +1,21 @@
+<form hx-post="{% url 'registry:flag_report' report.pk %}" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label small fw-bold">Reason for flagging</label>
+    <select name="reason" class="form-select" required>
+      {% for val, label in reasons %}
+        <option value="{{ val }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label small fw-bold">Additional details (optional)</label>
+    <textarea name="details" class="form-control" rows="3" placeholder="Tell us more..."></textarea>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-danger px-4">Flag Report</button>
+    {% if not request.headers.HX_Request %}
+      <a href="{% url 'registry:report_detail' report.pk %}" class="btn btn-outline-secondary px-4">Cancel</a>
+    {% endif %}
+  </div>
+</form>

@@ -1,0 +1,42 @@
+{% extends 'registry/base.html' %}
+{% load static %}
+
+{% block title %}Suggest Specs — Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="sr-card shadow-sm">
+        <h2 class="fw-bold mb-4">Suggest Specs</h2>
+        <p class="text-muted small mb-4">Suggesting a correction for: <strong>{{ machine.vendor }} {{ machine.model_name }}</strong></p>
+        
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Field to suggest</label>
+            <select name="field_name" class="form-select" required>
+              {% for val, label in spec_fields %}
+                <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Suggested value</label>
+            <input type="text" name="suggested_value" class="form-control" placeholder="e.g. Core i7-1365U" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Source URL (optional but helpful)</label>
+            <input type="url" name="source_url" class="form-control" placeholder="https://...">
+            <div class="form-text small">Link to proof — manufacturer page, Notebookcheck, etc.</div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4 fw-bold">Submit Suggestion</button>
+            <a href="{% url 'registry:machine_detail' machine.pk %}" class="btn btn-outline-secondary px-4">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
