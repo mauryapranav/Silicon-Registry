@@ -1,0 +1,73 @@
+{% extends 'registry/base.html' %}
+
+{% block title %}Leaderboard | Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-5 sm:px-8 pt-10 pb-24">
+
+  <div class="mb-10 fade-in">
+    <h1 class="text-3xl font-black tracking-tight">Leaderboard</h1>
+    <p class="text-zinc-600 text-sm mt-1.5">Top contributors by trust score</p>
+  </div>
+
+  <div class="card-surface rounded-2xl overflow-hidden fade-in" style="animation-delay:0.08s">
+    <table class="w-full text-sm">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <th class="tbl-head text-left px-6 py-4">#</th>
+          <th class="tbl-head text-left px-6 py-4">Contributor</th>
+          <th class="tbl-head text-right px-6 py-4">Reports</th>
+          <th class="tbl-head text-right px-6 py-4">Fixes</th>
+          <th class="tbl-head text-right px-6 py-4">Score</th>
+          <th class="tbl-head text-right px-6 py-4">Trust</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr class="tbl-row">
+          <td class="px-6 py-4 text-zinc-600 font-bold">
+            {% if forloop.counter == 1 %}<span class="text-yellow-500">01</span>
+            {% elif forloop.counter == 2 %}<span class="text-zinc-400">02</span>
+            {% elif forloop.counter == 3 %}<span class="text-orange-600">03</span>
+            {% else %}<span class="text-zinc-700">{{ forloop.counter|stringformat:"02d" }}</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4">
+            <a href="{% url 'registry:user_profile' u.username %}" class="flex items-center gap-3 group">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden shrink-0"
+                style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);">
+                {% if u.avatar %}
+                <img src="{{ u.avatar.url }}" class="w-full h-full object-cover rounded-full">
+                {% else %}
+                <span class="text-xs font-bold text-zinc-500">{{ u.username|make_list|first|upper }}</span>
+                {% endif %}
+              </div>
+              <div>
+                <span class="font-semibold group-hover:text-primary transition-colors">{{ u.username }}</span>
+                {% if u.is_verified %}
+                <i data-lucide="badge-check" class="inline w-3.5 h-3.5 text-primary ml-1"></i>
+                {% endif %}
+                <div class="text-[11px] text-zinc-700 mt-0.5">{{ u.role_type }}</div>
+              </div>
+            </a>
+          </td>
+          <td class="px-6 py-4 text-right font-medium text-zinc-300">{{ u.report_count }}</td>
+          <td class="px-6 py-4 text-right font-medium text-zinc-300">{{ u.fix_count }}</td>
+          <td class="px-6 py-4 text-right font-bold text-primary">+{{ u.positive_score }}</td>
+          <td class="px-6 py-4 text-right">
+            <span
+              class="font-bold {% if u.trust_ratio >= 80 %}text-primary{% elif u.trust_ratio >= 50 %}text-yellow-500{% else %}text-zinc-500{% endif %}">
+              {{ u.trust_ratio }}%
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="px-6 py-20 text-center text-zinc-700">No contributors with approved reports yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

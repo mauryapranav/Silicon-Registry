@@ -1,0 +1,47 @@
+{% if user.is_authenticated %}
+<form class="flex gap-4" id="vote-{{ model }}-{{ pk }}">
+  {% csrf_token %}
+  <button type="button"
+          hx-post="{% url 'registry:cast_vote' model pk 'UPVOTE' %}"
+          hx-target="#vote-{{ model }}-{{ pk }}"
+          hx-swap="outerHTML"
+          class="flex flex-col items-center gap-1.5 group">
+    <div class="w-11 h-11 rounded-xl border flex items-center justify-center transition-all
+      {% if user_vote and user_vote.vote_type == 'UPVOTE' %}border-primary/40{% else %}border-white/8 hover:border-primary/25{% endif %}"
+      style="background:{% if user_vote and user_vote.vote_type == 'UPVOTE' %}rgba(57,211,83,0.12){% else %}rgba(255,255,255,0.04){% endif %}">
+      <i data-lucide="arrow-up" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-zinc-500 group-hover:text-primary{% endif %} transition-colors"></i>
+    </div>
+    <span class="text-xs font-bold {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-zinc-600{% endif %}">{{ upvotes }}</span>
+  </button>
+
+  <button type="button"
+          hx-post="{% url 'registry:cast_vote' model pk 'DOWNVOTE' %}"
+          hx-target="#vote-{{ model }}-{{ pk }}"
+          hx-swap="outerHTML"
+          class="flex flex-col items-center gap-1.5 group">
+    <div class="w-11 h-11 rounded-xl border flex items-center justify-center transition-all
+      {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}border-red-500/40{% else %}border-white/8 hover:border-red-500/25{% endif %}"
+      style="background:{% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}rgba(239,68,68,0.12){% else %}rgba(255,255,255,0.04){% endif %}">
+      <i data-lucide="arrow-down" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-500{% else %}text-zinc-500 group-hover:text-red-500{% endif %} transition-colors"></i>
+    </div>
+    <span class="text-xs font-bold {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-500{% else %}text-zinc-600{% endif %}">{{ downvotes }}</span>
+  </button>
+</form>
+<script>lucide.createIcons();</script>
+
+{% else %}
+<div class="flex gap-4">
+  <div class="flex flex-col items-center gap-1.5">
+    <div class="w-11 h-11 rounded-xl border border-white/8 flex items-center justify-center" style="background:rgba(255,255,255,0.04);">
+      <i data-lucide="arrow-up" class="w-5 h-5 text-zinc-700"></i>
+    </div>
+    <span class="text-xs text-zinc-700">{{ upvotes }}</span>
+  </div>
+  <div class="flex flex-col items-center gap-1.5">
+    <div class="w-11 h-11 rounded-xl border border-white/8 flex items-center justify-center" style="background:rgba(255,255,255,0.04);">
+      <i data-lucide="arrow-down" class="w-5 h-5 text-zinc-700"></i>
+    </div>
+    <span class="text-xs text-zinc-700">{{ downvotes }}</span>
+  </div>
+</div>
+{% endif %}

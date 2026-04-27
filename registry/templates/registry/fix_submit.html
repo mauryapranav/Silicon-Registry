@@ -1,0 +1,38 @@
+{% extends 'registry/base.html' %}
+
+{% block title %}Submit a Driver Fix | Silicon Registry{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-20">
+    <div class="mb-8 fade-in">
+        <h1 class="text-3xl font-bold tracking-tight">Submit a Driver Fix</h1>
+        <p class="text-zinc-500 text-sm mt-1">Share workarounds and driver commands for broken components</p>
+    </div>
+
+    <form method="POST" class="card-surface p-8 rounded-2xl space-y-6 fade-in" style="animation-delay:0.1s">
+        {% csrf_token %}
+        <div>
+            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Component *</label>
+            <select name="component_id" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+                <option value="">Select component...</option>
+                {% for comp in components %}
+                    <option value="{{ comp.pk }}">{{ comp.get_type_display }} — {{ comp.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Title *</label>
+            <input type="text" name="title" required minlength="10" placeholder="e.g. Fix WiFi disconnects on kernel 6.8+" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+        </div>
+        <div>
+            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Fix commands & instructions *</label>
+            <textarea name="body" rows="8" required placeholder="Include terminal commands, config file changes, and any prerequisites..." class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono"></textarea>
+        </div>
+        <div>
+            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">External URL (optional)</label>
+            <input type="url" name="external_url" placeholder="https://wiki.archlinux.org/..." class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+        </div>
+        <button type="submit" class="w-full bg-primary text-black py-3 rounded-xl font-semibold text-sm hover:bg-accent transition-colors">Submit Fix for Review</button>
+    </form>
+</div>
+{% endblock %}
