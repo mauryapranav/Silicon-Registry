@@ -2,13 +2,14 @@
 registry/admin.py — Silicon Registry
 ======================================
 
-All 17 models registered with @admin.register decorators.
+All models registered with @admin.register decorators.
 Key behaviours:
   - ReportAdmin:         bulk approve action, FK traversal search
   - TrustEventAdmin:     pending penalty rows highlighted in red
   - FlagAdmin:           bulk reviewed / dismissed actions
   - HelpGroupAdmin:      inline membership + message tabs
   - UserAdmin:           trust_ratio read-only, score columns in list
+  - ComponentAdmin:      ComponentSpec inline, has_spec indicator
 """
 
 from django.contrib import admin
@@ -20,6 +21,7 @@ from .models import (
     Comment,
     CompStatus,
     Component,
+    ComponentSpec,
     DriverFix,
     Distro,
     Flag,
@@ -39,16 +41,47 @@ from .models import (
 
 
 # =============================================================================
+# Bulk Actions
+# =============================================================================
+
+@admin.action(description='Approve selected reports')
+def approve_reports(modeladmin, request, queryset):
+    queryset.update(status=Report.ModerationStatus.APPROVED)
+
+
+@admin.action(description='Mark selected flags as Reviewed')
+def mark_reviewed(modeladmin, request, queryset):
+    queryset.update(status=Flag.FlagStatus.REVIEWED)
+
+
+@admin.action(description='Mark selected flags as Dismissed')
+def mark_dismissed(modeladmin, request, queryset):
+    queryset.update(status=Flag.FlagStatus.DISMISSED)
+
+
+@admin.action(description='Accept selected suggestions')
+def accept_suggestions(modeladmin, request, queryset):
+    for suggestion in queryset:
+        spec, created = MachineSpec.objects.get_or_create(machine=suggestion.machine)
+        setattr(spec, suggestion.field_name, suggestion.suggested_value)
+        spec.save()
+        suggestion.status = SpecSuggestion.Status.ACCEPTED
+        suggestion.save()
+
+
+@admin.action(description='Generate slugs for selected items')
+def bulk_generate_slugs(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.slug = None
+        obj.save()
+
+
+# =============================================================================
 # User
 # =============================================================================
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    """
-    Extends Django's built-in UserAdmin.
-    trust_ratio is a computed @property — exposed as read-only field.
-    """
-
     list_display = (
         'username', 'email', 'role_type', 'is_verified',
         'positive_score', 'negative_score', 'display_trust_ratio',
@@ -83,12 +116,15 @@ class MachineSpecInline(admin.StackedInline):
     model = MachineSpec
     extra = 0
 
+
 @admin.register(Machine)
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('vendor', 'series', 'model_name', 'cpu_family')
-    list_filter = ('vendor', 'cpu_family')
+    list_display = ('vendor', 'series', 'model_name', 'cpu_family', 'form_factor', 'slug')
+    list_filter = ('vendor', 'cpu_family', 'form_factor')
     search_fields = ('vendor', 'series', 'model_name', 'cpu_family')
     inlines = [MachineSpecInline]
+    actions = [bulk_generate_slugs]
+    prepopulated_fields = {'slug': ('vendor', 'series', 'model_name')}
 
 
 # =============================================================================
@@ -97,30 +133,50 @@ class MachineAdmin(admin.ModelAdmin):
 
 @admin.register(Distro)
 class DistroAdmin(admin.ModelAdmin):
-    list_display = ('name', 'version', 'kernel_default')
-    list_filter = ('name',)
+    list_display = ('name', 'version', 'kernel_default', 'is_lts', 'is_rolling', 'slug')
+    list_filter = ('name', 'is_lts', 'is_rolling')
     search_fields = ('name', 'version', 'kernel_default')
+    actions = [bulk_generate_slugs]
 
 
 # =============================================================================
 # Component
 # =============================================================================
 
+class ComponentSpecInline(admin.StackedInline):
+    model = ComponentSpec
+    extra = 0
+
+
 @admin.register(Component)
 class ComponentAdmin(admin.ModelAdmin):
-    list_display = ('type', 'name', 'driver')
+    list_display = ('name', 'type', 'driver', 'has_spec', 'slug')
     list_filter = ('type',)
     search_fields = ('name', 'driver')
+    inlines = [ComponentSpecInline]
+    actions = [bulk_generate_slugs]
+
+    @admin.display(description='Has Spec', boolean=True)
+    def has_spec(self, obj):
+        return hasattr(obj, 'spec')
+
+
+# =============================================================================
+# ComponentSpec
+# =============================================================================
+
+@admin.register(ComponentSpec)
+class ComponentSpecAdmin(admin.ModelAdmin):
+    list_display = ('component', 'gpu_vram_gb', 'gpu_architecture', 'wifi_standard',
+                    'storage_interface', 'is_verified')
+    list_filter = ('gpu_architecture', 'wifi_standard', 'storage_interface',
+                   'display_tech', 'is_verified')
+    search_fields = ('component__name',)
 
 
 # =============================================================================
 # Report
 # =============================================================================
-
-@admin.action(description='Approve selected reports')
-def approve_reports(modeladmin, request, queryset):
-    queryset.update(status=Report.ModerationStatus.APPROVED)
-
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
@@ -179,16 +235,6 @@ class VoteAdmin(admin.ModelAdmin):
 # Flag
 # =============================================================================
 
-@admin.action(description='Mark selected flags as Reviewed')
-def mark_reviewed(modeladmin, request, queryset):
-    queryset.update(status=Flag.FlagStatus.REVIEWED)
-
-
-@admin.action(description='Mark selected flags as Dismissed')
-def mark_dismissed(modeladmin, request, queryset):
-    queryset.update(status=Flag.FlagStatus.DISMISSED)
-
-
 @admin.register(Flag)
 class FlagAdmin(admin.ModelAdmin):
     list_display = (
@@ -237,15 +283,10 @@ class DriverFixAdmin(admin.ModelAdmin):
 
 @admin.register(TrustEvent)
 class TrustEventAdmin(admin.ModelAdmin):
-    """
-    Rows where event_type contains PENALTY and mod_penalty_approved=False
-    are highlighted in red — these are pending penalty approvals requiring
-    moderator action before User.negative_score is decremented.
-    """
-
     list_display = (
         'user', 'event_type', 'points_delta',
-        'display_penalty_approved', 'approved_by', 'created_at',
+        'display_penalty_approved', 'display_status_indicator',
+        'approved_by', 'created_at',
     )
     list_filter = ('event_type', 'mod_penalty_approved')
     search_fields = ('user__username', 'approved_by__username', 'notes')
@@ -255,28 +296,6 @@ class TrustEventAdmin(admin.ModelAdmin):
     def display_penalty_approved(self, obj):
         return obj.mod_penalty_approved
 
-    def get_row_css(self, obj, index):
-        """Highlight pending penalty approvals in red."""
-        if 'PENALTY' in obj.event_type and not obj.mod_penalty_approved:
-            return 'background-color: #ffe0e0;'
-        return ''
-
-    class Media:
-        css = {
-            'all': [],
-        }
-
-    def changelist_view(self, request, extra_context=None):
-        """Inject inline CSS to colour pending-penalty rows."""
-        extra_context = extra_context or {}
-        return super().changelist_view(request, extra_context=extra_context)
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        return super().change_view(request, object_id, form_url, extra_context)
-
-    # Django admin does not support per-row CSS natively without a custom
-    # template. The cleanest approach that requires no template override is to
-    # override the row's display inside list_display with coloured HTML output.
     @admin.display(description='Status')
     def display_status_indicator(self, obj):
         if 'PENALTY' in obj.event_type and not obj.mod_penalty_approved:
@@ -328,20 +347,12 @@ class HelpGroupAdmin(admin.ModelAdmin):
     filter_horizontal = ('driver_fixes',)
 
 
-# =============================================================================
-# HelpGroupMembership
-# =============================================================================
-
 @admin.register(HelpGroupMembership)
 class HelpGroupMembershipAdmin(admin.ModelAdmin):
     list_display = ('user', 'group', 'invite_status', 'joined_at')
     list_filter = ('invite_status',)
     search_fields = ('user__username', 'group__title')
 
-
-# =============================================================================
-# HelpGroupMessage
-# =============================================================================
 
 @admin.register(HelpGroupMessage)
 class HelpGroupMessageAdmin(admin.ModelAdmin):
@@ -375,15 +386,6 @@ class MachineSpecAdmin(admin.ModelAdmin):
 # =============================================================================
 # SpecSuggestion
 # =============================================================================
-
-@admin.action(description='Accept selected suggestions')
-def accept_suggestions(modeladmin, request, queryset):
-    for suggestion in queryset:
-        spec, created = MachineSpec.objects.get_or_create(machine=suggestion.machine)
-        setattr(spec, suggestion.field_name, suggestion.suggested_value)
-        spec.save()
-        suggestion.status = SpecSuggestion.Status.ACCEPTED
-        suggestion.save()
 
 @admin.register(SpecSuggestion)
 class SpecSuggestionAdmin(admin.ModelAdmin):

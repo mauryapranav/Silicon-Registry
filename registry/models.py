@@ -32,10 +32,11 @@ Decision 4 — Compatibility Score Field:
 """
 
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import slugify
 
 
 # =============================================================================
@@ -120,6 +121,18 @@ class Machine(models.Model):
         null=True,
         blank=True
     )
+    slug = models.SlugField(max_length=300, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(f"{self.vendor}-{self.series}-{self.model_name}")
+            slug = base_slug
+            counter = 2
+            while Machine.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.vendor} {self.series} {self.model_name}"
@@ -128,6 +141,10 @@ class Machine(models.Model):
         ordering = ['vendor', 'series', 'model_name']
         unique_together = [['vendor', 'series', 'model_name']]
         verbose_name_plural = 'Machines'
+        indexes = [
+            models.Index(fields=['vendor']),
+            models.Index(fields=['form_factor']),
+        ]
 
 
 # =============================================================================
@@ -144,6 +161,25 @@ class Distro(models.Model):
     name = models.CharField(max_length=100)
     version = models.CharField(max_length=50)
     kernel_default = models.CharField(max_length=100, blank=True, null=True)
+    release_date = models.DateField(null=True, blank=True)
+    eol_date = models.DateField(null=True, blank=True, help_text='End of life date')
+    is_rolling = models.BooleanField(default=False, help_text='Rolling release e.g. Arch')
+    is_lts = models.BooleanField(default=False, help_text='Long-term support release')
+    based_on = models.CharField(max_length=50, null=True, blank=True, help_text='e.g. Debian, Arch')
+    desktop_default = models.CharField(max_length=50, null=True, blank=True, help_text='Default DE e.g. GNOME')
+    website_url = models.URLField(null=True, blank=True)
+    slug = models.SlugField(max_length=150, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(f"{self.name}-{self.version}")
+            slug = base_slug
+            counter = 2
+            while Distro.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} {self.version}"
@@ -166,15 +202,35 @@ class Component(models.Model):
     """
 
     class ComponentType(models.TextChoices):
-        WIFI = 'WIFI', 'Wi-Fi'
-        AUDIO = 'AUDIO', 'Audio'
-        GPU = 'GPU', 'GPU'
-        BLUETOOTH = 'BLUETOOTH', 'Bluetooth'
-        INPUT = 'INPUT', 'Input Device'
+        WIFI        = 'WIFI',        'WiFi'
+        AUDIO       = 'AUDIO',       'Audio'
+        GPU         = 'GPU',         'GPU'
+        BLUETOOTH   = 'BLUETOOTH',   'Bluetooth'
+        INPUT       = 'INPUT',       'Input device'
+        STORAGE     = 'STORAGE',     'Storage (SSD/HDD/NVMe)'
+        DISPLAY     = 'DISPLAY',     'Display / Screen'
+        FINGERPRINT = 'FINGERPRINT', 'Fingerprint reader'
+        WEBCAM      = 'WEBCAM',      'Webcam / Camera'
+        THUNDERBOLT = 'THUNDERBOLT', 'Thunderbolt / USB4'
+        ETHERNET    = 'ETHERNET',    'Ethernet / LAN'
+        CELLULAR    = 'CELLULAR',    'Cellular / WWAN / 5G'
+        USB_C       = 'USB_C',       'USB-C / Power delivery'
 
     type = models.CharField(max_length=20, choices=ComponentType.choices)
     name = models.CharField(max_length=200)
     driver = models.CharField(max_length=200, blank=True, null=True)
+    slug = models.SlugField(max_length=300, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(f"{self.get_type_display()}-{self.name}")
+            slug = base_slug
+            counter = 2
+            while Component.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_type_display()} — {self.name}"
@@ -183,6 +239,9 @@ class Component(models.Model):
         ordering = ['type', 'name']
         unique_together = [['type', 'name']]
         verbose_name_plural = 'Components'
+        indexes = [
+            models.Index(fields=['type']),
+        ]
 
 
 # =============================================================================
@@ -287,6 +346,10 @@ class Report(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Generic relations for voting and flagging
+    votes = GenericRelation('Vote', related_query_name='report')
+    flags = GenericRelation('Flag', related_query_name='report')
+
     def clean(self):
         rt = self.report_type
         has_machine = self.machine is not None
@@ -339,6 +402,14 @@ class Report(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = 'Reports'
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['boot_status']),
+            models.Index(fields=['report_type']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['status', 'boot_status']),
+            models.Index(fields=['user', 'status']),
+        ]
 
 
 # =============================================================================
@@ -378,6 +449,10 @@ class CompStatus(models.Model):
         ordering = ['component__type', 'component__name']
         unique_together = [['report', 'component']]
         verbose_name_plural = 'Component Statuses'
+        indexes = [
+            models.Index(fields=['component', 'status']),
+            models.Index(fields=['report', 'component']),
+        ]
 
 
 # =============================================================================
@@ -409,6 +484,10 @@ class Comment(models.Model):
         help_text="Maintainer-verified accuracy badge.",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Generic relations for voting and flagging
+    votes = GenericRelation('Vote', related_query_name='comment')
+    flags = GenericRelation('Flag', related_query_name='comment')
 
     def __str__(self):
         return f"Comment by {self.user} on Report #{self.report.id}"
@@ -676,6 +755,10 @@ class TrustEvent(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = 'Trust Events'
+        indexes = [
+            models.Index(fields=['user', 'event_type']),
+            models.Index(fields=['mod_penalty_approved']),
+        ]
 
 
 # =============================================================================
@@ -1003,3 +1086,118 @@ class SpecSuggestion(models.Model):
 
     def __str__(self):
         return f"Suggestion: {self.field_name} = {self.suggested_value} for {self.machine}"
+
+
+# =============================================================================
+# Model 20 — ComponentSpec (NEW — 1:1 with Component)
+# =============================================================================
+
+class ComponentSpec(models.Model):
+
+    component = models.OneToOneField(
+        'Component', on_delete=models.CASCADE, related_name='spec'
+    )
+
+    # GPU
+    class GPUArchitecture(models.TextChoices):
+        ADA_LOVELACE  = 'ADA_LOVELACE',  'Ada Lovelace (RTX 40xx)'
+        AMPERE        = 'AMPERE',        'Ampere (RTX 30xx)'
+        TURING        = 'TURING',        'Turing (RTX 20xx)'
+        RDNA4         = 'RDNA4',         'RDNA 4 (RX 9xxx)'
+        RDNA3         = 'RDNA3',         'RDNA 3 (RX 7xxx)'
+        RDNA2         = 'RDNA2',         'RDNA 2 (RX 6xxx)'
+        INTEL_XE2     = 'INTEL_XE2',     'Intel Xe2 (Arc Battlemage)'
+        INTEL_XE      = 'INTEL_XE',      'Intel Xe (Arc Alchemist)'
+        APPLE_GPU     = 'APPLE_GPU',     'Apple GPU'
+        INTEGRATED    = 'INTEGRATED',    'Integrated (no dedicated)'
+
+    class GPUMemoryType(models.TextChoices):
+        GDDR7   = 'GDDR7',   'GDDR7'
+        GDDR6X  = 'GDDR6X',  'GDDR6X'
+        GDDR6   = 'GDDR6',   'GDDR6'
+        LPDDR5  = 'LPDDR5',  'LPDDR5 (integrated)'
+        SHARED  = 'SHARED',  'Shared system RAM'
+
+    gpu_vram_gb       = models.IntegerField(null=True, blank=True, help_text='VRAM in GB')
+    gpu_architecture  = models.CharField(max_length=20, choices=GPUArchitecture.choices, null=True, blank=True)
+    gpu_tdp_watts     = models.IntegerField(null=True, blank=True, help_text='TDP in watts')
+    gpu_memory_type   = models.CharField(max_length=10, choices=GPUMemoryType.choices, null=True, blank=True)
+    gpu_generation    = models.CharField(max_length=50, null=True, blank=True, help_text='e.g. RTX 40xx, RX 7xxx')
+    gpu_cuda_cores    = models.IntegerField(null=True, blank=True, help_text='CUDA / Stream processors')
+
+    # WiFi
+    class WiFiStandard(models.TextChoices):
+        WIFI7   = 'WIFI7',   'WiFi 7 (802.11be)'
+        WIFI6E  = 'WIFI6E',  'WiFi 6E (802.11ax 6GHz)'
+        WIFI6   = 'WIFI6',   'WiFi 6 (802.11ax)'
+        WIFI5   = 'WIFI5',   'WiFi 5 (802.11ac)'
+        WIFI4   = 'WIFI4',   'WiFi 4 (802.11n)'
+
+    wifi_standard        = models.CharField(max_length=10, choices=WiFiStandard.choices, null=True, blank=True)
+    wifi_max_speed_mbps  = models.IntegerField(null=True, blank=True, help_text='Max theoretical speed Mbps')
+    wifi_bands           = models.CharField(max_length=40, null=True, blank=True, help_text='e.g. 2.4GHz, 5GHz, 6GHz')
+    wifi_bluetooth_ver   = models.CharField(max_length=10, null=True, blank=True, help_text='Bluetooth version e.g. 5.3')
+
+    # Audio
+    audio_codec          = models.CharField(max_length=50, null=True, blank=True, help_text='e.g. Realtek ALC289')
+    audio_jack_detection = models.BooleanField(null=True, blank=True)
+    audio_hdmi_output    = models.BooleanField(null=True, blank=True)
+    audio_microphone     = models.BooleanField(null=True, blank=True)
+    audio_speakers       = models.BooleanField(null=True, blank=True)
+
+    # Storage
+    class StorageInterface(models.TextChoices):
+        NVME_GEN5 = 'NVME_GEN5', 'NVMe PCIe Gen 5'
+        NVME_GEN4 = 'NVME_GEN4', 'NVMe PCIe Gen 4'
+        NVME_GEN3 = 'NVME_GEN3', 'NVMe PCIe Gen 3'
+        SATA      = 'SATA',      'SATA SSD'
+        EMMC      = 'EMMC',      'eMMC'
+        UFS       = 'UFS',       'UFS'
+
+    storage_interface    = models.CharField(max_length=15, choices=StorageInterface.choices, null=True, blank=True)
+    storage_form_factor  = models.CharField(max_length=20, null=True, blank=True, help_text='e.g. M.2 2280, M.2 2242')
+    storage_capacity_gb  = models.IntegerField(null=True, blank=True)
+    storage_read_mbps    = models.IntegerField(null=True, blank=True, help_text='Sequential read MB/s')
+    storage_write_mbps   = models.IntegerField(null=True, blank=True, help_text='Sequential write MB/s')
+
+    # Display
+    class DisplayTech(models.TextChoices):
+        IPS      = 'IPS',      'IPS'
+        OLED     = 'OLED',     'OLED'
+        AMOLED   = 'AMOLED',   'AMOLED'
+        MINI_LED = 'MINI_LED', 'Mini-LED'
+        TN       = 'TN',       'TN'
+        VA       = 'VA',       'VA'
+
+    display_size_inches  = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    display_resolution   = models.CharField(max_length=20, null=True, blank=True, help_text='e.g. 1920x1200')
+    display_refresh_hz   = models.IntegerField(null=True, blank=True)
+    display_tech         = models.CharField(max_length=10, choices=DisplayTech.choices, null=True, blank=True)
+    display_touch        = models.BooleanField(null=True, blank=True)
+    display_hdr          = models.BooleanField(null=True, blank=True)
+    display_brightness   = models.IntegerField(null=True, blank=True, help_text='Max brightness in nits')
+
+    # Ethernet
+    ethernet_speed_mbps  = models.IntegerField(null=True, blank=True, help_text='e.g. 1000, 2500, 5000')
+    ethernet_chip        = models.CharField(max_length=50, null=True, blank=True, help_text='e.g. Intel I219-V')
+
+    # Thunderbolt / USB-C
+    tb_version           = models.CharField(max_length=5, null=True, blank=True, help_text='e.g. 4, 5, USB4')
+    tb_power_delivery    = models.BooleanField(null=True, blank=True)
+    tb_display_output    = models.BooleanField(null=True, blank=True)
+    tb_data_speed_gbps   = models.IntegerField(null=True, blank=True)
+
+    # Verification
+    is_verified  = models.BooleanField(default=False)
+    verified_by  = models.ForeignKey(
+        'User', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='verified_component_specs'
+    )
+    verified_at  = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name        = 'Component spec'
+        verbose_name_plural = 'Component specs'
+
+    def __str__(self):
+        return f'Spec for {self.component}'

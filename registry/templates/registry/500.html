@@ -1,16 +1,10 @@
 {% extends 'registry/base.html' %}
-{% load static %}
-
-{% block title %}500 - Server Error — Silicon Registry{% endblock %}
-
+{% block title %}500 — Server Error | Silicon Registry{% endblock %}
 {% block content %}
-<div class="sr-hero" style="padding: 120px 0; background: linear-gradient(135deg, #cf222e 0%, #a40e26 100%);">
-  <div class="container text-center">
-    <h1 style="font-size: 80px; font-weight: 800; margin-bottom: 0;">500</h1>
-    <p class="lead" style="font-size: 24px; margin-bottom: 40px;">Something went wrong on our end.</p>
-    <div class="d-flex justify-content-center gap-3">
-      <a href="{% url 'registry:homepage' %}" class="btn btn-light fw-bold px-4">Go home</a>
-    </div>
-  </div>
+<div class="max-w-lg mx-auto px-4 py-32 text-center fade-in">
+    <div class="text-8xl font-black text-zinc-800 mb-4">500</div>
+    <h1 class="text-2xl font-bold mb-2">Something went wrong</h1>
+    <p class="text-zinc-500 mb-8">We're working on fixing this. Please try again later.</p>
+    <a href="{% url 'registry:homepage' %}" class="bg-primary text-black px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-accent transition-colors">Go home</a>
 </div>
 {% endblock %}

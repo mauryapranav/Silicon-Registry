@@ -1,59 +1,42 @@
 {% extends 'registry/mod/base_mod.html' %}
-
 {% block mod_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h3 class="fw-bold mb-0">Spec Suggestions</h3>
-</div>
+<h1 class="text-2xl font-black tracking-tight mb-8">Spec Suggestions</h1>
 
-<div class="sr-card">
-  <div class="table-responsive">
-    <table class="table align-middle mb-0">
-      <thead class="bg-light">
-        <tr>
-          <th>Machine</th>
-          <th>Suggestion</th>
-          <th>Source</th>
-          <th>User / Date</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for suggestion in suggestions %}
-        <tr>
-          <td>
-            <a href="{% url 'registry:machine_detail' suggestion.machine.pk %}" class="fw-bold text-dark text-decoration-none d-block">{{ suggestion.machine.vendor }} {{ suggestion.machine.model_name }}</a>
-          </td>
-          <td>
-            <div class="small text-muted mb-1">{{ suggestion.field_name }}</div>
-            <div class="fw-bold">{{ suggestion.suggested_value }}</div>
-          </td>
-          <td>
-            {% if suggestion.source_url %}
-              <a href="{{ suggestion.source_url }}" target="_blank" class="small text-decoration-none">View Source</a>
-            {% else %}
-              <span class="text-muted small">-</span>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{% url 'registry:user_profile' suggestion.suggested_by.username %}" class="small text-muted text-decoration-none d-block">{{ suggestion.suggested_by.username }}</a>
-            <span class="small text-muted">{{ suggestion.created_at|date:"M d, Y" }}</span>
-          </td>
-          <td class="text-end">
-            <form method="POST" action="{% url 'registry:mod_specs' %}" class="d-flex justify-content-end gap-2">
-              {% csrf_token %}
-              <input type="hidden" name="suggestion_id" value="{{ suggestion.pk }}">
-              <button type="submit" name="action" value="accept" class="btn btn-sm btn-success fw-bold">Accept</button>
-              <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger fw-bold">Reject</button>
-            </form>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5" class="text-center py-4 text-muted">No pending spec suggestions.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="space-y-4">
+  {% for s in suggestions %}
+  <div class="card-surface p-5 rounded-2xl flex items-start justify-between gap-4">
+    <div>
+      <div class="text-sm font-semibold">{{ s.machine }} — <span class="text-primary">{{ s.field_name }}</span></div>
+      <div class="text-sm text-zinc-500 mt-1.5">
+        Suggested: <span class="font-mono text-zinc-300 px-1.5 py-0.5 rounded" style="background:#0d0d0d;">{{ s.suggested_value }}</span>
+      </div>
+      <div class="text-[11px] text-zinc-700 mt-2">
+        by <span class="text-zinc-500 font-semibold">{{ s.suggested_by.username }}</span>
+        {% if s.source_url %} ·
+          <a href="{{ s.source_url }}" class="text-primary hover:underline" target="_blank">source</a>
+        {% endif %}
+      </div>
+    </div>
+    <form method="POST" class="flex gap-2 shrink-0">
+      {% csrf_token %}
+      <input type="hidden" name="suggestion_id" value="{{ s.pk }}">
+      <button name="action" value="accept"
+        class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+        style="background:rgba(57,211,83,0.08);color:#39d353;border:1px solid rgba(57,211,83,0.2);"
+        onmouseenter="this.style.background='rgba(57,211,83,0.16)'"
+        onmouseleave="this.style.background='rgba(57,211,83,0.08)'">Accept</button>
+      <button name="action" value="reject"
+        class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+        style="background:rgba(239,68,68,0.08);color:#ef4444;border:1px solid rgba(239,68,68,0.2);"
+        onmouseenter="this.style.background='rgba(239,68,68,0.16)'"
+        onmouseleave="this.style.background='rgba(239,68,68,0.08)'">Reject</button>
+    </form>
   </div>
+  {% empty %}
+  <div class="text-center py-20 card-surface rounded-2xl">
+    <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-4" style="color:rgba(57,211,83,0.3);"></i>
+    <p class="text-zinc-600 text-sm">No pending spec suggestions.</p>
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}

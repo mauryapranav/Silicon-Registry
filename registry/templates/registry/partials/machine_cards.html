@@ -1,55 +1,26 @@
 {% for machine in machines %}
-<div class="col-md-4 mb-4">
-  <div class="sr-card h-100 position-relative">
-    <h6 class="fw-bold mb-2">{{ machine.vendor }} {{ machine.model_name }}</h6>
-    <div class="d-flex flex-wrap gap-1 mb-3">
-      {% if machine.form_factor %}
-        <span class="badge bg-light text-dark border mono">{{ machine.get_form_factor_display }}</span>
-      {% endif %}
-      <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ machine.report_count }} reports</span>
-      {% if machine.gold_count > 0 %}
-        <span class="badge bg-success-subtle text-success border border-success-subtle">{{ machine.gold_count }} Gold</span>
-      {% endif %}
+<a href="{% url 'registry:machine_detail' machine.slug %}" class="group fade-in" style="animation-delay:{{ forloop.counter }}0ms">
+    <div class="card-surface p-5 rounded-2xl group-hover:border-primary/20 transition-all flex flex-col h-full">
+        <div class="flex justify-between items-start mb-3">
+            <span class="text-xs font-medium text-primary">{{ machine.vendor }}</span>
+            {% if machine.form_factor %}
+            <span class="text-[10px] font-medium bg-zinc-800 px-2 py-0.5 rounded text-zinc-400">{{ machine.get_form_factor_display }}</span>
+            {% endif %}
+        </div>
+        <h3 class="text-base font-bold mb-1 group-hover:text-primary transition-colors">{{ machine.model_name }}</h3>
+        {% if machine.spec.cpu_name %}
+        <p class="text-xs text-zinc-500 mb-3">{{ machine.spec.cpu_name }}</p>
+        {% endif %}
+        <div class="mt-auto flex items-center justify-between text-xs text-zinc-500 pt-3 border-t border-white/5">
+            <span>{{ machine.report_count }} reports</span>
+            {% if machine.gold_count > 0 %}
+            <span class="text-yellow-500 font-medium">{{ machine.gold_count }} Gold</span>
+            {% endif %}
+        </div>
     </div>
-
-    <div class="mb-3">
-      {% if machine.spec.cpu_name %}
-        <div class="mono text-muted small">{{ machine.spec.cpu_name }}</div>
-      {% endif %}
-      {% if machine.spec.ram_base_gb %}
-        <div class="text-muted small">{{ machine.spec.ram_base_gb }}GB RAM</div>
-      {% endif %}
-    </div>
-
-    <div class="mt-auto pt-2 border-top">
-      {% if machine.report_count == 0 %}
-        <span class="text-muted small">No reports yet</span>
-      {% elif machine.gold_count == machine.report_count %}
-        <span class="badge badge-gold">Gold</span>
-      {% elif machine.gold_count > 0 %}
-        <span class="badge badge-silver">Mixed</span>
-      {% else %}
-        <span class="badge badge-broken">Issues</span>
-      {% endif %}
-    </div>
-    <a href="{% url 'registry:machine_detail' machine.pk %}" class="stretched-link"></a>
-  </div>
-</div>
+</a>
 {% empty %}
-<div class="col-12 text-center py-5 text-muted">
-  No machines found matching your filters.
+<div class="col-span-full text-center py-16 card-surface rounded-2xl">
+    <p class="text-zinc-500 text-sm">No machines found.</p>
 </div>
 {% endfor %}
-
-{% if machines.has_next %}
-<div class="col-12 text-center mt-4">
-  <button hx-get="{% url 'registry:machine_list' %}?page={{ machines.next_page_number }}&q={{ q }}&form_factor={{ form_factor }}&cpu_manufacturer={{ cpu_mfr }}&cpu_series_tier={{ cpu_tier }}&distro={{ distro_id }}&sort={{ sort }}"
-          hx-target="#machine-grid"
-          hx-swap="beforeend"
-          hx-indicator="#load-more-spinner"
-          class="btn btn-outline-secondary">
-    Load more
-    <span id="load-more-spinner" class="htmx-indicator spinner-border spinner-border-sm ms-2"></span>
-  </button>
-</div>
-{% endif %}

@@ -1,8 +1,12 @@
 {% extends 'registry/base.html' %}
-{% block title %}Add Machine - Silicon Registry{% endblock %}
+{% block title %}Add Machine | Silicon Registry{% endblock %}
 {% block content %}
-<div class="container py-5">
-    <h1>Add Machine</h1>
-    <p>Coming soon</p>
+<div class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-20">
+    <h1 class="text-2xl font-bold tracking-tight mb-6 fade-in">Add a Machine</h1>
+    <div class="card-surface p-8 rounded-2xl text-center fade-in" style="animation-delay:0.1s">
+        <i data-lucide="laptop" class="w-12 h-12 text-zinc-700 mx-auto mb-4"></i>
+        <p class="text-zinc-400 mb-4">Machine submission is handled through reports. Submit a report for a new machine and it will be added automatically.</p>
+        <a href="{% url 'registry:report_submit' %}" class="bg-primary text-black px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-accent transition-colors inline-block">Submit a Report</a>
+    </div>
 </div>
 {% endblock %}

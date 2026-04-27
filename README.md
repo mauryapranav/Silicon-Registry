@@ -2,108 +2,90 @@
 
 **Crowdsourced Linux hardware compatibility database**
 
-Silicon Registry is a community-driven platform for tracking, reporting, and improving Linux hardware compatibility across laptops, desktops, mini PCs, and individual components. Our goal is to provide a reliable, transparent, and up-to-date registry that helps users find the best hardware for their Linux experience.
+Silicon Registry is a community-driven platform for tracking, reporting, and improving Linux hardware compatibility across laptops, desktops, mini PCs, and individual components. The goal is a reliable, transparent, and up-to-date registry that helps users find the best hardware for their Linux experience.
+
+> 🌐 **Live at** [silicon-registry.up.railway.app](https://silicon-registry.up.railway.app) *(or your deployed URL)*
 
 ---
 
-## 🚀 Key Features
+## ✨ Features
 
-- **Hardware Compatibility Reports**: Detailed community reports with tiered boot status (Gold, Silver, Bronze, Broken).
-- **Machine Registry**: A growing database of hardware models, including laptops, desktops, and handhelds.
-- **Detailed Technical Specs**: Comprehensive machine specifications, from CPU/GPU details to battery capacity and panel types.
-- **Component-Level Tracking**: Per-component status tracking for Wi-Fi, Audio, GPU, Bluetooth, and Input devices.
-- **Community Driver Fixes**: A central place for users to share and find workarounds, kernel parameters, and driver installation guides.
-- **Reputation-based Trust System**: A moderation layer powered by user contributions, ensuring high-quality, verified data.
-- **Spec Suggestions**: Crowdsourced updates to hardware specifications with proof-based verification.
-- **Interactive HTMX UI**: A modern, fast, and responsive user interface powered by HTMX partials.
-- **REST API**: Read-only JSON API for accessing machine, report, component, and distro data.
+| Feature | Description |
+|---------|-------------|
+| **Compatibility Reports** | Tiered boot status — Gold, Silver, Bronze, Broken |
+| **Machine Registry** | Growing database of laptops, desktops, mini PCs |
+| **Hardware Specs** | CPU, GPU, RAM, storage, display, battery per device |
+| **Component Tracking** | Per-component status: Wi-Fi, Audio, GPU, Bluetooth |
+| **Driver Fix Library** | Community workarounds, kernel params, driver guides |
+| **Trust System** | Reputation-based moderation with audit-trailed scoring |
+| **Spec Suggestions** | Crowdsourced spec updates with proof-based verification |
+| **Fuzzy Search** | Typo-tolerant search with "did you mean" suggestions |
+| **HTMX UI** | Fast, partial-reload interface without a JS framework |
+| **REST API** | Read-only JSON API for machines, reports, components, distros |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python 3.12+, [Django](https://www.djangoproject.com/), [Django REST Framework](https://www.django-rest-framework.org/)
-- **Frontend**: HTML5, [Vanilla CSS](https://developer.mozilla.org/en-US/docs/Web/CSS), [HTMX](https://htmx.org/)
-- **Database**: [MySQL](https://www.mysql.com/) (with utf8mb4 support)
-- **Auth**: [django-allauth](https://django-allauth.readthedocs.io/en/latest/) (GitHub OAuth support)
-- **Styling**: [Bootstrap 5](https://getbootstrap.com/) (base) + Custom Silicon CSS
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.12, Django 5, Django REST Framework |
+| Frontend | HTML5, Tailwind CSS (CDN), HTMX, Lucide Icons |
+| Database | MySQL (utf8mb4) |
+| Auth | django-allauth (GitHub OAuth) |
+| Deployment | Railway / PaaS |
 
 ---
 
-## 📦 Installation & Setup
+## 🏗️ Architecture
 
-### Prerequisites
-- Python 3.12 or higher
-- MySQL Server
-- `virtualenv` or `venv`
+### Data Model
+- **Single unified `Report` model** with nullable FKs across machines, components, and distros — keeps votes/comments centralized and reduces join complexity.
+- **`TrustEvent` audit log** — every trust score change is explicitly recorded; penalties require moderator approval before affecting a user's score.
+- **Generic interactions** — voting and flagging use Django's `ContentTypes` framework, making them work across any future entity.
 
-### Getting Started
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/silicon-registry.git
-   cd silicon-registry
-   ```
-
-2. **Set up a virtual environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install django django-allauth djangorestframework mysqlclient pillow requests
-   ```
-   *(Note: Ensure you have the necessary MySQL development headers installed on your system for `mysqlclient`.)*
-
-4. **Configure Database**:
-   Create a MySQL database named `silicon_registry` and update the `DATABASES` setting in `silicon_registry/settings.py` with your credentials.
-
-5. **Run Migrations**:
-   ```bash
-   python manage.py migrate
-   ```
-
-6. **Create a Superuser**:
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-7. **Run the Development Server**:
-   ```bash
-   python manage.py runserver
-   ```
-
-8. **Access the Registry**:
-   Visit `http://127.0.0.1:8000/` in your browser.
-
----
-
-## 🏗️ Architecture Decisions
-
-The project follows several key architectural decisions to ensure scalability and maintainability:
-
-1. **Single Flexible Report Table**: Instead of separate tables for different report types (Machine, Component, Distro), a single unified `Report` model is used with nullable foreign keys. This reduces join complexity and keeps community interactions (votes, comments) centralized.
-2. **Audit-trailed Trust System**: Every trust score change is logged in a `TrustEvent` table, ensuring transparency. Penalties for rejected reports require explicit moderator approval before affecting a user's score.
-3. **Generic Interactions**: Voting and flagging systems utilize Django's `GenericForeignKey` (ContentTypes), allowing them to work seamlessly across reports, comments, and other future entities.
+### Pages & Routing
+```
+/                     → Homepage — hero, stats, top hardware
+/machines/            → Browse all machines with filters
+/machines/<slug>/     → Machine detail — specs, component matrix, reports
+/components/<slug>/   → Component detail — driver info, compatibility arc
+/reports/<id>/        → Report detail — component results, comments, votes
+/search/              → Fuzzy search across machines, components, reports
+/leaderboard/         → Contributors ranked by trust score
+/profile/<username>/  → User profile — stats, reports, fixes
+/mod/                 → Moderator dashboard — pending queue management
+/api/                 → REST API (read-only)
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions of all kinds! Whether you're reporting a bug, suggesting a feature, or submitting a driver fix, your help makes the registry better for everyone.
+Community contributions keep the registry accurate and growing:
 
-- **Submit Reports**: Share your hardware experience by submitting compatibility reports.
-- **Verify Specs**: Suggest updates to machine specifications to keep the database accurate.
-- **Code Contributions**: Pull requests are welcome for new features, bug fixes, or UI improvements.
+- **Submit Reports** — share your hardware + Linux distro experience
+- **Verify Specs** — suggest spec updates with manufacturer sources
+- **Driver Fixes** — post kernel parameters, modprobe configs, workarounds
+- **Code** — PRs welcome for new features, bug fixes, or design improvements
+
+---
+
+## 📊 Rating System
+
+| Rating | Meaning |
+|--------|---------|
+| 🥇 **Gold** | Everything works out of the box |
+| 🥈 **Silver** | Most things work, minor issues only |
+| 🥉 **Bronze** | Usable with significant workarounds |
+| 💔 **Broken** | Does not boot or is entirely unusable |
 
 ---
 
 ## ⚖️ License
 
-This project is currently licensed under the [MIT License](LICENSE) (or your preferred license).
+MIT License — see [LICENSE](LICENSE).
 
 ---
 
-*“Helping you find the silicon that speaks Linux.”*
+*"Helping you find the silicon that speaks Linux."*

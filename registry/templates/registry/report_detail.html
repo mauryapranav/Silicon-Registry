@@ -1,140 +1,93 @@
 {% extends 'registry/base.html' %}
-{% load static %}
 
-{% block title %}{{ report.title }} — Silicon Registry{% endblock %}
+{% block title %}{{ report.title }} | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb mb-4">
-      <li class="breadcrumb-item"><a href="{% url 'registry:homepage' %}">Home</a></li>
-      {% if report.machine %}
-        <li class="breadcrumb-item"><a href="{% url 'registry:machine_detail' report.machine.pk %}">{{ report.machine.vendor }} {{ report.machine.model_name }}</a></li>
-      {% endif %}
-      <li class="breadcrumb-item active">{{ report.title }}</li>
-    </ol>
-  </nav>
+<div class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-24">
 
-  <div class="d-flex justify-content-between align-items-start mb-4">
-    <div>
-      <h1 class="fw-bold mb-1">{{ report.title }}</h1>
-      <div class="d-flex gap-2">
-        <span class="badge {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %} py-2 px-3">
-          {{ report.get_boot_status_display }}
-        </span>
-        <span class="badge bg-light text-dark border mono py-2 px-3">{{ report.get_report_type_display }}</span>
-      </div>
-    </div>
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 mb-8 text-sm text-zinc-600 fade-in">
+    <a href="{% url 'registry:homepage' %}" class="hover:text-white transition-colors">Home</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
+    <a href="{% url 'registry:machine_detail' report.machine.slug %}" class="hover:text-white transition-colors">{{ report.machine.model_name }}</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
+    <span class="text-zinc-400">Report #{{ report.id }}</span>
   </div>
 
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <div class="sr-card mb-4">
-        <div class="row g-3 mb-3 pb-3 border-bottom">
-          <div class="col-md-6">
-            <small class="text-muted d-block mb-1">Submitted by</small>
-            <div class="d-flex align-items-center">
-              {% if report.user.avatar %}
-                <img src="{{ report.user.avatar.url }}" width="24" height="24" class="rounded-circle me-2">
-              {% endif %}
-              <a href="{% url 'registry:user_profile' report.user.username %}" class="fw-bold text-dark text-decoration-none">{{ report.user.username }}</a>
-              <small class="text-muted ms-2">• {{ report.created_at|date:"M d, Y" }}</small>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <small class="text-muted d-block mb-1">Testing Environment</small>
-            <div class="mono small">{{ report.distro.name }} {{ report.distro.version }}</div>
-            {% if report.kernel_version %}
-              <div class="mono small text-muted">Kernel: {{ report.kernel_version }}</div>
-            {% endif %}
-          </div>
-        </div>
+  <div class="grid lg:grid-cols-12 gap-8">
 
-        <div class="report-description mb-4">
-          <h6 class="fw-bold mb-2">Description</h6>
-          <p style="white-space: pre-wrap;">{{ report.description }}</p>
-        </div>
-
-        {% if comp_statuses %}
-        <h6 class="fw-bold mb-3">Component Status</h6>
-        <div class="table-responsive">
-          <table class="table table-sm align-middle">
-            <thead class="bg-light">
-              <tr>
-                <th>Component</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for cs in comp_statuses %}
-              <tr>
-                <td class="fw-medium">{{ cs.component.name }}</td>
-                <td><span class="text-muted small text-uppercase">{{ cs.component.get_type_display }}</span></td>
-                <td>
-                  <span class="{% if cs.status == 'WORKING' %}comp-working{% elif cs.status == 'ISSUES' %}comp-issues{% else %}comp-broken{% endif %}">
-                    {{ cs.get_status_display }}
-                  </span>
-                </td>
-                <td class="small">{{ cs.notes|default:"-" }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- Benchmarks -->
-      {% if benchmarks %}
-      <div class="sr-card mb-4">
-        <h6 class="fw-bold mb-3">Benchmarks</h6>
-        <div class="row g-3">
-          {% for b in benchmarks %}
-          <div class="col-md-4">
-            <div class="p-3 bg-light rounded border">
-              <small class="text-muted d-block mb-1">Battery Life</small>
-              <div class="h5 mb-0 fw-bold">{{ b.battery_life_hours|default:"-" }} hrs</div>
-            </div>
+    <!-- ── Main content ──────────────────────── -->
+    <div class="lg:col-span-8 space-y-6 fade-in" style="animation-delay:0.08s">
+      <div class="card-surface rounded-2xl relative overflow-hidden">
+        <div class="accent-bar"></div>
+        <div class="p-8 sm:p-10">
+          <div class="flex items-center gap-2.5 mb-6 flex-wrap">
+            <span class="badge-primary text-[11px] px-2.5 py-1 rounded-full font-bold">{{ report.get_report_type_display }}</span>
+            <span class="text-[11px] px-2.5 py-1 rounded-full font-bold
+              {% if report.boot_status == 'GOLD' %}badge-gold
+              {% elif report.boot_status == 'SILVER' %}badge-silver
+              {% elif report.boot_status == 'BRONZE' %}badge-bronze
+              {% else %}badge-broken{% endif %}">
+              {{ report.get_boot_status_display|default:"N/A" }}
+            </span>
+            <span class="text-xs text-zinc-700">{{ report.created_at|date:"M d, Y · H:i" }}</span>
           </div>
-          <div class="col-md-4">
-            <div class="p-3 bg-light rounded border">
-              <small class="text-muted d-block mb-1">Suspend/Resume</small>
-              <div class="h5 mb-0">
-                {% if b.suspend_resume_pass %}
-                  <span class="badge bg-success">Pass</span>
-                  <small class="text-muted ms-1">({{ b.suspend_resume_seconds }}s)</small>
-                {% else %}
-                  <span class="badge bg-danger">Fail</span>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="p-3 bg-light rounded border">
-              <small class="text-muted d-block mb-1">Performance</small>
-              <div class="small mono">CPU: {{ b.cpu_score|default:"-" }}</div>
-              <div class="small mono">GPU: {{ b.gpu_score|default:"-" }}</div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
 
-      <!-- Attachments -->
-      {% if attachments %}
-      <div class="sr-card mb-4">
-        <h6 class="fw-bold mb-3">Attachments</h6>
-        <div class="list-group list-group-flush">
-          {% for a in attachments %}
-          <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight mb-6">{{ report.title }}</h1>
+          <div class="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{{ report.description }}</div>
+
+          <!-- Tech details grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-10 pt-8" style="border-top:1px solid rgba(255,255,255,0.05);">
             <div>
-              <span class="badge bg-light text-dark border mono me-2">{{ a.get_file_type_display }}</span>
-              <span class="small">{{ a.original_filename }}</span>
+              <div class="text-[10px] text-zinc-700 uppercase tracking-widest font-semibold mb-1.5">Machine</div>
+              <a href="{% url 'registry:machine_detail' report.machine.slug %}"
+                 class="text-sm font-semibold hover:text-primary transition-colors">
+                {{ report.machine.vendor }} {{ report.machine.model_name }}
+              </a>
             </div>
-            <a href="{{ a.file.url }}" class="btn btn-sm btn-link" download>Download</a>
+            <div>
+              <div class="text-[10px] text-zinc-700 uppercase tracking-widest font-semibold mb-1.5">Distribution</div>
+              <a href="{% url 'registry:distro_detail' report.distro.slug %}"
+                 class="text-sm font-semibold hover:text-primary transition-colors">
+                {{ report.distro.name }} {{ report.distro.version }}
+              </a>
+            </div>
+            <div>
+              <div class="text-[10px] text-zinc-700 uppercase tracking-widest font-semibold mb-1.5">Kernel</div>
+              <div class="text-sm font-mono font-semibold">{{ report.kernel_version|default:"Default" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Results -->
+      {% if comp_statuses %}
+      <div class="card-surface p-6 rounded-2xl">
+        <h2 class="text-base font-bold mb-5">Component Results</h2>
+        <div class="space-y-3">
+          {% for cs in comp_statuses %}
+          <div class="flex items-start gap-4 p-4 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+            <div class="w-2.5 h-2.5 rounded-full mt-2 shrink-0
+              {% if cs.status == 'WORKING' %}bg-primary
+              {% elif cs.status == 'ISSUES' %}bg-yellow-500
+              {% else %}bg-red-500{% endif %}">
+            </div>
+            <div class="flex-grow">
+              <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'registry:component_detail' cs.component.slug %}"
+                   class="text-sm font-semibold hover:text-primary transition-colors">{{ cs.component.name }}</a>
+                <span class="text-[10px] text-zinc-700 uppercase tracking-wide">{{ cs.component.get_type_display }}</span>
+              </div>
+              {% if cs.notes %}
+              <p class="text-xs text-zinc-500 leading-relaxed">{{ cs.notes }}</p>
+              {% endif %}
+            </div>
+            <span class="text-[10px] font-bold shrink-0 px-2.5 py-1 rounded-full
+              {% if cs.status == 'WORKING' %}badge-working
+              {% elif cs.status == 'ISSUES' %}badge-issues
+              {% else %}badge-broken{% endif %}">
+              {{ cs.get_status_display }}
+            </span>
           </div>
           {% endfor %}
         </div>
@@ -142,79 +95,115 @@
       {% endif %}
 
       <!-- Comments -->
-      <div class="mt-5">
-        <h5 class="fw-bold mb-4">Comments ({{ comment_count }})</h5>
-        <div id="comment-list" class="mb-4">
-          {% for comment in comments %}
-          <div class="d-flex mb-4">
-            <div class="flex-shrink-0">
-              {% if comment.user.avatar %}
-                <img src="{{ comment.user.avatar.url }}" width="40" height="40" class="rounded-circle">
-              {% else %}
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px">
-                  {{ comment.user.username|slice:":1"|upper }}
-                </div>
-              {% endif %}
-            </div>
-            <div class="ms-3 flex-grow-1">
-              <div class="d-flex align-items-center mb-1">
-                <a href="{% url 'registry:user_profile' comment.user.username %}" class="fw-bold text-dark text-decoration-none me-2">{{ comment.user.username }}</a>
-                {% if comment.is_verified %}
-                  <span class="badge bg-info-subtle text-info border border-info-subtle me-2" style="font-size:10px">Verified</span>
-                {% endif %}
-                <small class="text-muted">{{ comment.created_at|date:"M d, Y" }}</small>
-              </div>
-              <p class="mb-0 text-muted">{{ comment.content }}</p>
-            </div>
+      <div class="space-y-4">
+        <h2 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="message-circle" class="w-4 h-4 text-zinc-600"></i>
+          Comments ({{ comment_count }})
+        </h2>
+
+        {% for comment in comments %}
+        <div class="card-surface p-5 rounded-2xl flex gap-4">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 overflow-hidden"
+               style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);">
+            {% if comment.user.avatar %}
+              <img src="{{ comment.user.avatar.url }}" class="w-full h-full object-cover rounded-full">
+            {% else %}
+              <span class="text-xs font-bold text-zinc-500">{{ comment.user.username|make_list|first|upper }}</span>
+            {% endif %}
           </div>
-          {% empty %}
-          <p class="text-muted py-3">No comments yet.</p>
-          {% endfor %}
+          <div class="flex-grow">
+            <div class="flex items-center gap-2 mb-1.5">
+              <a href="{% url 'registry:user_profile' comment.user.username %}"
+                 class="text-sm font-semibold hover:text-primary transition-colors">{{ comment.user.username }}</a>
+              {% if comment.is_verified %}
+              <i data-lucide="badge-check" class="w-3.5 h-3.5 text-primary"></i>
+              {% endif %}
+              <span class="text-xs text-zinc-700">{{ comment.created_at|timesince }} ago</span>
+            </div>
+            <p class="text-sm text-zinc-300 leading-relaxed">{{ comment.content }}</p>
+          </div>
         </div>
+        {% empty %}
+        <div class="text-center py-12 card-surface rounded-2xl">
+          <p class="text-zinc-700 text-sm">No comments yet. Be the first to share your thoughts.</p>
+        </div>
+        {% endfor %}
 
         {% if user.is_authenticated %}
-          <div id="comment-form-container" class="sr-card">
-            <h6 class="fw-bold mb-3">Leave a comment</h6>
-            {% include 'registry/partials/comment_form.html' %}
+        <form action="{% url 'registry:add_comment' report.pk %}" method="POST" class="mt-2">
+          {% csrf_token %}
+          <div class="card-surface rounded-2xl p-1.5 flex items-center gap-2 focus-within:border-primary/30 transition-all">
+            <textarea name="content" rows="1"
+                      placeholder="Add a comment…"
+                      class="bg-transparent border-none focus:ring-0 text-sm w-full px-4 py-2.5 placeholder:text-zinc-700 resize-none"></textarea>
+            <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-sm shrink-0">Post</button>
           </div>
-        {% else %}
-          <div class="text-center py-4 bg-light rounded border">
-            <p class="text-muted mb-0">Please <a href="{% url 'account_login' %}">login</a> to leave a comment.</p>
-          </div>
+        </form>
         {% endif %}
-      </div>
-
-      <div class="text-end mt-4 pt-4 border-top">
-        <button class="btn btn-sm btn-outline-secondary" hx-post="{% url 'registry:flag_report' report.pk %}" hx-confirm="Are you sure you want to report this?">Report a problem</button>
       </div>
     </div>
 
-    <div class="col-lg-4">
-      {% if report.machine %}
-      <div class="sr-card mb-4">
-        <h6 class="fw-bold mb-3">Machine Details</h6>
-        <div class="mb-3">
-          <a href="{% url 'registry:machine_detail' report.machine.pk %}" class="text-decoration-none text-dark fw-bold h6 d-block mb-1">
-            {{ report.machine.vendor }} {{ report.machine.model_name }}
-          </a>
-          <small class="text-muted">{{ report.machine.series }}</small>
+    <!-- ── Sidebar ──────────────────────────── -->
+    <div class="lg:col-span-4 space-y-5 fade-in" style="animation-delay:0.18s">
+
+      <!-- Author + voting -->
+      <div class="card-surface p-6 rounded-2xl text-center space-y-5 relative overflow-hidden">
+        <div class="accent-bar"></div>
+        <div class="text-[10px] text-zinc-700 uppercase tracking-widest font-semibold pt-2">Author</div>
+        <a href="{% url 'registry:user_profile' report.user.username %}" class="group block">
+          <div class="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden mx-auto mb-3"
+               style="background:#1a1a1a;border:2px solid rgba(57,211,83,0.2);box-shadow:0 0 20px rgba(57,211,83,0.08);">
+            {% if report.user.avatar %}
+              <img src="{{ report.user.avatar.url }}" class="w-full h-full object-cover">
+            {% else %}
+              <span class="text-xl font-black text-zinc-500">{{ report.user.username|make_list|first|upper }}</span>
+            {% endif %}
+          </div>
+          <div class="text-base font-bold group-hover:text-primary transition-colors">{{ report.user.username }}</div>
+          <div class="text-xs text-primary font-semibold mt-0.5">Trust {{ report.user.trust_ratio }}%</div>
+        </a>
+        <div class="flex justify-center gap-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.05);">
+          {% include 'registry/partials/vote_buttons.html' with model='report' pk=report.pk upvotes=upvotes downvotes=downvotes user_vote=user_vote %}
         </div>
-        {% if report.machine.spec %}
-          <div class="small text-muted mb-1">{{ report.machine.spec.cpu_name }}</div>
-          <div class="small text-muted">{{ report.machine.spec.gpu_name }}</div>
-        {% endif %}
+      </div>
+
+      <!-- Flag -->
+      {% if user.is_authenticated %}
+      <div class="card-surface p-4 rounded-2xl">
+        <button hx-get="{% url 'registry:flag_report' report.pk %}"
+                hx-target="#flag-area" hx-swap="innerHTML"
+                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl btn-ghost text-sm">
+          <i data-lucide="flag" class="w-4 h-4"></i> Flag report
+        </button>
+        <div id="flag-area"></div>
       </div>
       {% endif %}
 
-      <div class="sr-card bg-light border-0">
-        <h6 class="fw-bold mb-2">Helpful?</h6>
-        <p class="small text-muted">Upvote if this report helped you make a decision.</p>
-        <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-success flex-grow-1">Upvote</button>
-          <button class="btn btn-sm btn-outline-danger flex-grow-1">Downvote</button>
+      <!-- Attachments -->
+      {% if attachments %}
+      <div class="card-surface p-5 rounded-2xl">
+        <h3 class="tbl-head mb-4 flex items-center gap-2">
+          <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Attachments
+        </h3>
+        <div class="space-y-2">
+          {% for file in attachments %}
+          <a href="{{ file.file.url }}"
+             class="flex items-center justify-between p-3 rounded-xl transition-all group"
+             style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);"
+             onmouseenter="this.style.background='rgba(57,211,83,0.04)'"
+             onmouseleave="this.style.background='rgba(255,255,255,0.03)'">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="file-text" class="w-4 h-4 text-zinc-600"></i>
+              <span class="text-sm truncate max-w-[160px]">{{ file.original_filename }}</span>
+            </div>
+            <i data-lucide="download" class="w-3.5 h-3.5 text-zinc-700 group-hover:text-primary transition-colors"></i>
+          </a>
+          {% endfor %}
         </div>
       </div>
+      {% endif %}
     </div>
+
   </div>
 </div>
 {% endblock %}

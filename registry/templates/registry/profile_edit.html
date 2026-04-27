@@ -1,35 +1,24 @@
 {% extends 'registry/base.html' %}
-{% load static %}
-
-{% block title %}Edit Profile — Silicon Registry{% endblock %}
-
+{% block title %}Edit Profile | Silicon Registry{% endblock %}
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="sr-card shadow-sm">
-        <h2 class="fw-bold mb-4">Edit Profile</h2>
-        <form method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          {% for field in form %}
-            <div class="mb-3">
-              <label for="{{ field.id_for_label }}" class="form-label small fw-bold">{{ field.label }}</label>
-              {{ field }}
-              {% if field.help_text %}
-                <div class="form-text small">{{ field.help_text|safe }}</div>
-              {% endif %}
-              {% for error in field.errors %}
-                <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
-            </div>
-          {% endfor %}
-          <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary px-4 fw-bold">Save Changes</button>
-            <a href="{% url 'registry:user_profile' user.username %}" class="btn btn-outline-secondary px-4">Cancel</a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+<div class="max-w-lg mx-auto px-4 sm:px-6 pt-8 pb-20">
+    <h1 class="text-2xl font-bold tracking-tight mb-6 fade-in">Edit Profile</h1>
+    <form method="POST" enctype="multipart/form-data" class="card-surface p-8 rounded-2xl space-y-5 fade-in" style="animation-delay:0.1s">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}" class="text-sm font-medium text-zinc-400 mb-1.5 block">{{ field.label }}</label>
+            {% if field.field.widget.input_type == 'file' %}
+                <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+            {% elif field.field.widget.input_type == 'textarea' or field.name == 'bio' %}
+                <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="4" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">{{ field.value|default:"" }}</textarea>
+            {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" {% if field.value %}value="{{ field.value }}"{% endif %} class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+            {% endif %}
+            {% if field.errors %}<p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="w-full bg-primary text-black py-3 rounded-xl font-semibold text-sm hover:bg-accent transition-colors">Save Changes</button>
+    </form>
 </div>
 {% endblock %}

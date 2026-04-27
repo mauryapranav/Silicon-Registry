@@ -1,208 +1,271 @@
 {% extends 'registry/base.html' %}
-{% load static %}
 
-{% block title %}{{ machine.vendor }} {{ machine.model_name }} — Silicon Registry{% endblock %}
+{% block title %}{{ machine.vendor }} {{ machine.model_name }} | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb mb-4">
-      <li class="breadcrumb-item"><a href="{% url 'registry:homepage' %}">Home</a></li>
-      <li class="breadcrumb-item"><a href="{% url 'registry:machine_list' %}">Machines</a></li>
-      <li class="breadcrumb-item active">{{ machine.vendor }} {{ machine.model_name }}</li>
-    </ol>
-  </nav>
+<div class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-24">
 
-  <div class="d-flex justify-content-between align-items-start mb-4">
-    <div>
-      <h1 class="fw-bold mb-1">{{ machine.vendor }} {{ machine.model_name }}</h1>
-      <div class="d-flex gap-2">
-        {% if machine.form_factor %}
-          <span class="badge bg-light text-dark border mono">{{ machine.get_form_factor_display }}</span>
-        {% endif %}
-        {% if compat == 'gold' %}
-          <span class="badge badge-gold">Gold Compatibility</span>
-        {% elif compat == 'mostly_gold' %}
-          <span class="badge" style="background: #0d9488; color: #fff;">Mostly Gold</span>
-        {% elif compat == 'mixed' %}
-          <span class="badge bg-warning text-dark">Mixed Compatibility</span>
-        {% elif compat == 'broken' %}
-          <span class="badge badge-broken">Broken Compatibility</span>
-        {% else %}
-          <span class="badge bg-secondary">No Reports Yet</span>
-        {% endif %}
-      </div>
-    </div>
-    <a href="{% url 'registry:report_submit' %}?machine={{ machine.id }}" class="btn btn-dark">Submit report</a>
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 mb-8 text-sm text-zinc-700 fade-in">
+    <a href="{% url 'registry:homepage' %}" class="hover:text-white transition-colors">Home</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
+    <a href="{% url 'registry:machine_list' %}" class="hover:text-white transition-colors">Machines</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
+    <span class="text-zinc-500">{{ machine.vendor }} {{ machine.model_name }}</span>
   </div>
 
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <!-- Specs card -->
-      <div class="sr-card mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0">Hardware Specifications</h5>
-          {% if spec and spec.is_verified %}
-            <span class="badge bg-success-subtle text-success border border-success-subtle">Verified specs</span>
-          {% endif %}
-        </div>
-        
-        {% if spec %}
-          <div class="row g-3">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Processor</small>
-                <div class="mono">{{ spec.cpu_name|default:"Unknown CPU" }}</div>
-                {% if spec.cpu_series_tier or spec.cpu_generation %}
-                  <div class="mt-1">
-                    {% if spec.cpu_series_tier %}<span class="badge bg-light text-dark border mono me-1">{{ spec.get_cpu_series_tier_display }}</span>{% endif %}
-                    {% if spec.cpu_generation %}<small class="text-muted">{{ spec.cpu_generation }}</small>{% endif %}
-                  </div>
-                {% endif %}
-              </div>
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Graphics</small>
-                <div class="mono">{{ spec.gpu_name|default:"Integrated Graphics" }}</div>
-                <small class="text-muted">{{ spec.get_gpu_type_display|default:"" }} • {{ spec.gpu_manufacturer|default:"" }}</small>
-              </div>
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Display</small>
-                <div>{{ spec.display_size_inches|default:"-" }}" {{ spec.display_resolution|default:"" }}</div>
-                <small class="text-muted">{{ spec.get_display_panel_type_display|default:"" }}</small>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Memory (RAM)</small>
-                <div class="mono">{{ spec.ram_base_gb|default:"-" }}GB / {{ spec.ram_max_gb|default:"-" }}GB max</div>
-                <small class="text-muted">{{ spec.get_ram_type_display|default:"" }} • {{ spec.ram_speed_mhz|default:"" }} MHz</small>
-              </div>
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Storage</small>
-                <div class="mono">{{ spec.storage_base_gb|default:"-" }}GB {{ spec.get_storage_type_display|default:"" }}</div>
-                <small class="text-muted">Max: {{ spec.storage_max_gb|default:"Soldered" }}GB</small>
-              </div>
-              <div class="mb-3">
-                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:10px">Battery</small>
-                <div>{{ spec.battery_wh|default:"-" }} Wh</div>
-              </div>
-            </div>
+  <div class="grid lg:grid-cols-3 gap-8">
+
+    <!-- ── Left Sidebar ──────────────────────── -->
+    <div class="lg:col-span-1 space-y-4 fade-in" style="animation-delay:0.06s">
+
+      <!-- Identity hero card -->
+      <div class="rounded-2xl relative overflow-hidden" style="background:linear-gradient(180deg,#161616 0%,#111 100%);border:1px solid rgba(255,255,255,0.08);">
+        <div class="accent-bar"></div>
+        <!-- Subtle ambient top glow -->
+        <div class="absolute top-0 left-0 right-0 h-24 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(57,211,83,0.06),transparent 70%);"></div>
+
+        <div class="p-7 relative">
+          <div class="section-label mb-2">{{ machine.vendor }}{% if machine.series %} · {{ machine.series }}{% endif %}</div>
+          <h1 class="text-2xl font-black tracking-tight mb-5">{{ machine.model_name }}</h1>
+
+          <!-- Compat pill -->
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-6
+            {% if compat == 'gold' or compat == 'mostly_gold' %}badge-gold
+            {% elif compat == 'broken' %}badge-broken
+            {% elif compat == 'mixed' %}badge-silver
+            {% else %}text-zinc-700 border border-zinc-800{% endif %}">
+            <span class="w-1.5 h-1.5 rounded-full
+              {% if compat == 'gold' or compat == 'mostly_gold' %}bg-yellow-500
+              {% elif compat == 'broken' %}bg-red-500
+              {% elif compat == 'mixed' %}bg-zinc-400
+              {% else %}bg-zinc-700{% endif %}"></span>
+            {% if compat == 'gold' %}Gold compatible
+            {% elif compat == 'mostly_gold' %}Mostly Gold
+            {% elif compat == 'broken' %}Broken
+            {% elif compat == 'mixed' %}Mixed results
+            {% else %}No data yet{% endif %}
           </div>
-          {% if not spec.is_verified %}
-            <div class="mt-3 p-2 bg-warning-subtle rounded border border-warning-subtle">
-              <small class="text-warning-emphasis">Unverified specs — <a href="{% url 'registry:suggest_spec' machine.pk %}" class="fw-bold">Suggest a correction</a></small>
+
+          <div class="space-y-0 text-sm" style="border-top:1px solid rgba(255,255,255,0.06);">
+            <div class="flex justify-between py-3" style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span class="text-zinc-600">Reports</span>
+              <span class="font-bold">{{ report_count }}</span>
             </div>
-          {% endif %}
-        {% else %}
-          <div class="text-center py-4">
-            <p class="text-muted mb-2">No specs yet.</p>
-            {% if user.is_authenticated %}
-              <a href="{% url 'registry:suggest_spec' machine.pk %}" class="btn btn-sm btn-outline-dark">Suggest specs</a>
+            {% if machine.form_factor %}
+            <div class="flex justify-between py-3">
+              <span class="text-zinc-600">Form factor</span>
+              <span class="font-bold">{{ machine.get_form_factor_display }}</span>
+            </div>
             {% endif %}
           </div>
+        </div>
+      </div>
+
+      <!-- Spec card — icon grid layout -->
+      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
+        <div class="px-5 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span class="section-label">Hardware Specs</span>
+        </div>
+        {% if spec %}
+        <div class="divide-y" style="divide-color:rgba(255,255,255,0.05);">
+          {% if spec.cpu_name %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="cpu" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow min-w-0">
+              <div class="section-label text-[9px] mb-0.5">CPU</div>
+              <div class="text-xs font-semibold truncate">{{ spec.cpu_name }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if spec.gpu_name %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="monitor" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow min-w-0">
+              <div class="section-label text-[9px] mb-0.5">GPU</div>
+              <div class="text-xs font-semibold truncate">{{ spec.gpu_name }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if spec.ram_base_gb %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="memory-stick" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow">
+              <div class="section-label text-[9px] mb-0.5">Memory</div>
+              <div class="text-xs font-semibold">{{ spec.ram_base_gb }}GB {{ spec.get_ram_type_display|default:"" }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if spec.storage_base_gb %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow">
+              <div class="section-label text-[9px] mb-0.5">Storage</div>
+              <div class="text-xs font-semibold">{{ spec.storage_base_gb }}GB {{ spec.get_storage_type_display|default:"" }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if spec.display_size_inches %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="tablet" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow">
+              <div class="section-label text-[9px] mb-0.5">Display</div>
+              <div class="text-xs font-semibold">{{ spec.display_size_inches }}" {{ spec.display_resolution }} {{ spec.get_display_panel_type_display|default:"" }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if spec.battery_wh %}
+          <div class="flex items-center gap-3 px-5 py-3.5">
+            <i data-lucide="battery" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+            <div class="flex-grow">
+              <div class="section-label text-[9px] mb-0.5">Battery</div>
+              <div class="text-xs font-semibold">{{ spec.battery_wh }}Wh</div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="text-xs text-zinc-700 text-center py-8">No specs recorded yet.</p>
+        {% endif %}
+        <div class="p-4">
+          <a href="{% url 'registry:suggest_spec' machine.pk %}"
+             class="btn-ghost flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Contribute spec
+          </a>
+        </div>
+      </div>
+
+      <!-- Related machines -->
+      {% if related %}
+      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
+        <div class="px-5 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span class="section-label">Related</span>
+        </div>
+        {% for r in related %}
+        <a href="{% url 'registry:machine_detail' r.slug %}"
+           class="flex items-center justify-between px-5 py-3 group transition-colors hover:bg-white/3"
+           style="{% if not forloop.last %}border-bottom:1px solid rgba(255,255,255,0.04);{% endif %}">
+          <span class="text-sm font-medium group-hover:text-primary transition-colors">{{ r.model_name }}</span>
+          <span class="text-[11px] text-zinc-700">{{ r.report_count }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ── Main Content ──────────────────────── -->
+    <div class="lg:col-span-2 space-y-6 fade-in" style="animation-delay:0.14s">
+
+      <!-- Component Status matrix -->
+      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
+        <div class="px-6 py-4 flex justify-between items-center" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span class="font-bold text-sm">Component Matrix</span>
+          <span class="section-label">{{ comp_summary|length }} components tracked</span>
+        </div>
+
+        {% if comp_summary %}
+        <div class="grid sm:grid-cols-2 gap-px" style="background:rgba(255,255,255,0.05);">
+          {% for comp_id, info in comp_summary.items %}
+          <a href="{% if info.slug %}{% url 'registry:component_detail' info.slug %}{% else %}#{% endif %}"
+             class="flex gap-4 p-5 group transition-all hover:bg-primary/4"
+             style="background:#0e0e0e;">
+            <!-- Status dot bar -->
+            <div class="flex flex-col gap-1 w-1.5 rounded-full shrink-0 overflow-hidden" style="background:rgba(255,255,255,0.05);">
+              {% if info.working > 0 %}
+              <div class="w-full rounded-full flex-1" style="background:#39d353;min-height:6px;"></div>
+              {% endif %}
+              {% if info.issues > 0 %}
+              <div class="w-full rounded-full flex-1" style="background:#eab308;min-height:6px;"></div>
+              {% endif %}
+              {% if info.broken > 0 %}
+              <div class="w-full rounded-full flex-1" style="background:#ef4444;min-height:6px;"></div>
+              {% endif %}
+            </div>
+
+            <div class="flex-grow min-w-0">
+              <div class="section-label mb-0.5">{{ info.type }}</div>
+              <div class="text-sm font-semibold truncate group-hover:text-primary transition-colors">{{ info.name }}</div>
+              <!-- Status pill row -->
+              <div class="flex gap-1.5 mt-2.5">
+                {% if info.working > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-working">✓ {{ info.working }}</span>{% endif %}
+                {% if info.issues  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-issues">! {{ info.issues }}</span>{% endif %}
+                {% if info.broken  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-broken">✗ {{ info.broken }}</span>{% endif %}
+              </div>
+            </div>
+
+            <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-800 group-hover:text-primary transition-colors shrink-0 self-center"></i>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-zinc-700 text-center py-12">No component data linked yet.</p>
         {% endif %}
       </div>
 
-      <!-- Component summary -->
-      {% if comp_summary %}
-      <div class="sr-card mb-4">
-        <h5 class="fw-bold mb-3">Component Summary</h5>
-        <div class="table-responsive">
-          <table class="table table-sm align-middle mb-0">
-            <thead class="bg-light">
-              <tr>
-                <th>Component</th>
-                <th>Type</th>
-                <th class="text-center">Working</th>
-                <th class="text-center">Issues</th>
-                <th class="text-center">Broken</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for cid, data in comp_summary.items %}
-              <tr>
-                <td class="fw-medium">{{ data.name }}</td>
-                <td><span class="text-muted small text-uppercase">{{ data.type }}</span></td>
-                <td class="text-center"><span class="comp-working">{% if data.working %}{{ data.working }}{% else %}-{% endif %}</span></td>
-                <td class="text-center"><span class="comp-issues">{% if data.issues %}{{ data.issues }}{% else %}-{% endif %}</span></td>
-                <td class="text-center"><span class="comp-broken">{% if data.broken %}{{ data.broken }}{% else %}-{% endif %}</span></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <!-- Known Fixes -->
+      {% if driver_fixes %}
+      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
+        <div class="px-6 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span class="font-bold text-sm">Known Fixes</span>
+        </div>
+        <div class="p-5 space-y-4">
+          {% for fix in driver_fixes %}
+          <div class="rounded-xl p-5 relative overflow-hidden" style="background:#111;border:1px solid rgba(255,255,255,0.06);">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="badge-working text-[10px] px-2.5 py-1 rounded-full font-bold">{{ fix.component.name }}</span>
+            </div>
+            <h4 class="text-sm font-bold mb-3">{{ fix.title }}</h4>
+            <pre class="font-mono text-[11px] text-zinc-500 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap" style="background:#080808;">{{ fix.body }}</pre>
+          </div>
+          {% endfor %}
         </div>
       </div>
       {% endif %}
 
       <!-- Reports list -->
-      <h5 class="fw-bold mb-3 mt-5">Reports ({{ report_count }})</h5>
-      <div class="mb-4 d-flex gap-2 overflow-auto pb-2">
-        <a href="?" class="badge bg-dark text-white text-decoration-none">All distros</a>
-        {% for report in reports|dictsort:"distro.name" %}
-          {% if changed %}<!-- logic for unique distros is better in view but here is a simple hack -->{% endif %}
-        {% endfor %}
-      </div>
-
-      {% for report in reports %}
-      <div class="sr-card mb-3">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <h6 class="fw-bold mb-0"><a href="{% url 'registry:report_detail' report.pk %}" class="text-decoration-none text-dark">{{ report.title }}</a></h6>
-          <span class="badge {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %}">
-            {{ report.get_boot_status_display|truncatechars:10 }}
-          </span>
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-bold">Compatibility Reports</h2>
+          <a href="{% url 'registry:report_submit' %}?machine_id={{ machine.pk }}"
+             class="btn-primary px-4 py-2 rounded-xl text-sm">Submit Report</a>
         </div>
-        <div class="d-flex gap-2 mb-3">
-          <span class="mono small bg-light px-2 py-1 rounded border">{{ report.distro.name }} {{ report.distro.version }}</span>
-          {% if report.kernel_version %}
-            <span class="mono small text-muted px-2 py-1">kernel {{ report.kernel_version }}</span>
-          {% endif %}
-        </div>
-        <div class="d-flex flex-wrap gap-1 mb-3">
-          {% for cs in report.comp_statuses.all %}
-            <span class="badge border bg-white {% if cs.status == 'WORKING' %}text-success{% elif cs.status == 'ISSUES' %}text-warning{% else %}text-danger{% endif %}" style="font-size:10px">
-              {{ cs.component.name }}
-            </span>
+        <div class="space-y-3">
+          {% for report in reports %}
+          <a href="{% url 'registry:report_detail' report.pk %}" class="block group">
+            <div class="card-inner rounded-2xl p-5 flex gap-5 items-start border-l-2
+              {% if report.boot_status == 'GOLD' %}border-l-yellow-500/60
+              {% elif report.boot_status == 'SILVER' %}border-l-zinc-600/60
+              {% elif report.boot_status == 'BRONZE' %}border-l-orange-500/60
+              {% else %}border-l-red-500/60{% endif %}">
+              <!-- Status badge circle -->
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[13px] shrink-0
+                {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %}">
+                {{ report.boot_status|slice:":1" }}
+              </div>
+              <div class="flex-grow min-w-0">
+                <div class="flex items-center gap-2 mb-1 text-[11px]">
+                  <span class="font-bold text-primary">{{ report.distro }}</span>
+                  <span class="text-zinc-700">Kernel&nbsp;{{ report.kernel_version|default:"–" }}</span>
+                </div>
+                <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">{{ report.title }}</h4>
+                <div class="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-700">
+                  <span>{{ report.user.username }}</span>
+                  <span class="w-1 h-1 rounded-full bg-zinc-800"></span>
+                  <span>{{ report.created_at|date:"M d, Y" }}</span>
+                </div>
+              </div>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-zinc-800 group-hover:text-primary shrink-0 transition-colors hidden sm:block mt-3"></i>
+            </div>
+          </a>
+          {% empty %}
+          <div class="text-center py-20 rounded-2xl" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
+            <i data-lucide="file-warning" class="w-10 h-10 text-zinc-800 mx-auto mb-3"></i>
+            <p class="text-zinc-600 text-sm">No compatibility reports yet.</p>
+          </div>
           {% endfor %}
         </div>
-        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-          <small class="text-muted">by <a href="{% url 'registry:user_profile' report.user.username %}" class="fw-medium">{{ report.user.username }}</a></small>
-          <small class="text-muted">{{ report.created_at|date:"M d, Y" }}</small>
-        </div>
       </div>
-      {% empty %}
-        <p class="text-muted">No approved reports yet.</p>
-      {% endfor %}
-    </div>
 
-    <div class="col-lg-4">
-      <!-- Related machines -->
-      {% if related %}
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3">Other {{ machine.series }} models</h6>
-        {% for rm in related %}
-        <div class="sr-card mb-2 py-2">
-          <a href="{% url 'registry:machine_detail' rm.pk %}" class="text-decoration-none text-dark small fw-bold d-block">{{ rm.vendor }} {{ rm.model_name }}</a>
-          <small class="text-muted">{{ rm.report_count }} reports</small>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <!-- Driver fixes -->
-      {% if driver_fixes %}
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3">Driver fixes</h6>
-        {% for fix in driver_fixes %}
-        <div class="sr-card mb-2 py-2">
-          <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size:9px">{{ fix.component.name }}</small>
-          <h6 class="small fw-bold mb-1">{{ fix.title }}</h6>
-          {% if fix.external_url %}
-            <a href="{{ fix.external_url }}" target="_blank" class="small text-decoration-none">View fix →</a>
-          {% endif %}
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
     </div>
   </div>
 </div>

@@ -1,22 +1,52 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import views, api
 
 app_name = 'registry'
 
+router = DefaultRouter()
+router.register(r'users', api.UserViewSet)
+router.register(r'machines', api.MachineViewSet)
+router.register(r'distros', api.DistroViewSet)
+router.register(r'components', api.ComponentViewSet)
+router.register(r'reports', api.ReportViewSet)
+router.register(r'comments', api.CommentViewSet)
+router.register(r'driver-fixes', api.DriverFixViewSet)
+router.register(r'help-groups', api.HelpGroupViewSet)
+
 urlpatterns = [
+    # API v1
+    path('api/v1/', include(router.urls)),
+
     # Core pages
     path('',                               views.homepage,        name='homepage'),
     path('about/',                         views.about,           name='about'),
     path('search/',                        views.search,          name='search'),
+    path('leaderboard/',                   views.leaderboard,     name='leaderboard'),
 
-    # Machines
+    # Machines (slug-based)
     path('machines/',                      views.machine_list,    name='machine_list'),
     path('machines/add/',                  views.machine_add,     name='machine_add'),
-    path('machines/<int:pk>/',             views.machine_detail,  name='machine_detail'),
+    path('machines/<slug:slug>/',          views.machine_detail,  name='machine_detail'),
+    path('machines/pk/<int:pk>/',          views.machine_detail_by_pk, name='machine_detail_pk'),
+
+    # Components (slug-based)
+    path('components/<slug:slug>/',        views.component_detail, name='component_detail'),
+    path('components/pk/<int:pk>/',        views.component_detail_by_pk, name='component_detail_pk'),
+
+    # Distros (slug-based)
+    path('distros/<slug:slug>/',           views.distro_detail,    name='distro_detail'),
+    path('distros/pk/<int:pk>/',           views.distro_detail_by_pk, name='distro_detail_pk'),
 
     # Reports
     path('reports/submit/',                views.report_submit,   name='report_submit'),
     path('reports/<int:pk>/',              views.report_detail,   name='report_detail'),
+
+    # Driver fixes
+    path('fixes/submit/',                  views.fix_submit,      name='fix_submit'),
+
+    # Voting
+    path('vote/<str:model>/<int:pk>/<str:vote_type>/', views.cast_vote, name='cast_vote'),
 
     # Users
     path('profile/edit/',                  views.profile_edit,    name='profile_edit'),
@@ -25,7 +55,7 @@ urlpatterns = [
     # Actions (HTMX endpoints)
     path('reports/<int:pk>/flag/',         views.flag_report,     name='flag_report'),
     path('reports/<int:pk>/comment/',      views.add_comment,     name='add_comment'),
-    path('machines/<int:pk>/suggest-spec/',views.suggest_spec,    name='suggest_spec'),
+    path('machines/pk/<int:pk>/suggest-spec/', views.suggest_spec, name='suggest_spec'),
 
     # Moderator dashboard
     path('mod/',                           views.mod_dashboard,   name='mod_dashboard'),

@@ -1,17 +1,10 @@
 {% extends 'registry/base.html' %}
-{% load static %}
-
-{% block title %}404 - Not Found — Silicon Registry{% endblock %}
-
+{% block title %}404 — Not Found | Silicon Registry{% endblock %}
 {% block content %}
-<div class="sr-hero" style="padding: 120px 0;">
-  <div class="container text-center">
-    <h1 style="font-size: 80px; font-weight: 800; margin-bottom: 0;">404</h1>
-    <p class="lead" style="font-size: 24px; margin-bottom: 40px;">Page not found.</p>
-    <div class="d-flex justify-content-center gap-3">
-      <a href="{% url 'registry:homepage' %}" class="btn btn-light fw-bold px-4">Go home</a>
-      <a href="{% url 'registry:machine_list' %}" class="btn btn-outline-light fw-bold px-4">Search machines</a>
-    </div>
-  </div>
+<div class="max-w-lg mx-auto px-4 py-32 text-center fade-in">
+    <div class="text-8xl font-black text-zinc-800 mb-4">404</div>
+    <h1 class="text-2xl font-bold mb-2">Page not found</h1>
+    <p class="text-zinc-500 mb-8">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{% url 'registry:homepage' %}" class="bg-primary text-black px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-accent transition-colors">Go home</a>
 </div>
 {% endblock %}

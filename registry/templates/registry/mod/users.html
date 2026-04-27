@@ -1,53 +1,53 @@
 {% extends 'registry/mod/base_mod.html' %}
-
 {% block mod_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h3 class="fw-bold mb-0">Users</h3>
-</div>
+<h1 class="text-2xl font-black tracking-tight mb-8">Manage Users</h1>
 
-<div class="sr-card">
-  <div class="table-responsive">
-    <table class="table align-middle mb-0">
-      <thead class="bg-light">
-        <tr>
-          <th>Username</th>
-          <th>Trust Ratio</th>
-          <th>Joined</th>
-          <th class="text-end">Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for u in users %}
-        <tr>
-          <td>
-            <div class="d-flex align-items-center">
-              {% if u.avatar %}
-                <img src="{{ u.avatar.url }}" width="24" height="24" class="rounded-circle me-2">
-              {% endif %}
-              <a href="{% url 'registry:user_profile' u.username %}" class="fw-bold text-dark text-decoration-none">{{ u.username }}</a>
-            </div>
-          </td>
-          <td>
-            <span class="{% if u.trust_ratio > 70 %}text-success{% elif u.trust_ratio > 40 %}text-warning{% else %}text-danger{% endif %} fw-bold">
-              {{ u.trust_ratio }}%
-            </span>
-          </td>
-          <td class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</td>
-          <td class="text-end">
-            <form method="POST" action="{% url 'registry:mod_users' %}" class="d-flex justify-content-end">
-              {% csrf_token %}
-              <input type="hidden" name="user_id" value="{{ u.pk }}">
-              <select name="role_type" class="form-select form-select-sm w-auto d-inline-block" onchange="this.form.submit()">
+<div class="card-surface rounded-2xl overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+        <th class="tbl-head text-left px-5 py-4">User</th>
+        <th class="tbl-head text-left px-5 py-4">Role</th>
+        <th class="tbl-head text-right px-5 py-4">Trust</th>
+        <th class="tbl-head text-right px-5 py-4">Update</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr class="tbl-row">
+        <td class="px-5 py-3.5">
+          <a href="{% url 'registry:user_profile' u.username %}"
+             class="font-semibold hover:text-primary transition-colors">{{ u.username }}</a>
+          <div class="text-[11px] text-zinc-700 mt-0.5">{{ u.email }}</div>
+        </td>
+        <td class="px-5 py-3.5">
+          <span class="badge-primary text-[10px] px-2.5 py-1 rounded-full font-bold">{{ u.role_type }}</span>
+        </td>
+        <td class="px-5 py-3.5 text-right font-semibold
+          {% if u.trust_ratio >= 80 %}text-primary{% elif u.trust_ratio >= 50 %}text-yellow-500{% else %}text-zinc-600{% endif %}">
+          {{ u.trust_ratio }}%
+        </td>
+        <td class="px-5 py-3.5 text-right">
+          <form method="POST" class="flex gap-2 justify-end">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ u.pk }}">
+            <div class="relative">
+              <select name="role_type" class="input-dark rounded-xl text-xs py-1.5 px-3 pr-7 appearance-none">
                 {% for val, label in roles %}
-                  <option value="{{ val }}" {% if u.role_type == val %}selected{% endif %}>{{ label }}</option>
+                  <option value="{{ val }}" {% if val == u.role_type %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
               </select>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+              <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-600 pointer-events-none"></i>
+            </div>
+            <button class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+              style="background:rgba(57,211,83,0.08);color:#39d353;border:1px solid rgba(57,211,83,0.2);"
+              onmouseenter="this.style.background='rgba(57,211,83,0.16)'"
+              onmouseleave="this.style.background='rgba(57,211,83,0.08)'">Save</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

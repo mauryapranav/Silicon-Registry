@@ -1,46 +1,62 @@
 {% extends 'registry/base.html' %}
-{% load static %}
-
-{% block title %}Mod Dashboard — Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-  <div class="row g-4">
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2">
-      <div class="list-group shadow-sm">
-        <a href="{% url 'registry:mod_dashboard' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_dashboard' %}active{% endif %}">
-          <span class="fw-bold">Overview</span>
-        </a>
-        <a href="{% url 'registry:mod_reports' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_reports' %}active{% endif %}">
-          <span>Reports</span>
-          {% if pending_reports %}<span class="badge bg-danger rounded-pill">{{ pending_reports }}</span>{% endif %}
-        </a>
-        <a href="{% url 'registry:mod_specs' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_specs' %}active{% endif %}">
-          <span>Spec Suggestions</span>
-          {% if pending_specs %}<span class="badge bg-danger rounded-pill">{{ pending_specs }}</span>{% endif %}
-        </a>
-        <a href="{% url 'registry:mod_fixes' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_fixes' %}active{% endif %}">
-          <span>Driver Fixes</span>
-          {% if pending_fixes %}<span class="badge bg-danger rounded-pill">{{ pending_fixes }}</span>{% endif %}
-        </a>
-        <a href="{% url 'registry:mod_trust' %}" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center {% if request.resolver_match.url_name == 'mod_trust' %}active{% endif %}">
-          <span>Trust Penalties</span>
-          {% if pending_trust_events %}<span class="badge bg-danger rounded-pill">{{ pending_trust_events }}</span>{% endif %}
-        </a>
-        <a href="{% url 'registry:mod_groups' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_groups' %}active{% endif %}">
-          <span>Help Groups</span>
-        </a>
-        <a href="{% url 'registry:mod_users' %}" class="list-group-item list-group-item-action py-3 {% if request.resolver_match.url_name == 'mod_users' %}active{% endif %}">
-          <span>Users</span>
-        </a>
-      </div>
-    </div>
+<div class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-24">
+  <div class="flex items-start gap-8">
 
-    <!-- Main Content Area -->
-    <div class="col-md-9 col-lg-10">
+    <!-- ── Mod Sidebar ───────────────────────── -->
+    <aside class="hidden lg:block w-60 shrink-0">
+      <div class="card-surface rounded-2xl p-3 sticky top-20">
+        <div class="px-3 pt-1 pb-3 mb-1" style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div class="tbl-head">Moderation</div>
+        </div>
+
+        {% with url_name=request.resolver_match.url_name %}
+        <a href="{% url 'registry:mod_dashboard' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all
+             {% if url_name == 'mod_dashboard' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_dashboard' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview
+        </a>
+        <a href="{% url 'registry:mod_reports' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all
+             {% if url_name == 'mod_reports' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_reports' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="file-text" class="w-4 h-4"></i> Reports
+        </a>
+        <a href="{% url 'registry:mod_specs' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all
+             {% if url_name == 'mod_specs' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_specs' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="settings-2" class="w-4 h-4"></i> Specs
+        </a>
+        <a href="{% url 'registry:mod_fixes' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all
+             {% if url_name == 'mod_fixes' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_fixes' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="wrench" class="w-4 h-4"></i> Fixes
+        </a>
+        <a href="{% url 'registry:mod_trust' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all
+             {% if url_name == 'mod_trust' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_trust' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Trust
+        </a>
+        <a href="{% url 'registry:mod_users' %}"
+           class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+             {% if url_name == 'mod_users' %}text-primary{% else %}text-zinc-500 hover:text-white hover:bg-white/4{% endif %}"
+           {% if url_name == 'mod_users' %}style="background:rgba(57,211,83,0.08);"{% endif %}>
+          <i data-lucide="users" class="w-4 h-4"></i> Users
+        </a>
+        {% endwith %}
+      </div>
+    </aside>
+
+    <!-- ── Mod Content ───────────────────────── -->
+    <div class="flex-grow min-w-0 fade-in">
       {% block mod_content %}{% endblock %}
     </div>
+
   </div>
 </div>
 {% endblock %}

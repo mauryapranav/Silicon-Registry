@@ -1,11 +1,16 @@
-<form hx-post="{% url 'registry:add_comment' report.pk %}" 
-      hx-target="#comment-form-container" 
-      hx-swap="outerHTML">
-  {% csrf_token %}
-  <div class="mb-3">
-    <textarea name="content" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
+{% for comment in comments %}
+<div class="card-surface p-5 rounded-2xl flex gap-4 mb-3 fade-in">
+  <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 overflow-hidden"
+       style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);">
+    <span class="text-xs font-bold text-zinc-500">{{ comment.user.username|make_list|first|upper }}</span>
   </div>
-  <div class="text-end">
-    <button type="submit" class="btn btn-sm btn-dark">Post Comment</button>
+  <div class="flex-grow">
+    <div class="flex items-center gap-2 mb-1.5">
+      <a href="{% url 'registry:user_profile' comment.user.username %}"
+         class="text-sm font-semibold hover:text-primary transition-colors">{{ comment.user.username }}</a>
+      <span class="text-xs text-zinc-700">{{ comment.created_at|timesince }} ago</span>
+    </div>
+    <p class="text-sm text-zinc-300 leading-relaxed">{{ comment.content }}</p>
   </div>
-</form>
+</div>
+{% endfor %}
