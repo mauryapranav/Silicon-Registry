@@ -79,13 +79,6 @@ Community contributions keep the registry accurate and growing:
 | 🥈 **Silver** | Most things work, minor issues only |
 | 🥉 **Bronze** | Usable with significant workarounds |
 | 💔 **Broken** | Does not boot or is entirely unusable |
-
----
-
-## ⚖️ License
-
-MIT License — see [LICENSE](LICENSE).
-
 ---
 
 *"Helping you find the silicon that speaks Linux."*
