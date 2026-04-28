@@ -1,0 +1,2507 @@
+DATABASE TABLES AND ATTRIBUTES
+==============================
+
+TABLE: User (Custom User Model)
+- id (Auto)
+- username (String)
+- role_type (Choice: ADMIN, MAINTAINER, CONTRIBUTOR)
+- bio (Text, Nullable)
+- avatar (Image, Nullable)
+- positive_score (Integer, Default: 0)
+- negative_score (Integer, Default: 0)
+- is_verified (Boolean, Default: False)
+- github_username (String)
+- date_joined (DateTime)
+- last_login (DateTime)
+- is_staff (Boolean)
+- is_active (Boolean)
+- is_superuser (Boolean)
+
+TABLE: Machine
+- id (Auto)
+- vendor (String)
+- series (String)
+- model_name (String)
+- cpu_family (String)
+- form_factor (Choice: LAPTOP, DESKTOP, MINI_PC, HANDHELD, ALL_IN_ONE, Nullable)
+
+TABLE: Distro
+- id (Auto)
+- name (String)
+- version (String)
+- kernel_default (String, Nullable)
+
+TABLE: Component
+- id (Auto)
+- type (Choice: WIFI, AUDIO, GPU, BLUETOOTH, INPUT)
+- name (String)
+- driver (String, Nullable)
+
+TABLE: Report (Central Entity)
+- id (Auto)
+- user (FK -> User, SET_NULL)
+- machine (FK -> Machine, CASCADE, Nullable)
+- distro (FK -> Distro, CASCADE, Nullable)
+- component (FK -> Component, CASCADE, Nullable)
+- report_type (Choice: MACHINE_DISTRO, MACHINE_COMPONENT, COMPONENT_DISTRO, COMPONENT_ONLY, MACHINE_ONLY)
+- title (String)
+- description (Text)
+- boot_status (Choice: GOLD, SILVER, BRONZE, BROKEN, Nullable)
+- kernel_version (String, Nullable)
+- status (Choice: PENDING, APPROVED, REJECTED)
+- compatibility_score (Float, Nullable, Reserved for AI)
+- created_at (DateTime)
+- updated_at (DateTime)
+
+TABLE: CompStatus
+- id (Auto)
+- report (FK -> Report, CASCADE)
+- component (FK -> Component, CASCADE)
+- status (Choice: WORKING, ISSUES, BROKEN)
+- notes (Text, Nullable)
+
+TABLE: Comment
+- id (Auto)
+- user (FK -> User, SET_NULL)
+- report (FK -> Report, CASCADE)
+- content (Text)
+- is_verified (Boolean)
+- created_at (DateTime)
+
+TABLE: Vote (Generic)
+- id (Auto)
+- user (FK -> User, CASCADE)
+- content_type (FK -> ContentType)
+- object_id (Positive Integer)
+- vote_type (Choice: UPVOTE, DOWNVOTE, HELPFUL, NOT_HELPFUL)
+- created_at (DateTime)
+
+TABLE: Flag (Generic)
+- id (Auto)
+- user (FK -> User, SET_NULL)
+- content_type (FK -> ContentType)
+- object_id (Positive Integer)
+- reason (Choice: SPAM, INCORRECT, MISLEADING, DUPLICATE, OTHER)
+- details (Text, Nullable)
+- status (Choice: PENDING, REVIEWED, DISMISSED)
+- reviewed_by (FK -> User, SET_NULL)
+- mod_notes (Text, Nullable)
+- created_at (DateTime)
+
+TABLE: Benchmark
+- id (Auto)
+- report (FK -> Report, CASCADE)
+- battery_life_hours (Float, Nullable)
+- power_draw_watts (Float, Nullable)
+- cpu_score (Integer, Nullable)
+- gpu_score (Integer, Nullable)
+- suspend_resume_pass (Boolean, Nullable)
+- suspend_resume_seconds (Float, Nullable)
+- notes (Text, Nullable)
+- created_at (DateTime)
+
+TABLE: DriverFix
+- id (Auto)
+- component (FK -> Component, CASCADE)
+- submitted_by (FK -> User, SET_NULL)
+- title (String)
+- body (Text)
+- external_url (URL, Nullable)
+- status (Choice: PENDING, ACCEPTED, REJECTED)
+- reviewed_by (FK -> User, SET_NULL)
+- mod_notes (Text, Nullable)
+- created_at (DateTime)
+
+TABLE: TrustEvent (Audit Log)
+- id (Auto)
+- user (FK -> User, CASCADE)
+- event_type (Choice: REPORT_UPVOTED, REPORT_DOWNVOTED, etc.)
+- points_delta (Integer)
+- mod_penalty_approved (Boolean)
+- approved_by (FK -> User, SET_NULL)
+- notes (Text, Nullable)
+- created_at (DateTime)
+
+TABLE: ReportAttachment
+- id (Auto)
+- report (FK -> Report, CASCADE)
+- file (File)
+- file_type (Choice: IMAGE, LOG, CONFIG)
+- original_filename (String)
+- uploaded_at (DateTime)
+
+TABLE: HelpGroup
+- id (Auto)
+- title (String)
+- description (Text)
+- component (FK -> Component, CASCADE)
+- distro (FK -> Distro, CASCADE)
+- status (Choice: SUGGESTED, OPEN, RESOLVED)
+- created_by (FK -> User, SET_NULL)
+- driver_fixes (M2M -> DriverFix)
+- created_at (DateTime)
+
+TABLE: HelpGroupMembership
+- id (Auto)
+- group (FK -> HelpGroup, CASCADE)
+- user (FK -> User, CASCADE)
+- invite_status (Choice: INVITED, REQUESTED, ACCEPTED)
+- joined_at (DateTime)
+
+TABLE: HelpGroupMessage
+- id (Auto)
+- group (FK -> HelpGroup, CASCADE)
+- user (FK -> User, SET_NULL)
+- content (Text)
+- created_at (DateTime)
+
+TABLE: UserMachine
+- id (Auto)
+- user (FK -> User, CASCADE)
+- machine (FK -> Machine, CASCADE)
+- added_at (DateTime)
+
+TABLE: MachineSpec
+- id (Auto)
+- machine (OneToOne -> Machine)
+- cpu_name (String)
+- cpu_manufacturer (Choice: INTEL, AMD, etc.)
+- cpu_generation (String)
+- cpu_series_tier (Choice: U, P, H, etc.)
+- gpu_name (String)
+- gpu_manufacturer (Choice: NVIDIA, AMD, etc.)
+- gpu_generation (String)
+- gpu_type (Choice: DEDICATED, INTEGRATED)
+- ram_type (Choice: DDR4, DDR5, etc.)
+- ram_speed_mhz (Integer)
+- ram_base_gb (Integer)
+- ram_max_gb (Integer)
+- storage_type (Choice: NVME, SATA, EMMC)
+- storage_base_gb (Integer)
+- storage_max_gb (Integer)
+- display_size_inches (Decimal)
+- display_resolution (String)
+- display_panel_type (Choice: IPS, OLED, etc.)
+- battery_wh (Float)
+- is_verified (Boolean)
+- verified_by (FK -> User, SET_NULL)
+- verified_at (DateTime)
+
+TABLE: SpecSuggestion
+- id (Auto)
+- machine (FK -> Machine)
+- suggested_by (FK -> User, SET_NULL)
+- field_name (String)
+- suggested_value (String)
+- source_url (URL, Nullable)
+- status (Choice: PENDING, ACCEPTED, REJECTED)
+- reviewed_by (FK -> User, SET_NULL)
+- mod_notes (Text, Nullable)
+- created_at (DateTime)
+
+
+FILE: registry/models.py
+========================
+"""
+registry/models.py — Silicon Registry
+======================================
+
+ARCHITECTURE DECISIONS (read before modifying):
+
+Decision 1 — Single Flexible Report Table:
+    The Report model uses a report_type field + nullable FKs instead of separate
+    MachineReport, ComponentReport, DistroReport tables. This keeps Vote, Flag,
+    Comment, Benchmark, and Attachment tables linked to ONE table instead of five,
+    avoiding severe join complexity. Only 3 nullable FK columns exist (machine,
+    distro, component). A clean() method enforces valid FK combinations per
+    report_type at model level.
+
+Decision 2 — Trust Score Storage:
+    User trust uses two IntegerField columns: positive_score and negative_score.
+    trust_ratio is a computed @property. A TrustEvent table logs every change
+    with full audit trail. Mod-rejection penalties require mod_penalty_approved=True
+    on TrustEvent before points deduct — this prevents unfair score drops from
+    rejections due to incomplete info rather than malicious intent.
+    Users with trust_ratio < 30% have new reports auto-defaulted to PENDING.
+
+Decision 3 — Generic Voting and Flagging via ContentTypes:
+    Vote and Flag use Django GenericForeignKey so they work across both Report
+    and Comment without duplicating tables. django.contrib.contenttypes must
+    be in INSTALLED_APPS.
+
+Decision 4 — Compatibility Score Field:
+    compatibility_score is a stubbed FloatField on Report. It is null=True,
+    blank=True and MUST NOT be filled by users or any write serializer.
+    Reserved exclusively for a future AI integration phase.
+"""
+
+from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.db import models
+
+
+# =============================================================================
+# Model 1 — User
+# =============================================================================
+
+class User(AbstractUser):
+    """
+    Custom user model extending AbstractUser.
+
+    Must be set as AUTH_USER_MODEL in settings.py BEFORE any migration is run.
+    trust_ratio and needs_moderation are computed properties — never stored.
+    github_username is populated by django-allauth on OAuth login.
+    """
+
+    class RoleType(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin'
+        MAINTAINER = 'MAINTAINER', 'Maintainer'
+        CONTRIBUTOR = 'CONTRIBUTOR', 'Contributor'
+
+    role_type = models.CharField(
+        max_length=20,
+        choices=RoleType.choices,
+        default=RoleType.CONTRIBUTOR,
+    )
+    bio = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    positive_score = models.IntegerField(default=0)
+    negative_score = models.IntegerField(default=0)
+    is_verified = models.BooleanField(
+        default=False,
+        help_text="User account credibility badge awarded by maintainers.",
+    )
+    github_username = models.CharField(max_length=100, blank=True)
+
+    @property
+    def trust_ratio(self):
+        """Returns trust as a percentage: positive / (positive + negative) * 100."""
+        return round(
+            self.positive_score / max(self.positive_score + self.negative_score, 1) * 100,
+            1,
+        )
+
+    @property
+    def needs_moderation(self):
+        """True when trust_ratio < 30 — new reports from this user go to PENDING."""
+        return self.trust_ratio < 30
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        ordering = ['username']
+        verbose_name_plural = 'Users'
+
+
+# =============================================================================
+# Model 2 — Machine
+# =============================================================================
+
+class Machine(models.Model):
+    """
+    Represents a specific laptop/desktop hardware model.
+    unique_together on (vendor, series, model_name) prevents duplicates while
+    allowing the same model_name to exist under a different vendor or series.
+    """
+
+    class FormFactor(models.TextChoices):
+        LAPTOP    = 'LAPTOP',    'Laptop'
+        DESKTOP   = 'DESKTOP',   'Desktop'
+        MINI_PC   = 'MINI_PC',   'Mini PC'
+        HANDHELD  = 'HANDHELD',  'Handheld'
+        ALL_IN_ONE = 'ALL_IN_ONE', 'All-in-One'
+
+    vendor = models.CharField(max_length=100)
+    series = models.CharField(max_length=100)
+    model_name = models.CharField(max_length=200)
+    cpu_family = models.CharField(max_length=100)
+    form_factor = models.CharField(
+        max_length=20,
+        choices=FormFactor.choices,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.vendor} {self.series} {self.model_name}"
+
+    class Meta:
+        ordering = ['vendor', 'series', 'model_name']
+        unique_together = [['vendor', 'series', 'model_name']]
+        verbose_name_plural = 'Machines'
+
+
+# =============================================================================
+# Model 3 — Distro
+# =============================================================================
+
+class Distro(models.Model):
+    """
+    A Linux distribution + version combination.
+    kernel_default represents the kernel shipped by default with this release.
+    Reports may override this via Report.kernel_version when users run custom kernels.
+    """
+
+    name = models.CharField(max_length=100)
+    version = models.CharField(max_length=50)
+    kernel_default = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} {self.version}"
+
+    class Meta:
+        ordering = ['name', 'version']
+        unique_together = [['name', 'version']]
+        verbose_name_plural = 'Distros'
+
+
+# =============================================================================
+# Model 4 — Component
+# =============================================================================
+
+class Component(models.Model):
+    """
+    A hardware component category + specific product name.
+    unique_together on (type, name) prevents duplicate entries for the same
+    component variant (e.g. two entries for "Wi-Fi 6E AX210" under WIFI).
+    """
+
+    class ComponentType(models.TextChoices):
+        WIFI = 'WIFI', 'Wi-Fi'
+        AUDIO = 'AUDIO', 'Audio'
+        GPU = 'GPU', 'GPU'
+        BLUETOOTH = 'BLUETOOTH', 'Bluetooth'
+        INPUT = 'INPUT', 'Input Device'
+
+    type = models.CharField(max_length=20, choices=ComponentType.choices)
+    name = models.CharField(max_length=200)
+    driver = models.CharField(max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.get_type_display()} — {self.name}"
+
+    class Meta:
+        ordering = ['type', 'name']
+        unique_together = [['type', 'name']]
+        verbose_name_plural = 'Components'
+
+
+# =============================================================================
+# Model 5 — Report  (Central flexible entity)
+# =============================================================================
+
+class Report(models.Model):
+    """
+    Central entity for all hardware compatibility reports.
+
+    See Decision 1 at the top of this file for why this is a single flexible
+    table rather than separate MachineReport / ComponentReport / DistroReport.
+
+    FK rules enforced by clean():
+        MACHINE_DISTRO    → machine + distro required
+        MACHINE_COMPONENT → machine + component required
+        COMPONENT_DISTRO  → component + distro required
+        COMPONENT_ONLY    → component only; machine + distro must be null
+        MACHINE_ONLY      → machine only; distro + component must be null
+
+    save() forces status=PENDING when the submitting user has needs_moderation=True.
+
+    compatibility_score is RESERVED for AI integration — never expose in write
+    serializers or user-facing forms (see Decision 4).
+    """
+
+    class ReportType(models.TextChoices):
+        MACHINE_DISTRO = 'MACHINE_DISTRO', 'Machine + Distro'
+        MACHINE_COMPONENT = 'MACHINE_COMPONENT', 'Machine + Component'
+        COMPONENT_DISTRO = 'COMPONENT_DISTRO', 'Component + Distro'
+        COMPONENT_ONLY = 'COMPONENT_ONLY', 'Component Only'
+        MACHINE_ONLY = 'MACHINE_ONLY', 'Machine Only'
+
+    class BootStatus(models.TextChoices):
+        GOLD = 'GOLD', 'Gold — Everything works out of the box'
+        SILVER = 'SILVER', 'Silver — Most things work, minor issues'
+        BRONZE = 'BRONZE', 'Bronze — Usable with significant workarounds'
+        BROKEN = 'BROKEN', 'Broken — Does not boot or unusable'
+
+    class ModerationStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Review'
+        APPROVED = 'APPROVED', 'Approved'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='reports',
+        help_text="SET_NULL so community reports survive account deletion.",
+    )
+    machine = models.ForeignKey(
+        'Machine',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reports',
+    )
+    distro = models.ForeignKey(
+        'Distro',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reports',
+    )
+    component = models.ForeignKey(
+        'Component',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reports',
+    )
+    report_type = models.CharField(max_length=30, choices=ReportType.choices)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    boot_status = models.CharField(
+        max_length=10,
+        choices=BootStatus.choices,
+        null=True,
+        blank=True,
+        help_text="Only applicable for MACHINE_DISTRO and MACHINE_ONLY report types.",
+    )
+    kernel_version = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="e.g. 6.8.0-45 — override if user ran a non-default kernel.",
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=ModerationStatus.choices,
+        default=ModerationStatus.PENDING,
+    )
+    compatibility_score = models.FloatField(
+        null=True,
+        blank=True,
+        help_text=(
+            "RESERVED: Do not populate manually. "
+            "This field is reserved for future AI-powered compatibility assessment."
+        ),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Generic relations for voting and flagging
+    votes = GenericRelation('Vote', related_query_name='report')
+    flags = GenericRelation('Flag', related_query_name='report')
+
+    def clean(self):
+        rt = self.report_type
+        has_machine = self.machine is not None
+        has_distro = self.distro is not None
+        has_component = self.component is not None
+
+        if rt == self.ReportType.MACHINE_DISTRO:
+            if not has_machine or not has_distro:
+                raise ValidationError(
+                    "MACHINE_DISTRO reports require both machine and distro."
+                )
+        elif rt == self.ReportType.MACHINE_COMPONENT:
+            if not has_machine or not has_component:
+                raise ValidationError(
+                    "MACHINE_COMPONENT reports require both machine and component."
+                )
+        elif rt == self.ReportType.COMPONENT_DISTRO:
+            if not has_component or not has_distro:
+                raise ValidationError(
+                    "COMPONENT_DISTRO reports require both component and distro."
+                )
+        elif rt == self.ReportType.COMPONENT_ONLY:
+            if not has_component:
+                raise ValidationError(
+                    "COMPONENT_ONLY reports require a component."
+                )
+            if has_machine or has_distro:
+                raise ValidationError(
+                    "COMPONENT_ONLY reports must not have a machine or distro."
+                )
+        elif rt == self.ReportType.MACHINE_ONLY:
+            if not has_machine:
+                raise ValidationError(
+                    "MACHINE_ONLY reports require a machine."
+                )
+            if has_distro or has_component:
+                raise ValidationError(
+                    "MACHINE_ONLY reports must not have a distro or component."
+                )
+
+    def save(self, *args, **kwargs):
+        # Decision 2: Low-trust users always get PENDING status regardless of input.
+        if self.user and self.user.needs_moderation:
+            self.status = self.ModerationStatus.PENDING
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"[{self.report_type}] {self.title} by {self.user}"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Reports'
+
+
+# =============================================================================
+# Model 6 — CompStatus
+# =============================================================================
+
+class CompStatus(models.Model):
+    """
+    Per-component working status within a single Report.
+    Allows a machine report to list multiple components (GPU, Wi-Fi, Audio, etc.)
+    each with its own status, rather than requiring separate reports per component.
+    unique_together prevents duplicate component entries per report.
+    """
+
+    class ComponentStatus(models.TextChoices):
+        WORKING = 'WORKING', 'Working'
+        ISSUES = 'ISSUES', 'Has Issues'
+        BROKEN = 'BROKEN', 'Broken'
+
+    report = models.ForeignKey(
+        'Report',
+        on_delete=models.CASCADE,
+        related_name='comp_statuses',
+    )
+    component = models.ForeignKey(
+        'Component',
+        on_delete=models.CASCADE,
+        related_name='comp_statuses',
+    )
+    status = models.CharField(max_length=10, choices=ComponentStatus.choices)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.component.name} on Report #{self.report.id} — {self.status}"
+
+    class Meta:
+        ordering = ['component__type', 'component__name']
+        unique_together = [['report', 'component']]
+        verbose_name_plural = 'Component Statuses'
+
+
+# =============================================================================
+# Model 7 — Comment
+# =============================================================================
+
+class Comment(models.Model):
+    """
+    Community comments attached to a Report.
+    user is SET_NULL so comments survive account deletion (community content).
+    is_verified can be set by maintainers to highlight accurate/helpful comments.
+    Supports generic votes via the Vote model (Decision 3).
+    """
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='comments',
+    )
+    report = models.ForeignKey(
+        'Report',
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    content = models.TextField()
+    is_verified = models.BooleanField(
+        default=False,
+        help_text="Maintainer-verified accuracy badge.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Generic relations for voting and flagging
+    votes = GenericRelation('Vote', related_query_name='comment')
+    flags = GenericRelation('Flag', related_query_name='comment')
+
+    def __str__(self):
+        return f"Comment by {self.user} on Report #{self.report.id}"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Comments'
+
+
+# =============================================================================
+# Model 8 — Vote  (Generic — works on Report and Comment)
+# =============================================================================
+
+class Vote(models.Model):
+    """
+    Generic vote attached to any model via ContentTypes (Decision 3).
+    unique_together on (user, content_type, object_id) enforces one vote per
+    user per object — this works correctly across both Report and Comment.
+
+    To vote on a Report:
+        Vote.objects.create(
+            user=request.user,
+            content_object=report_instance,
+            vote_type=Vote.VoteType.UPVOTE,
+        )
+    """
+
+    class VoteType(models.TextChoices):
+        UPVOTE = 'UPVOTE', 'Upvote'
+        DOWNVOTE = 'DOWNVOTE', 'Downvote'
+        HELPFUL = 'HELPFUL', 'Helpful'
+        NOT_HELPFUL = 'NOT_HELPFUL', 'Not Helpful'
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='votes',
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    vote_type = models.CharField(max_length=15, choices=VoteType.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} — {self.vote_type}"
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = [['user', 'content_type', 'object_id']]
+        verbose_name_plural = 'Votes'
+
+
+# =============================================================================
+# Model 9 — Flag  (Generic — works on Report and Comment)
+# =============================================================================
+
+class Flag(models.Model):
+    """
+    Generic flag for community moderation (Decision 3).
+    user is SET_NULL so flags survive account deletion — mod review history
+    must not be lost because a user deleted their account.
+    reviewed_by tracks which moderator acted on the flag.
+    mod_notes captures reasoning for the moderation decision.
+    """
+
+    class FlagReason(models.TextChoices):
+        SPAM = 'SPAM', 'Spam'
+        INCORRECT = 'INCORRECT', 'Incorrect Information'
+        MISLEADING = 'MISLEADING', 'Misleading'
+        DUPLICATE = 'DUPLICATE', 'Duplicate'
+        OTHER = 'OTHER', 'Other'
+
+    class FlagStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Review'
+        REVIEWED = 'REVIEWED', 'Reviewed'
+        DISMISSED = 'DISMISSED', 'Dismissed'
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='flags',
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    reason = models.CharField(max_length=15, choices=FlagReason.choices)
+    details = models.TextField(blank=True, null=True)
+    status = models.CharField(
+        max_length=10,
+        choices=FlagStatus.choices,
+        default=FlagStatus.PENDING,
+    )
+    reviewed_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_flags',
+    )
+    mod_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Flag [{self.reason}] by {self.user} — {self.status}"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Flags'
+
+
+# =============================================================================
+# Model 10 — Benchmark
+# =============================================================================
+
+class Benchmark(models.Model):
+    """
+    Optional performance metrics attached to a Report.
+    All measurement fields are nullable — contributors provide what they can.
+    suspend_resume_pass is a boolean test result (did it work at all?).
+    suspend_resume_seconds measures resume latency when it does work.
+    """
+
+    report = models.ForeignKey(
+        'Report',
+        on_delete=models.CASCADE,
+        related_name='benchmarks',
+    )
+    battery_life_hours = models.FloatField(null=True, blank=True)
+    power_draw_watts = models.FloatField(null=True, blank=True)
+    cpu_score = models.IntegerField(null=True, blank=True)
+    gpu_score = models.IntegerField(null=True, blank=True)
+    suspend_resume_pass = models.BooleanField(null=True, blank=True)
+    suspend_resume_seconds = models.FloatField(null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Benchmark for Report #{self.report.id}"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Benchmarks'
+
+
+# =============================================================================
+# Model 11 — DriverFix
+# =============================================================================
+
+class DriverFix(models.Model):
+    """
+    Community-submitted driver fix or workaround for a Component.
+    submitted_by is SET_NULL so fixes survive contributor account deletion.
+    reviewed_by is SET_NULL for the same reason.
+    status tracks the moderation lifecycle: PENDING → ACCEPTED or REJECTED.
+    Accepted fixes can be linked to HelpGroups via HelpGroup.driver_fixes M2M.
+    """
+
+    class FixStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Review'
+        ACCEPTED = 'ACCEPTED', 'Accepted'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    component = models.ForeignKey(
+        'Component',
+        on_delete=models.CASCADE,
+        related_name='driver_fixes',
+    )
+    submitted_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='driver_fixes',
+    )
+    title = models.CharField(max_length=200)
+    body = models.TextField(
+        help_text="Fix commands, terminal instructions, workarounds.",
+    )
+    external_url = models.URLField(blank=True, null=True)
+    status = models.CharField(
+        max_length=10,
+        choices=FixStatus.choices,
+        default=FixStatus.PENDING,
+    )
+    reviewed_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_fixes',
+    )
+    mod_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Fix for {self.component.name} — {self.title} [{self.status}]"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Driver Fixes'
+
+
+# =============================================================================
+# Model 12 — TrustEvent
+# =============================================================================
+
+class TrustEvent(models.Model):
+    """
+    Immutable audit log for every trust score change (Decision 2).
+
+    IMPORTANT — mod_penalty_approved flag:
+        Any event_type containing PENALTY must have mod_penalty_approved=True
+        before the corresponding User.negative_score is incremented.
+        A Django signal should listen for mod_penalty_approved transitioning
+        to True and then update User.negative_score += abs(points_delta).
+        This prevents unfair score drops from rejections due to incomplete
+        information rather than malicious intent.
+
+    points_delta should be positive for beneficial events, negative for penalties.
+    CASCADE on user intentionally — if a user is deleted, their audit trail
+    loses meaning. Admin should soft-delete or deactivate users instead.
+    """
+
+    class EventType(models.TextChoices):
+        REPORT_UPVOTED = 'REPORT_UPVOTED', 'Report Upvoted'
+        REPORT_DOWNVOTED = 'REPORT_DOWNVOTED', 'Report Downvoted'
+        REPORT_APPROVED = 'REPORT_APPROVED', 'Report Approved'
+        REPORT_REJECTED_PENALTY = 'REPORT_REJECTED_PENALTY', 'Report Rejected (Penalty)'
+        COMMENT_VERIFIED = 'COMMENT_VERIFIED', 'Comment Verified'
+        COMMENT_DOWNVOTED = 'COMMENT_DOWNVOTED', 'Comment Downvoted'
+        COMMENT_FLAGGED_CONFIRMED = 'COMMENT_FLAGGED_CONFIRMED', 'Comment Flag Confirmed'
+        DRIVER_FIX_ACCEPTED = 'DRIVER_FIX_ACCEPTED', 'Driver Fix Accepted'
+        DRIVER_FIX_REJECTED_PENALTY = 'DRIVER_FIX_REJECTED_PENALTY', 'Driver Fix Rejected (Penalty)'
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='trust_events',
+    )
+    event_type = models.CharField(max_length=40, choices=EventType.choices)
+    points_delta = models.IntegerField(
+        help_text="Positive for gains, negative for penalties.",
+    )
+    mod_penalty_approved = models.BooleanField(
+        default=False,
+        help_text=(
+            "Must be True for any PENALTY event before negative_score is updated. "
+            "A signal listens for this transitioning to True and applies the deduction."
+        ),
+    )
+    approved_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_trust_events',
+    )
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"TrustEvent: {self.event_type} for {self.user} ({self.points_delta:+d})"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Trust Events'
+
+
+# =============================================================================
+# Model 13 — ReportAttachment
+# =============================================================================
+
+class ReportAttachment(models.Model):
+    """
+    Files attached to a Report — screenshots, dmesg logs, config files.
+    Files are stored under MEDIA_ROOT/report_attachments/YYYY/MM/.
+    original_filename preserves the uploader's filename for display purposes
+    (Django may rename files on disk to avoid collisions).
+    """
+
+    class FileType(models.TextChoices):
+        IMAGE = 'IMAGE', 'Image'
+        LOG = 'LOG', 'Log File'
+        CONFIG = 'CONFIG', 'Config File'
+
+    report = models.ForeignKey(
+        'Report',
+        on_delete=models.CASCADE,
+        related_name='attachments',
+    )
+    file = models.FileField(upload_to='report_attachments/%Y/%m/')
+    file_type = models.CharField(max_length=10, choices=FileType.choices)
+    original_filename = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"[{self.file_type}] Attachment for Report #{self.report.id}"
+
+    class Meta:
+        ordering = ['-uploaded_at']
+        verbose_name_plural = 'Report Attachments'
+
+
+# =============================================================================
+# Model 14 — HelpGroup
+# =============================================================================
+
+class HelpGroup(models.Model):
+    """
+    A moderated support thread for a broken component+distro combination.
+    Suggested automatically when many users share the same problem;
+    a maintainer approves to promote it to OPEN.
+    driver_fixes is a M2M to link accepted workarounds into the group.
+    created_by is SET_NULL so groups survive account deletion.
+    """
+
+    class GroupStatus(models.TextChoices):
+        SUGGESTED = 'SUGGESTED', 'Suggested'
+        OPEN = 'OPEN', 'Open'
+        RESOLVED = 'RESOLVED', 'Resolved'
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    component = models.ForeignKey(
+        'Component',
+        on_delete=models.CASCADE,
+        related_name='help_groups',
+    )
+    distro = models.ForeignKey(
+        'Distro',
+        on_delete=models.CASCADE,
+        related_name='help_groups',
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=GroupStatus.choices,
+        default=GroupStatus.SUGGESTED,
+    )
+    created_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_help_groups',
+    )
+    driver_fixes = models.ManyToManyField(
+        'DriverFix',
+        blank=True,
+        related_name='help_groups',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"HelpGroup: {self.title} [{self.status}]"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Help Groups'
+
+
+# =============================================================================
+# Model 15 — HelpGroupMembership
+# =============================================================================
+
+class HelpGroupMembership(models.Model):
+    """
+    Tracks which users are members of a HelpGroup and how they joined.
+    CASCADE on both FKs — membership records have no meaning without
+    both the group and the user.
+    unique_together prevents duplicate memberships.
+    """
+
+    class InviteStatus(models.TextChoices):
+        INVITED = 'INVITED', 'Invited'
+        REQUESTED = 'REQUESTED', 'Requested'
+        ACCEPTED = 'ACCEPTED', 'Accepted'
+
+    group = models.ForeignKey(
+        'HelpGroup',
+        on_delete=models.CASCADE,
+        related_name='memberships',
+    )
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='help_group_memberships',
+    )
+    invite_status = models.CharField(max_length=10, choices=InviteStatus.choices)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} in '{self.group.title}' — {self.invite_status}"
+
+    class Meta:
+        ordering = ['-joined_at']
+        unique_together = [['group', 'user']]
+        verbose_name_plural = 'Help Group Memberships'
+
+
+# =============================================================================
+# Model 16 — HelpGroupMessage
+# =============================================================================
+
+class HelpGroupMessage(models.Model):
+    """
+    Chat-style messages inside a HelpGroup thread.
+    Ordered oldest-first (ascending created_at) to read like a conversation.
+    user is SET_NULL so message history survives account deletion.
+    """
+
+    group = models.ForeignKey(
+        'HelpGroup',
+        on_delete=models.CASCADE,
+        related_name='messages',
+    )
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='help_group_messages',
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message by {self.user} in '{self.group.title}'"
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name_plural = 'Help Group Messages'
+
+
+# =============================================================================
+# Model 17 — UserMachine  (User's owned hardware)
+# =============================================================================
+
+class UserMachine(models.Model):
+    """
+    Links a User to Machine(s) they personally own.
+    CASCADE on both FKs — the ownership record is meaningless without
+    both the user and the machine.
+    unique_together prevents a user adding the same machine twice.
+    """
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='user_machines',
+    )
+    machine = models.ForeignKey(
+        'Machine',
+        on_delete=models.CASCADE,
+        related_name='user_machines',
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} owns {self.machine}"
+
+    class Meta:
+        ordering = ['-added_at']
+        unique_together = [['user', 'machine']]
+        verbose_name_plural = 'User Machines'
+
+
+# =============================================================================
+# Model 18 — MachineSpec
+# =============================================================================
+
+class MachineSpec(models.Model):
+
+    machine = models.OneToOneField(
+        'Machine', on_delete=models.CASCADE, related_name='spec'
+    )
+
+    # CPU
+    class CPUManufacturer(models.TextChoices):
+        INTEL    = 'INTEL',    'Intel'
+        AMD      = 'AMD',      'AMD'
+        APPLE    = 'APPLE',    'Apple'
+        QUALCOMM = 'QUALCOMM', 'Qualcomm'
+
+    class CPUSeriesTier(models.TextChoices):
+        U        = 'U',        'U Series (ultra-low power)'
+        P        = 'P',        'P Series (performance)'
+        H        = 'H',        'H Series (high performance)'
+        HX       = 'HX',       'HX Series (extreme)'
+        X        = 'X',        'X Series (workstation)'
+        STANDARD = 'STANDARD', 'Standard (desktop / no tier)'
+
+    cpu_name         = models.CharField(max_length=100, null=True, blank=True, help_text="e.g. Core i7-1365U")
+    cpu_manufacturer = models.CharField(max_length=20, choices=CPUManufacturer.choices, null=True, blank=True)
+    cpu_generation   = models.CharField(max_length=50, null=True, blank=True, help_text="e.g. 13th Gen, Zen 4")
+    cpu_series_tier  = models.CharField(max_length=10, choices=CPUSeriesTier.choices, null=True, blank=True)
+
+    # GPU
+    class GPUManufacturer(models.TextChoices):
+        NVIDIA = 'NVIDIA', 'NVIDIA'
+        AMD    = 'AMD',    'AMD'
+        INTEL  = 'INTEL',  'Intel'
+        APPLE  = 'APPLE',  'Apple'
+
+    class GPUType(models.TextChoices):
+        DEDICATED  = 'DEDICATED',  'Dedicated'
+        INTEGRATED = 'INTEGRATED', 'Integrated'
+
+    gpu_name         = models.CharField(max_length=100, null=True, blank=True, help_text="e.g. RTX 4060, Radeon 780M")
+    gpu_manufacturer = models.CharField(max_length=10, choices=GPUManufacturer.choices, null=True, blank=True)
+    gpu_generation   = models.CharField(max_length=50, null=True, blank=True, help_text="e.g. Ada Lovelace, RDNA 3")
+    gpu_type         = models.CharField(max_length=15, choices=GPUType.choices, null=True, blank=True)
+
+    # RAM
+    class RAMType(models.TextChoices):
+        DDR4    = 'DDR4',    'DDR4'
+        DDR5    = 'DDR5',    'DDR5'
+        LPDDR4  = 'LPDDR4',  'LPDDR4'
+        LPDDR4X = 'LPDDR4X', 'LPDDR4X'
+        LPDDR5  = 'LPDDR5',  'LPDDR5'
+        LPDDR5X = 'LPDDR5X', 'LPDDR5X'
+
+    ram_type     = models.CharField(max_length=10, choices=RAMType.choices, null=True, blank=True)
+    ram_speed_mhz = models.IntegerField(null=True, blank=True, help_text="e.g. 4800, 5600")
+    ram_base_gb  = models.IntegerField(null=True, blank=True, help_text="RAM as shipped in base config")
+    ram_max_gb   = models.IntegerField(null=True, blank=True, help_text="Maximum supported RAM")
+
+    # Storage
+    class StorageType(models.TextChoices):
+        NVME = 'NVME', 'NVMe SSD'
+        SATA = 'SATA', 'SATA SSD'
+        EMMC = 'EMMC', 'eMMC'
+
+    storage_type    = models.CharField(max_length=10, choices=StorageType.choices, null=True, blank=True)
+    storage_base_gb = models.IntegerField(null=True, blank=True, help_text="Storage as shipped in base config")
+    storage_max_gb  = models.IntegerField(null=True, blank=True, help_text="Max storage (null if soldered/non-upgradeable)")
+
+    # Display
+    class PanelType(models.TextChoices):
+        IPS      = 'IPS',      'IPS'
+        OLED     = 'OLED',     'OLED'
+        AMOLED   = 'AMOLED',   'AMOLED'
+        TN       = 'TN',       'TN'
+        VA       = 'VA',       'VA'
+        MINI_LED = 'MINI_LED', 'Mini-LED'
+
+    display_size_inches  = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True, help_text="e.g. 14.0, 15.6")
+    display_resolution   = models.CharField(max_length=20, null=True, blank=True, help_text="e.g. 1920x1200")
+    display_panel_type   = models.CharField(max_length=10, choices=PanelType.choices, null=True, blank=True)
+
+    # Battery
+    battery_wh = models.FloatField(null=True, blank=True, help_text="Battery capacity in Wh. Null for desktops.")
+
+    # Verification
+    is_verified  = models.BooleanField(default=False)
+    verified_by  = models.ForeignKey(
+        'User', on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_specs'
+    )
+    verified_at  = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name        = 'Machine spec'
+        verbose_name_plural = 'Machine specs'
+
+    def __str__(self):
+        return f"Spec for {self.machine}"
+
+
+# =============================================================================
+# Model 19 — SpecSuggestion
+# =============================================================================
+
+class SpecSuggestion(models.Model):
+
+    class Status(models.TextChoices):
+        PENDING  = 'PENDING',  'Pending'
+        ACCEPTED = 'ACCEPTED', 'Accepted'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    machine        = models.ForeignKey('Machine', on_delete=models.CASCADE, related_name='spec_suggestions')
+    suggested_by   = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, related_name='spec_suggestions')
+    field_name     = models.CharField(max_length=50, help_text="The MachineSpec field this suggestion is for, e.g. cpu_name")
+    suggested_value = models.CharField(max_length=200, help_text="The suggested value as a string")
+    source_url     = models.URLField(null=True, blank=True, help_text="Link to proof — manufacturer page, Notebookcheck, GSMArena etc.")
+    status         = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    reviewed_by    = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_suggestions')
+    mod_notes      = models.TextField(null=True, blank=True)
+    created_at     = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering            = ['-created_at']
+        verbose_name        = 'Spec suggestion'
+        verbose_name_plural = 'Spec suggestions'
+
+    def __str__(self):
+        return f"Suggestion: {self.field_name} = {self.suggested_value} for {self.machine}"
+
+
+FILE: silicon_registry/settings.py
+==================================
+"""
+Django settings for silicon_registry project.
+
+Generated by 'django-admin startproject' using Django 6.0.3.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/6.0/ref/settings/
+"""
+
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-!pms((3by%akpd^7555i73)^%k$w2kcdzouuff_fgx2+(h9fvn'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',       # ← already present; required for GenericFK
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',              # ← ADD  (required by allauth)
+
+    # Third-party
+    'rest_framework',                    # ← ADD
+    'allauth',                           # ← ADD
+    'allauth.account',                   # ← ADD
+    'allauth.socialaccount',             # ← ADD
+    'allauth.socialaccount.providers.github',  # ← ADD
+
+    # Project
+    'registry',                          # ← ADD
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+ROOT_URLCONF = 'silicon_registry.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'silicon_registry.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'silicon_registry',
+        'USER': 'root',
+        'PASSWORD': '9303',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
+}
+
+# Password validation
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/6.0/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/6.0/howto/static-files/
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'registry' / 'static']
+
+AUTH_USER_MODEL = 'registry.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': ['user', 'repo'],
+    }
+}
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+FILE: registry/api.py
+=====================
+from rest_framework import viewsets, permissions, filters, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db.models import Count, Q
+from django.contrib.contenttypes.models import ContentType
+from .models import (
+    User, Machine, Distro, Component, Report, Comment, Vote, DriverFix, HelpGroup
+)
+from .serializers import (
+    UserSerializer, MachineSerializer, DistroSerializer, ComponentSerializer, 
+    ReportSerializer, CommentSerializer, VoteSerializer, DriverFixSerializer, 
+    HelpGroupSerializer
+)
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
+
+class MachineViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Machine.objects.annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+    ).order_by('-report_count')
+    serializer_class = MachineSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['vendor', 'model_name', 'series']
+
+class DistroViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Distro.objects.annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+    ).order_by('-report_count')
+    serializer_class = DistroSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'version']
+
+class ComponentViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Component.objects.all()
+    serializer_class = ComponentSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'driver']
+
+class ReportViewSet(viewsets.ModelViewSet):
+    queryset = Report.objects.filter(status='APPROVED').select_related(
+        'user', 'machine', 'distro', 'component'
+    ).prefetch_related(
+        'comp_statuses', 'attachments', 'benchmarks'
+    ).annotate(
+        upvotes=Count('votes', filter=Q(votes__vote_type='UPVOTE')),
+        downvotes=Count('votes', filter=Q(votes__vote_type='DOWNVOTE'))
+    )
+    serializer_class = ReportSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['title', 'description']
+    ordering_fields = ['created_at', 'upvotes']
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def vote(self, request, pk=None):
+        report = self.get_object()
+        vote_type = request.data.get('vote_type')
+        if vote_type not in ['UPVOTE', 'DOWNVOTE']:
+            return Response({'error': 'Invalid vote type'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        content_type = ContentType.objects.get_for_model(Report)
+        vote, created = Vote.objects.update_or_create(
+            user=request.user,
+            content_type=content_type,
+            object_id=report.id,
+            defaults={'vote_type': vote_type}
+        )
+        return Response({'status': 'voted', 'vote_type': vote_type})
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class DriverFixViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DriverFix.objects.filter(status='ACCEPTED')
+    serializer_class = DriverFixSerializer
+
+class HelpGroupViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = HelpGroup.objects.filter(status='OPEN')
+    serializer_class = HelpGroupSerializer
+
+
+FILE: registry/views.py
+=======================
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
+from django import forms
+from .models import *
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['bio', 'avatar', 'github_username']
+        widgets = {'bio': forms.Textarea(attrs={'rows': 4})}
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['machine', 'distro', 'report_type', 'title', 'description', 'boot_status', 'kernel_version']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 6}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Apply custom classes to all fields for styling if needed, 
+        # though we handle it mostly in CSS
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'silicon-input'})
+
+def homepage(request):
+    context = {
+        'total_machines': Machine.objects.count(),
+        'total_reports':  Report.objects.filter(status='APPROVED').count(),
+        'total_users':    User.objects.count(),
+        'total_distros':  Distro.objects.count(),
+        'top_machines': Machine.objects.annotate(
+            report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+        ).filter(report_count__gt=0).order_by('-report_count')[:6],
+        'featured_distros': Distro.objects.annotate(
+            report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+        ).filter(report_count__gt=0).order_by('-report_count')[:4],
+    }
+    return render(request, 'registry/homepage.html', context)
+
+def about(request): return render(request, 'registry/about.html', {})
+from functools import wraps
+
+def mod_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated or request.user.role_type not in ['MAINTAINER','ADMIN']:
+            messages.error(request, 'Access denied.')
+            return redirect('registry:homepage')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+def search(request):
+    q = request.GET.get('q', '').strip()
+    results = {'machines': [], 'reports': [], 'components': [], 'distros': []}
+    total = 0
+    if q:
+        # Machines: Search vendor, model, series, and even CPU/GPU info if specs exist
+        results['machines'] = Machine.objects.filter(
+            Q(vendor__icontains=q) | 
+            Q(model_name__icontains=q) | 
+            Q(series__icontains=q) |
+            Q(spec__cpu_name__icontains=q) |
+            Q(spec__gpu_name__icontains=q)
+        ).distinct().annotate(report_count=Count('reports'))[:12]
+
+        # Reports: Search title, description, and component status notes (the "issues")
+        results['reports'] = Report.objects.filter(
+            Q(title__icontains=q) | 
+            Q(description__icontains=q) |
+            Q(comp_statuses__notes__icontains=q) |
+            Q(machine__model_name__icontains=q),
+            status='APPROVED'
+        ).distinct().select_related('user', 'machine', 'distro')[:15]
+
+        # Components: Search name, driver, and type
+        results['components'] = Component.objects.filter(
+            Q(name__icontains=q) | 
+            Q(driver__icontains=q) |
+            Q(type__icontains=q)
+        ).distinct()[:10]
+
+        # Distros: Search name and version
+        results['distros'] = Distro.objects.filter(
+            Q(name__icontains=q) | 
+            Q(version__icontains=q)
+        ).distinct()[:6]
+
+        total = sum(len(v) for v in results.values())
+    
+    return render(request, 'registry/search.html', {
+        'q': q,
+        'results': results,
+        'total': total
+    })
+
+@mod_required
+def mod_dashboard(request):
+    context = {
+        'pending_reports': Report.objects.filter(status='PENDING').count(),
+        'pending_specs': SpecSuggestion.objects.filter(status='PENDING').count(),
+        'pending_fixes': DriverFix.objects.filter(status='PENDING').count(),
+        'open_flags': Flag.objects.filter(status='PENDING').count(),
+        'pending_trust_events': TrustEvent.objects.filter(mod_penalty_approved=False, points_delta__lt=0).count(),
+        'total_users': User.objects.count(),
+        'total_reports': Report.objects.filter(status='APPROVED').count(),
+        'total_machines': Machine.objects.count(),
+    }
+    return render(request, 'registry/mod/dashboard.html', context)
+
+@mod_required
+def mod_reports(request):
+    reports = Report.objects.filter(status='PENDING').select_related('user', 'machine', 'distro').order_by('created_at')
+    return render(request, 'registry/mod/reports.html', {'reports': reports})
+
+@mod_required
+def mod_approve_report(request, pk):
+    if request.method == 'POST':
+        report = get_object_or_404(Report, pk=pk)
+        report.status = 'APPROVED'
+        report.save()
+        messages.success(request, f'Report #{pk} approved.')
+    return redirect('registry:mod_reports')
+
+@mod_required
+def mod_reject_report(request, pk):
+    if request.method == 'POST':
+        report = get_object_or_404(Report, pk=pk)
+        report.status = 'REJECTED'
+        report.save()
+        messages.success(request, f'Report #{pk} rejected.')
+    return redirect('registry:mod_reports')
+
+@mod_required
+def mod_specs(request):
+    if request.method == 'POST':
+        suggestion = get_object_or_404(SpecSuggestion, pk=request.POST.get('suggestion_id'))
+        action = request.POST.get('action')
+        if action == 'accept':
+            spec, created = MachineSpec.objects.get_or_create(machine=suggestion.machine)
+            setattr(spec, suggestion.field_name, suggestion.suggested_value)
+            spec.save()
+            suggestion.status = 'ACCEPTED'
+            messages.success(request, 'Spec suggestion accepted and applied.')
+        elif action == 'reject':
+            suggestion.status = 'REJECTED'
+            messages.success(request, 'Spec suggestion rejected.')
+        suggestion.reviewed_by = request.user
+        suggestion.save()
+        return redirect('registry:mod_specs')
+        
+    suggestions = SpecSuggestion.objects.filter(status='PENDING').select_related('machine', 'suggested_by').order_by('created_at')
+    return render(request, 'registry/mod/specs.html', {'suggestions': suggestions})
+
+@mod_required
+def mod_fixes(request):
+    if request.method == 'POST':
+        fix = get_object_or_404(DriverFix, pk=request.POST.get('fix_id'))
+        action = request.POST.get('action')
+        if action == 'accept':
+            fix.status = 'ACCEPTED'
+            messages.success(request, 'Driver fix accepted.')
+        elif action == 'reject':
+            fix.status = 'REJECTED'
+            messages.success(request, 'Driver fix rejected.')
+        fix.reviewed_by = request.user
+        fix.save()
+        return redirect('registry:mod_fixes')
+
+    fixes = DriverFix.objects.filter(status='PENDING').select_related('component', 'submitted_by').order_by('created_at')
+    return render(request, 'registry/mod/fixes.html', {'fixes': fixes})
+
+@mod_required
+def mod_trust(request):
+    if request.method == 'POST':
+        event = get_object_or_404(TrustEvent, pk=request.POST.get('event_id'))
+        event.mod_penalty_approved = True
+        event.approved_by = request.user
+        event.save()
+        # Also need to update the user's actual score since it's approved now
+        event.user.negative_score += abs(event.points_delta)
+        event.user.save()
+        messages.success(request, 'Penalty approved.')
+        return redirect('registry:mod_trust')
+
+    events = TrustEvent.objects.filter(mod_penalty_approved=False, points_delta__lt=0).select_related('user').order_by('created_at')
+    return render(request, 'registry/mod/trust.html', {'events': events})
+
+@mod_required
+def mod_users(request):
+    if request.method == 'POST':
+        user = get_object_or_404(User, pk=request.POST.get('user_id'))
+        new_role = request.POST.get('role_type')
+        if new_role in dict(User.RoleType.choices):
+            user.role_type = new_role
+            user.save()
+            messages.success(request, f'Role for {user.username} updated to {new_role}.')
+        return redirect('registry:mod_users')
+
+    users = User.objects.all().order_by('-date_joined')
+    return render(request, 'registry/mod/users.html', {'users': users, 'roles': User.RoleType.choices})
+
+@mod_required
+def mod_groups(request):
+    return render(request, 'registry/mod/groups.html', {})
+
+def api_machines(request):
+    data = list(Machine.objects.annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+    ).values('id','vendor','series','model_name','cpu_family','form_factor','report_count'))
+    response = JsonResponse(data, safe=False)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+def api_reports(request):
+    data = list(Report.objects.filter(status='APPROVED').select_related(
+        'user','machine','distro'
+    ).values('id','title','report_type','boot_status','kernel_version','created_at',
+             'user__username','machine__model_name','distro__name','distro__version')[:50])
+    response = JsonResponse(data, safe=False)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+def api_components(request):
+    data = list(Component.objects.values('id','type','name','driver'))
+    response = JsonResponse(data, safe=False)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+def api_distros(request):
+    data = list(Distro.objects.annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+    ).values('id','name','version','kernel_default','report_count'))
+    response = JsonResponse(data, safe=False)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+def machine_list(request):
+    qs = Machine.objects.select_related('spec').annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED')),
+        gold_count=Count('reports', filter=Q(reports__status='APPROVED', reports__boot_status='GOLD')),
+    )
+    q           = request.GET.get('q', '')
+    form_factor = request.GET.get('form_factor', '')
+    cpu_mfr     = request.GET.get('cpu_manufacturer', '')
+    cpu_tier    = request.GET.get('cpu_series_tier', '')
+    distro_id   = request.GET.get('distro', '')
+    sort        = request.GET.get('sort', '-report_count')
+
+    if q:
+        qs = qs.filter(Q(vendor__icontains=q) | Q(model_name__icontains=q) | Q(series__icontains=q))
+    if form_factor:
+        qs = qs.filter(form_factor=form_factor)
+    if cpu_mfr:
+        qs = qs.filter(spec__cpu_manufacturer=cpu_mfr)
+    if cpu_tier:
+        qs = qs.filter(spec__cpu_series_tier=cpu_tier)
+    if distro_id:
+        qs = qs.filter(reports__distro_id=distro_id, reports__status='APPROVED').distinct()
+
+    valid_sorts = ['-report_count', '-gold_count', 'vendor', 'model_name']
+    if sort in valid_sorts:
+        qs = qs.order_by(sort)
+    else:
+        qs = qs.order_by('-report_count')
+
+    # Paginate 18 per page
+    from django.core.paginator import Paginator
+    paginator = Paginator(qs, 18)
+    page = request.GET.get('page', 1)
+    machines = paginator.get_page(page)
+
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'machines': machines,
+        'total_count': paginator.count,
+        'distros': Distro.objects.all().order_by('name'),
+        'form_factors': Machine.FormFactor.choices,
+        'cpu_tiers': MachineSpec.CPUSeriesTier.choices if hasattr(MachineSpec, 'CPUSeriesTier') else [],
+        'q': q, 'form_factor': form_factor,
+        'cpu_mfr': cpu_mfr, 'cpu_tier': cpu_tier,
+        'distro_id': distro_id, 'sort': sort,
+    }
+    if is_htmx:
+        return render(request, 'registry/partials/machine_cards.html', context)
+    return render(request, 'registry/machine_list.html', context)
+
+def machine_add(request): return render(request, 'registry/machine_add.html', {})
+
+def machine_detail(request, pk):
+    machine = get_object_or_404(Machine, pk=pk)
+    spec = getattr(machine, 'spec', None)
+    reports = Report.objects.filter(
+        machine=machine, status='APPROVED'
+    ).select_related('user', 'distro', 'component').prefetch_related(
+        'comp_statuses__component'
+    ).order_by('-created_at')
+
+    # Component status summary across all reports
+    from collections import defaultdict
+    comp_summary = defaultdict(lambda: {'working':0,'issues':0,'broken':0,'name':'','type':''})
+    for report in reports:
+        for cs in report.comp_statuses.all():
+            key = cs.component_id
+            comp_summary[key]['name'] = cs.component.name
+            comp_summary[key]['type'] = cs.component.type
+            if cs.status == 'WORKING': comp_summary[key]['working'] += 1
+            elif cs.status == 'ISSUES': comp_summary[key]['issues'] += 1
+            elif cs.status == 'BROKEN': comp_summary[key]['broken'] += 1
+
+    # Overall compat badge
+    total = reports.count()
+    gold  = reports.filter(boot_status='GOLD').count()
+    if total == 0: compat = 'none'
+    elif gold == total: compat = 'gold'
+    elif gold > total / 2: compat = 'mostly_gold'
+    elif reports.filter(boot_status='BROKEN').count() > total / 2: compat = 'broken'
+    else: compat = 'mixed'
+
+    driver_fixes = DriverFix.objects.filter(
+        component__in=[cs.component_id for r in reports for cs in r.comp_statuses.all()],
+        status='ACCEPTED'
+    ).select_related('component', 'submitted_by').distinct()[:10]
+
+    related = Machine.objects.filter(
+        vendor=machine.vendor, series=machine.series
+    ).exclude(pk=machine.pk).annotate(
+        report_count=Count('reports', filter=Q(reports__status='APPROVED'))
+    )[:4]
+
+    context = {
+        'machine': machine, 'spec': spec, 'reports': reports,
+        'report_count': total, 'compat': compat,
+        'comp_summary': dict(comp_summary),
+        'driver_fixes': driver_fixes, 'related': related,
+    }
+    return render(request, 'registry/machine_detail.html', context)
+
+def report_detail(request, pk):
+    report = get_object_or_404(
+        Report.objects.select_related('user','machine','distro','component'),
+        pk=pk, status='APPROVED'
+    )
+    comp_statuses = report.comp_statuses.select_related('component').all()
+    comments      = report.comments.select_related('user').order_by('created_at')
+    attachments   = report.attachments.all()
+    benchmarks    = report.benchmarks.all()
+    context = {
+        'report': report, 'comp_statuses': comp_statuses,
+        'comments': comments, 'attachments': attachments,
+        'benchmarks': benchmarks,
+        'comment_count': comments.count(),
+    }
+    return render(request, 'registry/report_detail.html', context)
+
+@login_required
+def report_submit(request):
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.user = request.user
+            report.status = 'PENDING'
+            report.save()
+            messages.success(request, 'Report submitted! It will appear once approved by a maintainer.')
+            return redirect('registry:homepage')
+    else:
+        form = ReportForm()
+    
+    return render(request, 'registry/report_submit.html', {'form': form})
+
+def user_profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    reports = Report.objects.filter(
+        user=profile_user, status='APPROVED'
+    ).select_related('machine','distro').order_by('-created_at')
+    driver_fixes = DriverFix.objects.filter(
+        submitted_by=profile_user, status='ACCEPTED'
+    ).select_related('component')
+    owned_machines = UserMachine.objects.filter(
+        user=profile_user
+    ).select_related('machine')
+    context = {
+        'profile_user': profile_user,
+        'reports': reports,
+        'report_count': reports.count(),
+        'driver_fixes': driver_fixes,
+        'owned_machines': owned_machines,
+        'trust_ratio': round(
+            profile_user.positive_score * 100 /
+            max(profile_user.positive_score + profile_user.negative_score, 1), 1
+        ),
+        'is_own_profile': request.user == profile_user,
+    }
+    return render(request, 'registry/user_profile.html', context)
+
+@login_required
+def profile_edit(request):
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated.')
+            return redirect('registry:user_profile', username=request.user.username)
+    else:
+        form = ProfileEditForm(instance=request.user)
+    return render(request, 'registry/profile_edit.html', {'form': form})
+
+@login_required
+def flag_report(request, pk):
+    report = get_object_or_404(Report, pk=pk)
+    if request.method == 'POST':
+        Flag.objects.create(
+            user=request.user,
+            content_type=ContentType.objects.get_for_model(Report),
+            object_id=report.pk,
+            reason=request.POST.get('reason'),
+            details=request.POST.get('details',''),
+        )
+        messages.success(request, 'Report flagged. Moderators will review it.')
+        if request.headers.get('HX-Request'):
+            return HttpResponse('<p class="text-muted small">Flagged. Thank you.</p>')
+        return redirect('registry:report_detail', pk=pk)
+    reasons = Flag.FlagReason.choices
+    if request.headers.get('HX-Request'):
+        return render(request, 'registry/partials/flag_form.html', {'report':report,'reasons':reasons})
+    return render(request, 'registry/flag_form.html', {'report':report,'reasons':reasons})
+
+@login_required
+def add_comment(request, pk):
+    report = get_object_or_404(Report, pk=pk, status='APPROVED')
+    if request.method == 'POST':
+        content = request.POST.get('content','').strip()
+        if content:
+            Comment.objects.create(user=request.user, report=report, content=content)
+            messages.success(request, 'Comment added.')
+        if request.headers.get('HX-Request'):
+            comments = report.comments.select_related('user').order_by('created_at')
+            return render(request, 'registry/partials/comment_form.html', {'report':report,'comments':comments})
+    return redirect('registry:report_detail', pk=pk)
+@login_required
+def suggest_spec(request, pk):
+    machine = get_object_or_404(Machine, pk=pk)
+    if request.method == 'POST':
+        field_name = request.POST.get('field_name')
+        suggested_value = request.POST.get('suggested_value')
+        source_url = request.POST.get('source_url')
+        if field_name and suggested_value:
+            SpecSuggestion.objects.create(
+                machine=machine,
+                suggested_by=request.user,
+                field_name=field_name,
+                suggested_value=suggested_value,
+                source_url=source_url,
+                status='PENDING'
+            )
+            messages.success(request, f'Suggestion for {field_name} submitted for review.')
+            return redirect('registry:machine_detail', pk=pk)
+    
+    # Get fields from MachineSpec model to suggest
+    spec_fields = [
+        ('cpu_name', 'CPU Name'), ('cpu_manufacturer', 'CPU Manufacturer'),
+        ('cpu_generation', 'CPU Generation'), ('cpu_series_tier', 'CPU Series Tier'),
+        ('gpu_name', 'GPU Name'), ('gpu_manufacturer', 'GPU Manufacturer'),
+        ('gpu_type', 'GPU Type'), ('ram_type', 'RAM Type'),
+        ('ram_speed_mhz', 'RAM Speed (MHz)'), ('ram_base_gb', 'RAM Base (GB)'),
+        ('ram_max_gb', 'RAM Max (GB)'), ('storage_type', 'Storage Type'),
+        ('storage_base_gb', 'Storage Base (GB)'), ('storage_max_gb', 'Storage Max (GB)'),
+        ('display_size_inches', 'Display Size (inches)'), ('display_resolution', 'Display Resolution'),
+        ('display_panel_type', 'Display Panel Type'), ('battery_wh', 'Battery (Wh)')
+    ]
+    return render(request, 'registry/suggest_spec.html', {'machine': machine, 'spec_fields': spec_fields})
+def partial_machine_cards(request): return HttpResponse('')
+def partial_navbar_search(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse('')
+    machines = Machine.objects.filter(
+        Q(vendor__icontains=q) | Q(model_name__icontains=q) | Q(series__icontains=q)
+    )[:5]
+    return render(request, 'registry/partials/navbar_search.html', {'machines': machines})
+
+def partial_load_more(request): return HttpResponse('')
+def api_machines(request): return JsonResponse([], safe=False)
+def api_reports(request): return JsonResponse([], safe=False)
+def api_components(request): return JsonResponse([], safe=False)
+def api_distros(request): return JsonResponse([], safe=False)
+def error_404(request, exception=None): return render(request, 'registry/404.html', {}, status=404)
+def error_500(request): return render(request, 'registry/500.html', {}, status=500)
+
+
+FILE: registry/urls.py
+======================
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import views, api
+
+app_name = 'registry'
+
+router = DefaultRouter()
+router.register(r'users', api.UserViewSet)
+router.register(r'machines', api.MachineViewSet)
+router.register(r'distros', api.DistroViewSet)
+router.register(r'components', api.ComponentViewSet)
+router.register(r'reports', api.ReportViewSet)
+router.register(r'comments', api.CommentViewSet)
+router.register(r'driver-fixes', api.DriverFixViewSet)
+router.register(r'help-groups', api.HelpGroupViewSet)
+
+urlpatterns = [
+    # API v1
+    path('api/v1/', include(router.urls)),
+
+    # Core pages
+    path('',                               views.homepage,        name='homepage'),
+    path('about/',                         views.about,           name='about'),
+    path('search/',                        views.search,          name='search'),
+
+    # Machines
+    path('machines/',                      views.machine_list,    name='machine_list'),
+    path('machines/add/',                  views.machine_add,     name='machine_add'),
+    path('machines/<int:pk>/',             views.machine_detail,  name='machine_detail'),
+
+    # Reports
+    path('reports/submit/',                views.report_submit,   name='report_submit'),
+    path('reports/<int:pk>/',              views.report_detail,   name='report_detail'),
+
+    # Users
+    path('profile/edit/',                  views.profile_edit,    name='profile_edit'),
+    path('profile/<str:username>/',        views.user_profile,    name='user_profile'),
+
+    # Actions (HTMX endpoints)
+    path('reports/<int:pk>/flag/',         views.flag_report,     name='flag_report'),
+    path('reports/<int:pk>/comment/',      views.add_comment,     name='add_comment'),
+    path('machines/<int:pk>/suggest-spec/',views.suggest_spec,    name='suggest_spec'),
+
+    # Moderator dashboard
+    path('mod/',                           views.mod_dashboard,   name='mod_dashboard'),
+    path('mod/reports/',                   views.mod_reports,     name='mod_reports'),
+    path('mod/reports/<int:pk>/approve/',  views.mod_approve_report, name='mod_approve_report'),
+    path('mod/reports/<int:pk>/reject/',   views.mod_reject_report,  name='mod_reject_report'),
+    path('mod/specs/',                     views.mod_specs,       name='mod_specs'),
+    path('mod/fixes/',                     views.mod_fixes,       name='mod_fixes'),
+    path('mod/trust/',                     views.mod_trust,       name='mod_trust'),
+    path('mod/groups/',                    views.mod_groups,      name='mod_groups'),
+    path('mod/users/',                     views.mod_users,       name='mod_users'),
+
+    # HTMX partials
+    path('partials/machine-cards/',        views.partial_machine_cards,  name='partial_machine_cards'),
+    path('partials/navbar-search/',        views.partial_navbar_search,  name='partial_navbar_search'),
+    path('partials/load-more-reports/',    views.partial_load_more,      name='partial_load_more'),
+
+    # API
+    path('api/machines/',                  views.api_machines,    name='api_machines'),
+    path('api/reports/',                   views.api_reports,     name='api_reports'),
+    path('api/components/',                views.api_components,  name='api_components'),
+    path('api/distros/',                   views.api_distros,     name='api_distros'),
+
+    # Error pages
+    path('404/',                           views.error_404,       name='error_404'),
+    path('500/',                           views.error_500,       name='error_500'),
+]
+
+
+FILE: registry/serializers.py
+=============================
+from rest_framework import serializers
+from django.contrib.contenttypes.models import ContentType
+from .models import (
+    User, Machine, Distro, Component, Report, CompStatus, 
+    Comment, Vote, Flag, Benchmark, DriverFix, TrustEvent, 
+    ReportAttachment, HelpGroup, HelpGroupMembership, 
+    HelpGroupMessage, UserMachine, MachineSpec, SpecSuggestion
+)
+
+class UserSerializer(serializers.ModelSerializer):
+    trust_ratio = serializers.ReadOnlyField()
+    needs_moderation = serializers.ReadOnlyField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'role_type', 'bio', 'avatar', 
+            'positive_score', 'negative_score', 'is_verified', 
+            'github_username', 'trust_ratio', 'needs_moderation'
+        ]
+        read_only_fields = ['positive_score', 'negative_score', 'is_verified']
+
+class MachineSpecSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MachineSpec
+        fields = '__all__'
+
+class MachineSerializer(serializers.ModelSerializer):
+    spec = MachineSpecSerializer(read_only=True)
+    report_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Machine
+        fields = ['id', 'vendor', 'series', 'model_name', 'cpu_family', 'form_factor', 'spec', 'report_count']
+
+class DistroSerializer(serializers.ModelSerializer):
+    report_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Distro
+        fields = ['id', 'name', 'version', 'kernel_default', 'report_count']
+
+class ComponentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Component
+        fields = ['id', 'type', 'name', 'driver']
+
+class CompStatusSerializer(serializers.ModelSerializer):
+    component_details = ComponentSerializer(source='component', read_only=True)
+
+    class Meta:
+        model = CompStatus
+        fields = ['id', 'report', 'component', 'component_details', 'status', 'notes']
+
+class ReportAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportAttachment
+        fields = ['id', 'file', 'file_type', 'original_filename', 'uploaded_at']
+
+class BenchmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Benchmark
+        fields = '__all__'
+
+class ReportSerializer(serializers.ModelSerializer):
+    user_details = UserSerializer(source='user', read_only=True)
+    machine_details = MachineSerializer(source='machine', read_only=True)
+    distro_details = DistroSerializer(source='distro', read_only=True)
+    component_details = ComponentSerializer(source='component', read_only=True)
+    comp_statuses = CompStatusSerializer(many=True, read_only=True)
+    attachments = ReportAttachmentSerializer(many=True, read_only=True)
+    benchmarks = BenchmarkSerializer(many=True, read_only=True)
+    
+    upvotes = serializers.IntegerField(read_only=True)
+    downvotes = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Report
+        fields = [
+            'id', 'user', 'user_details', 'machine', 'machine_details', 
+            'distro', 'distro_details', 'component', 'component_details',
+            'report_type', 'title', 'description', 'boot_status', 
+            'kernel_version', 'status', 'compatibility_score', 
+            'created_at', 'updated_at', 'comp_statuses', 'attachments', 
+            'benchmarks', 'upvotes', 'downvotes'
+        ]
+        read_only_fields = ['status', 'compatibility_score']
+
+class CommentSerializer(serializers.ModelSerializer):
+    user_details = UserSerializer(source='user', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'user', 'user_details', 'report', 'content', 'is_verified', 'created_at']
+
+class VoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vote
+        fields = '__all__'
+
+class DriverFixSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DriverFix
+        fields = '__all__'
+
+class HelpGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpGroup
+        fields = '__all__'
+
+
+FILE: registry/signals.py
+========================
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import TrustEvent
+
+@receiver(post_save, sender=TrustEvent)
+def update_user_trust_scores(sender, instance, created, **kwargs):
+    """
+    Auto-updates User scores when a TrustEvent is created.
+    If it's a penalty (points_delta < 0), we only update User.negative_score
+    when mod_penalty_approved=True.
+    """
+    user = instance.user
+    if created:
+        if instance.points_delta > 0:
+            user.positive_score += instance.points_delta
+            user.save(update_fields=['positive_score'])
+        # Penalties are handled via the update below when moderator approves them
+    else:
+        # On update (moderator approving a penalty)
+        if instance.mod_penalty_approved and instance.points_delta < 0:
+            user.negative_score += abs(instance.points_delta)
+            user.save(update_fields=['negative_score'])
+
+
+FILE: manage.py
+===============
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'silicon_registry.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()
+
+
+FILE: registry/templates/registry/base.html
+===========================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Silicon Registry | Hardware Compatibility Ledger{% endblock %}</title>
+    
+    <!-- Modern Stack -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0ea5e9',
+              background: '#09090b',
+              accent: '#38bdf8',
+            }
+          }
+        }
+      }
+    </script>
+    
+    <style>
+      body { 
+        font-family: 'Inter', sans-serif; 
+        background: #000; 
+        color: #fff; 
+        overflow-x: hidden;
+      }
+      .glass { 
+        background: rgba(255, 255, 255, 0.03); 
+        backdrop-filter: blur(12px); 
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+      }
+      .silicon-grid {
+        background-image: 
+          linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+      .font-mono { font-family: 'JetBrains Mono', monospace; }
+      
+      /* Smooth transitions */
+      .fade-in { animation: fadeIn 0.5s ease-out; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Glow effects */
+      .glow-primary {
+        box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+      }
+      .glow-text {
+        text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #000; }
+      ::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #333; }
+
+      /* User Dropdown */
+      .user-dropdown { position: relative; }
+      .user-dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 0.5rem;
+        min-width: 160px;
+        z-index: 100;
+      }
+      .user-dropdown:hover .user-dropdown-content { display: block; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="silicon-grid selection:bg-primary selection:text-black min-h-screen flex flex-col">
+
+    <!-- Global Navigation -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'registry:homepage' %}" class="flex items-center gap-2 group">
+                <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.4)] group-hover:shadow-[0_0_25px_rgba(14,165,233,0.6)] transition-all">
+                    <i data-lucide="cpu" class="text-black w-5 h-5"></i>
+                </div>
+                <span class="font-mono font-black text-xl tracking-tighter hidden sm:inline-block">SILICON_REGISTRY</span>
+            </a>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-10 text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase">
+            <a href="{% url 'registry:machine_list' %}" class="hover:text-primary transition-colors hover:glow-text">EXPLORE</a>
+            <a href="{% url 'registry:report_submit' %}" class="hover:text-primary transition-colors hover:glow-text">SUBMIT</a>
+            {% if user.is_authenticated and user.role_type != 'CONTRIBUTOR' %}
+                <a href="{% url 'registry:mod_dashboard' %}" class="text-accent hover:text-primary transition-colors hover:glow-text flex items-center gap-2">
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> MODERATION
+                </a>
+            {% endif %}
+            <a href="{% url 'registry:about' %}" class="hover:text-primary transition-colors hover:glow-text">ABOUT</a>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <form action="{% url 'registry:search' %}" method="GET" class="relative hidden lg:block group">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors"></i>
+                <input type="text" name="q" placeholder="SEARCH HARDWARE..." class="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-[10px] font-bold tracking-widest focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all w-48 focus:w-64">
+            </form>
+
+            {% if user.is_authenticated %}
+                <div class="user-dropdown">
+                    <button class="flex items-center gap-2 group">
+                        <div class="text-right hidden sm:block">
+                            <div class="text-[10px] font-black tracking-tighter leading-none">{{ user.username|upper }}</div>
+                            <div class="text-[8px] text-primary font-bold tracking-widest leading-none mt-1 uppercase">{{ user.role_type }}</div>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary/50 transition-colors">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="" class="w-full h-full object-cover">
+                            {% else %}
+                                <i data-lucide="user" class="w-4 h-4 text-white/20"></i>
+                            {% endif %}
+                        </div>
+                    </button>
+                    <div class="user-dropdown-content glass rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                        <a href="{% url 'registry:user_profile' user.username %}" class="flex items-center gap-3 px-5 py-4 text-[10px] font-black tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">
+                            <i data-lucide="user" class="w-3.5 h-3.5"></i> PROFILE
+                        </a>
+                        <a href="{% url 'registry:profile_edit' %}" class="flex items-center gap-3 px-5 py-4 text-[10px] font-black tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all border-t border-white/5">
+                            <i data-lucide="settings" class="w-3.5 h-3.5"></i> SETTINGS
+                        </a>
+                        <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-5 py-4 text-[10px] font-black tracking-widest text-red-500/60 hover:text-red-500 hover:bg-red-500/10 transition-all border-t border-white/5">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> LOGOUT
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'account_login' %}" class="text-[10px] font-bold tracking-widest hover:text-primary transition-colors">LOGIN</a>
+                    <a href="{% url 'account_signup' %}" class="bg-primary text-black px-5 py-2 rounded-md text-[10px] font-black tracking-widest hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] transition-all">SIGNUP</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <main class="flex-grow">
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-6 mt-6 space-y-2">
+                {% for message in messages %}
+                    <div class="glass border-l-4 {% if message.tags == 'success' %}border-green-500 bg-green-500/10{% elif message.tags == 'error' %}border-red-500 bg-red-500/10{% else %}border-primary bg-primary/10{% endif %} p-4 flex items-center justify-between fade-in">
+                        <span class="text-xs font-bold tracking-widest uppercase">{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="border-t border-white/5 py-12 px-6 mt-20">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 bg-white/5 rounded flex items-center justify-center">
+                    <i data-lucide="cpu" class="text-white/20 w-3 h-3"></i>
+                </div>
+                <span class="font-mono font-bold tracking-tighter text-white/20 text-xs">SILICON_REGISTRY CORE v1.0.0</span>
+            </div>
+            
+            <div class="flex gap-10 text-[9px] font-bold tracking-[0.3em] text-white/10 uppercase">
+                <a href="#" class="hover:text-primary transition-colors">GITHUB</a>
+                <a href="#" class="hover:text-primary transition-colors">API_DOCS</a>
+                <a href="#" class="hover:text-primary transition-colors">PRIVACY</a>
+                <a href="#" class="hover:text-primary transition-colors">SYSTEM_STATUS</a>
+            </div>
+
+            <div class="text-[10px] text-white/10 font-medium tracking-tight">
+                &copy; 2026 COMMUNITY POWERED SILICON ARCHIVE.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+
+FILE: registry/templates/registry/homepage.html
+===============================================
+{% extends 'registry/base.html' %}
+
+{% block content %}
+<div class="relative overflow-hidden">
+    <!-- Decorative Glows -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] -z-10"></div>
+    
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-6 pt-24 pb-32 text-center">
+        <div class="fade-in">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black tracking-[0.3em] mb-8 uppercase">
+                Hardware Compatibility Protocol Active
+            </span>
+            <h1 class="text-7xl md:text-9xl font-black tracking-tighter mb-8 leading-none italic uppercase">
+                Linux on <br> <span class="text-primary glow-text italic">Metal</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-white/40 text-lg md:text-xl font-medium leading-relaxed mb-12">
+                The definitive open-source ledger for hardware performance and compatibility on Linux. Verified by the community.
+            </p>
+        </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto relative group fade-in" style="animation-delay: 0.2s">
+                <form action="{% url 'registry:search' %}" method="GET" class="relative glass rounded-2xl p-1.5 flex items-center flex-grow w-full">
+                    <i data-lucide="search" class="ml-4 text-white/20 w-5 h-5"></i>
+                    <input type="text" name="q" placeholder="SEARCH HARDWARE..." class="bg-transparent border-none focus:outline-none focus:ring-0 text-[10px] font-black tracking-widest w-full px-4 py-3 placeholder:text-white/10 uppercase">
+                    <button type="submit" class="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black text-[9px] tracking-widest transition-all uppercase">
+                        SEARCH
+                    </button>
+                </form>
+                <a href="{% url 'registry:report_submit' %}" class="w-full sm:w-auto bg-primary text-black px-8 py-[1.15rem] rounded-2xl font-black text-[10px] tracking-[0.2em] hover:glow-primary hover:scale-[1.02] transition-all uppercase flex items-center justify-center gap-2 shadow-xl shadow-primary/10">
+                    SUBMIT_REPORT <i data-lucide="plus" class="w-4 h-4"></i>
+                </a>
+            </div>
+    </section>
+
+    <!-- Stats Grid -->
+    <section class="max-w-7xl mx-auto px-6 pb-32">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="glass p-10 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group fade-in" style="animation-delay: 0.3s">
+                <i data-lucide="cpu" class="w-8 h-8 text-primary/40 group-hover:text-primary transition-colors mb-6"></i>
+                <div class="text-5xl font-black tracking-tighter mb-2">{{ total_machines }}</div>
+                <div class="text-[9px] font-black tracking-[0.3em] text-white/20 uppercase">Registered Machines</div>
+            </div>
+            <div class="glass p-10 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group fade-in" style="animation-delay: 0.4s">
+                <i data-lucide="hard-drive" class="w-8 h-8 text-primary/40 group-hover:text-primary transition-colors mb-6"></i>
+                <div class="text-5xl font-black tracking-tighter mb-2">{{ total_reports }}</div>
+                <div class="text-[9px] font-black tracking-[0.3em] text-white/20 uppercase">Verified Reports</div>
+            </div>
+            <div class="glass p-10 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group fade-in" style="animation-delay: 0.5s">
+                <i data-lucide="users" class="w-8 h-8 text-primary/40 group-hover:text-primary transition-colors mb-6"></i>
+                <div class="text-5xl font-black tracking-tighter mb-2">{{ total_users }}</div>
+                <div class="text-[9px] font-black tracking-[0.3em] text-white/20 uppercase">Contributors</div>
+            </div>
+            <div class="glass p-10 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group fade-in" style="animation-delay: 0.6s">
+                <i data-lucide="shield-check" class="w-8 h-8 text-primary/40 group-hover:text-primary transition-colors mb-6"></i>
+                <div class="text-5xl font-black tracking-tighter mb-2">{{ total_distros }}</div>
+                <div class="text-[9px] font-black tracking-[0.3em] text-white/20 uppercase">Verified Distros</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Hardware -->
+    <section class="max-w-7xl mx-auto px-6 pb-32">
+        <div class="flex justify-between items-end mb-12 fade-in">
+            <div>
+                <h2 class="text-4xl font-black tracking-tighter italic uppercase">Top Hardware</h2>
+                <p class="text-white/30 text-xs font-bold tracking-widest mt-2">MOST ACTIVE SILICON PROFILES</p>
+            </div>
+            <a href="{% url 'registry:machine_list' %}" class="text-[10px] font-black tracking-[0.2em] text-primary hover:glow-text transition-all uppercase">View Registry Directory &rarr;</a>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for machine in top_machines %}
+            <a href="{% url 'registry:machine_detail' machine.pk %}" class="group fade-in" style="animation-delay: {{ forloop.counter|add:7 }}00ms">
+                <div class="glass p-8 rounded-3xl border border-white/5 group-hover:border-primary/30 transition-all relative overflow-hidden h-full">
+                    <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i data-lucide="external-link" class="w-5 h-5 text-primary"></i>
+                    </div>
+                    <div class="text-[10px] font-bold tracking-[0.3em] text-primary mb-4 uppercase">{{ machine.vendor }}</div>
+                    <h3 class="text-2xl font-black tracking-tight mb-6 group-hover:text-primary transition-colors uppercase leading-tight">{{ machine.model_name }}</h3>
+                    <div class="flex items-center gap-6 mt-auto pt-6 border-t border-white/5">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-3 h-3 text-white/20"></i>
+                            <span class="text-[10px] font-black tracking-tighter">{{ machine.report_count }} REPORTS</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="zap" class="w-3 h-3 text-primary"></i>
+                            <span class="text-[10px] font-black tracking-tighter text-primary">ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
