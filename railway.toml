@@ -3,5 +3,4 @@ buildCommand = "pip install -r requirements.txt && python manage.py collectstati
 
 [deploy]
 startCommand = "python manage.py migrate && gunicorn silicon_registry.wsgi --bind 0.0.0.0:$PORT --log-file -"
-healthcheckPath = "/"
 restartPolicyType = "ON_FAILURE"
