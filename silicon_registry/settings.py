@@ -93,6 +93,7 @@ DATABASES = {
             f"mysql://{config('DB_USER', default='root')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='127.0.0.1')}:{config('DB_PORT', default='3306')}/{config('DB_NAME', default='silicon_registry')}"
         ),
         conn_max_age=600,
+        engine='django.db.backends.mysql',
     )
 }
 
