@@ -86,16 +86,27 @@ WSGI_APPLICATION = 'silicon_registry.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get(
-            'DATABASE_URL',
-            f"mysql://{config('DB_USER', default='root')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='127.0.0.1')}:{config('DB_PORT', default='3306')}/{config('DB_NAME', default='silicon_registry')}"
-        ),
-        conn_max_age=600,
-        engine='django.db.backends.mysql',
-    )
-}
+_db_url = os.environ.get('DATABASE_URL', '')
+
+if _db_url:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=_db_url,
+            conn_max_age=600,
+            engine='django.db.backends.mysql',
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config('DB_NAME', default='silicon_registry'),
+            'USER': config('DB_USER', default='root'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='127.0.0.1'),
+            'PORT': config('DB_PORT', default='3306'),
+        }
+    }
 
 # Connection pooling for production
 # DATABASES['default']['CONN_MAX_AGE'] = 60  # uncomment in production
