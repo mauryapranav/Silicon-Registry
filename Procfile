@@ -1,0 +1,1 @@
+web: gunicorn silicon_registry.wsgi --log-file -
