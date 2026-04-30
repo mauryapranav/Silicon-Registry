@@ -4,20 +4,20 @@
 
 <div class="space-y-4">
   {% for event in events %}
-  <div class="card-surface p-5 rounded-2xl flex items-start justify-between gap-4" style="border-left:2px solid rgba(239,68,68,0.3);">
+  <div class="term-window p-5 rounded-xl flex items-start justify-between gap-4" style="border-left:2px solid rgba(239,68,68,0.3);">
     <div>
       <div class="text-sm font-semibold">
-        <span class="text-zinc-200">{{ event.user.username }}</span>
-        <span class="text-zinc-600 mx-2">·</span>
+        <span class="text-slate-200">{{ event.user.username }}</span>
+        <span class="text-slate-600 mx-2">·</span>
         <span class="text-red-400">{{ event.get_event_type_display }}</span>
       </div>
-      <div class="text-[11px] text-zinc-700 mt-1.5">
+      <div class="text-[11px] text-slate-700 mt-1.5">
         Delta: <span class="text-red-400 font-bold">{{ event.points_delta }}</span>
         <span class="mx-1.5">·</span>
         {{ event.created_at|date:"M d, Y" }}
       </div>
       {% if event.notes %}
-      <p class="text-xs text-zinc-500 mt-2 leading-relaxed">{{ event.notes }}</p>
+      <p class="text-xs text-slate-500 mt-2 leading-relaxed">{{ event.notes }}</p>
       {% endif %}
     </div>
     <form method="POST" class="shrink-0">
@@ -30,9 +30,9 @@
     </form>
   </div>
   {% empty %}
-  <div class="text-center py-20 card-surface rounded-2xl">
-    <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-4" style="color:rgba(57,211,83,0.3);"></i>
-    <p class="text-zinc-600 text-sm">No pending penalties.</p>
+  <div class="text-center py-20 term-window rounded-xl">
+    <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-4" style="color:rgba(96,165,250,0.3);"></i>
+    <p class="text-slate-600 text-sm">No pending penalties.</p>
   </div>
   {% endfor %}
 </div>

@@ -12,12 +12,12 @@
     <meta property="og:title" content="{% block og_title %}Silicon Registry — Linux Hardware Compatibility{% endblock %}">
     <meta property="og:description" content="{% block og_desc %}Community-tested Linux hardware compatibility reports. Find out if your machine works on Ubuntu, Fedora, Arch and more.{% endblock %}">
     <meta name="description" content="{% block meta_desc %}Silicon Registry — crowdsourced Linux hardware compatibility database{% endblock %}">
-    <meta name="theme-color" content="#39d353">
+    <meta name="theme-color" content="#60a5fa">
     <link rel="icon" type="image/svg+xml" href="{% static 'registry/img/favicon.svg' %}">
 
     <!-- Stack -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
@@ -26,11 +26,15 @@
         theme: {
           extend: {
             colors: {
-              primary:  '#39d353',
-              accent:   '#22c55e',
-              surface:  '#080808',
-              card:     '#111111',
-              'card-hi':'#181818',
+              primary:   '#60a5fa',
+              accent:    '#3b82f6',
+              green:     '#34d399',
+              surface:   '#111827',
+              'surface-hi': '#1a2235',
+              base:      '#0b0f19',
+              card:      '#111827',
+              'card-hi': '#1a2235',
+              dim:       '#475569',
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
@@ -46,57 +50,137 @@
       *, *::before, *::after { box-sizing: border-box; }
       body {
         font-family: 'Inter', sans-serif;
-        background: #080808;
-        color: #fafafa;
+        background: #0b0f19;
+        color: #e2e8f0;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
       }
 
       /* ── Dot-grid texture ──────────────────────────────── */
       .dot-grid {
-        background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
+        background-image: radial-gradient(circle, rgba(148,163,184,0.04) 1px, transparent 1px);
         background-size: 28px 28px;
       }
 
       /* ── Surfaces ──────────────────────────────────────── */
       .glass {
-        background: rgba(8,8,8,0.85);
+        background: rgba(11,15,25,0.88);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(148,163,184,0.08);
       }
       .card-surface {
-        background: #111111;
-        border: 1px solid rgba(255,255,255,0.07);
-        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        background: linear-gradient(180deg, rgba(96,165,250,0.02) 0%, #111827 60%);
+        border: 1px solid rgba(148,163,184,0.08);
+        border-radius: 8px;
+        transition: border-color 0.3s, transform 0.3s ease, box-shadow 0.3s;
       }
       .card-surface:hover {
-        border-color: rgba(57,211,83,0.18);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(57,211,83,0.06);
+        border-color: rgba(96,165,250,0.35);
+        transform: translateY(-6px) scale(1.015);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(96,165,250,0.15), 0 0 50px rgba(96,165,250,0.12), 0 0 80px rgba(96,165,250,0.04);
       }
-      /* Suppress lift on elements that manage hover themselves */
       .no-lift:hover { transform: none !important; box-shadow: none !important; }
 
       .card-hi {
-        background: #181818;
-        border: 1px solid rgba(255,255,255,0.08);
+        background: #1a2235;
+        border: 1px solid rgba(148,163,184,0.1);
       }
 
-      /* ── Inner card highlight (top edge shimmer) ──────── */
       .card-inner {
-        background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 40%), #111111;
-        border: 1px solid rgba(255,255,255,0.07);
-        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        background: linear-gradient(180deg, rgba(96,165,250,0.04) 0%, transparent 40%), #111827;
+        border: 1px solid rgba(148,163,184,0.08);
+        border-radius: 8px;
+        transition: border-color 0.3s, transform 0.3s ease, box-shadow 0.3s;
       }
       .card-inner:hover {
-        border-color: rgba(57,211,83,0.18);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        border-color: rgba(96,165,250,0.3);
+        transform: translateY(-6px) scale(1.015);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 50px rgba(96,165,250,0.1);
+      }
+
+      /* ── Terminal Window Chrome ─────────────────────────── */
+      .term-window {
+        background: linear-gradient(180deg, rgba(96,165,250,0.015) 0%, #111827 50%);
+        border: 1px solid rgba(148,163,184,0.08);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+      }
+      .term-window:hover {
+        border-color: rgba(96,165,250,0.18);
+        box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 40px rgba(96,165,250,0.06);
+      }
+      .term-titlebar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: rgba(148,163,184,0.03);
+        border-bottom: 1px solid rgba(148,163,184,0.06);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: #64748b;
+        user-select: none;
+      }
+      .term-dots {
+        display: flex;
+        gap: 5px;
+      }
+      .term-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .term-dots span:nth-child(1) { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.4); }
+      .term-dots span:nth-child(2) { background: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.4); }
+      .term-dots span:nth-child(3) { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+      .term-pid {
+        background: rgba(96,165,250,0.12);
+        color: #60a5fa;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10px;
+      }
+      .term-branch {
+        background: rgba(52,211,153,0.1);
+        color: #34d399;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-weight: 500;
+        font-size: 10px;
+      }
+      .term-path {
+        color: #94a3b8;
+        font-weight: 400;
+      }
+      .term-body {
+        padding: 24px;
+      }
+      .term-label-right {
+        margin-left: auto;
+        color: #475569;
+        font-size: 10px;
       }
 
       /* ── Typography ────────────────────────────────────── */
       .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+      /* ── Blinking terminal cursor ──────────────────────── */
+      .cursor-blink {
+        display: inline-block;
+        width: 0.55em;
+        height: 1.05em;
+        background: #60a5fa;
+        margin-left: 4px;
+        vertical-align: text-bottom;
+        animation: blink-cursor 1s step-end infinite;
+      }
+      @keyframes blink-cursor {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
 
       /* ── Animations ────────────────────────────────────── */
       .fade-in { animation: fadeIn 0.45s ease-out both; }
@@ -105,20 +189,27 @@
         to   { opacity: 1; transform: translateY(0); }
       }
       @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(57,211,83,0.4); }
-        50%       { box-shadow: 0 0 0 6px rgba(57,211,83,0); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(96,165,250,0.4); }
+        50%       { box-shadow: 0 0 0 6px rgba(96,165,250,0); }
       }
 
       /* ── Glows ─────────────────────────────────────────── */
-      .glow-sm  { box-shadow: 0 0 20px rgba(57,211,83,0.12); }
-      .glow-md  { box-shadow: 0 0 40px rgba(57,211,83,0.2); }
-      .glow-btn { box-shadow: 0 0 28px rgba(57,211,83,0.3); }
+      .glow-sm  { box-shadow: 0 0 24px rgba(96,165,250,0.2), 0 0 60px rgba(96,165,250,0.06); }
+      .glow-md  { box-shadow: 0 0 50px rgba(96,165,250,0.3), 0 0 100px rgba(96,165,250,0.08); }
+      .glow-btn { box-shadow: 0 0 30px rgba(96,165,250,0.4), 0 0 80px rgba(96,165,250,0.12); }
+      .glow-green { box-shadow: 0 0 24px rgba(52,211,153,0.25), 0 0 60px rgba(52,211,153,0.06); }
+      .glow-gold { box-shadow: 0 0 24px rgba(251,191,36,0.25), 0 0 60px rgba(251,191,36,0.06); }
+      .glow-purple { box-shadow: 0 0 24px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.06); }
+      /* ── Gradient text ──────────────────────────────────── */
+      .text-gradient { background: linear-gradient(135deg, #60a5fa 0%, #c084fc 50%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient-blue { background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient-green { background: linear-gradient(135deg, #34d399 0%, #22d3ee 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
       /* ── Scrollbar ─────────────────────────────────────── */
       ::-webkit-scrollbar       { width: 5px; height: 5px; }
-      ::-webkit-scrollbar-track { background: #080808; }
-      ::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #2a2a2a; }
+      ::-webkit-scrollbar-track { background: #0b0f19; }
+      ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
       /* ── Dropdown ──────────────────────────────────────── */
       .user-dropdown { position: relative; }
@@ -139,68 +230,88 @@
       }
 
       /* ── Status badges ─────────────────────────────────── */
-      .badge-gold    { background: rgba(234,179,8,0.1);   color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
-      .badge-silver  { background: rgba(163,163,163,0.1); color: #a3a3a3; border: 1px solid rgba(163,163,163,0.2); }
-      .badge-bronze  { background: rgba(217,119,6,0.1);   color: #d97706; border: 1px solid rgba(217,119,6,0.2); }
-      .badge-broken  { background: rgba(239,68,68,0.1);   color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
-      .badge-working { background: rgba(57,211,83,0.1);   color: #39d353; border: 1px solid rgba(57,211,83,0.2); }
-      .badge-issues  { background: rgba(234,179,8,0.1);   color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
-      .badge-primary { background: rgba(57,211,83,0.08);  color: #39d353; border: 1px solid rgba(57,211,83,0.18); }
-      .badge-fuzzy   { background: rgba(168,85,247,0.1);  color: #c084fc; border: 1px solid rgba(168,85,247,0.2); }
+      .badge-gold    { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+      .badge-silver  { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+      .badge-bronze  { background: rgba(251,146,60,0.1);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
+      .badge-broken  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+      .badge-working { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+      .badge-issues  { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+      .badge-primary { background: rgba(96,165,250,0.08); color: #60a5fa; border: 1px solid rgba(96,165,250,0.18); }
+      .badge-fuzzy   { background: rgba(192,132,252,0.1); color: #c084fc; border: 1px solid rgba(192,132,252,0.2); }
+      .badge-works   { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.2); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
+      .badge-partial { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
 
       /* ── Inputs ────────────────────────────────────────── */
       .input-dark {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        color: #fafafa;
+        background: #0d1220;
+        border: 1px solid rgba(148,163,184,0.1);
+        color: #e2e8f0;
         transition: border-color 0.2s, box-shadow 0.2s;
       }
       .input-dark:focus {
         outline: none;
-        border-color: rgba(57,211,83,0.4);
-        box-shadow: 0 0 0 3px rgba(57,211,83,0.07);
+        border-color: rgba(96,165,250,0.4);
+        box-shadow: 0 0 0 3px rgba(96,165,250,0.07);
       }
-      .input-dark::placeholder { color: rgba(255,255,255,0.18); }
-      select.input-dark { appearance: none; background-color: #131313; color: #fafafa; }
-      select.input-dark option { background-color: #131313; color: #fafafa; }
+      .input-dark::placeholder { color: rgba(148,163,184,0.3); }
+      select.input-dark { appearance: none; background-color: #0d1220; color: #e2e8f0; }
+      select.input-dark option { background-color: #0d1220; color: #e2e8f0; }
 
       /* ── Buttons ───────────────────────────────────────── */
       .btn-primary {
-        background: #39d353;
-        color: #040d04;
+        background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+        color: #0b0f19;
         font-weight: 700;
         letter-spacing: -0.01em;
-        transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+        transition: all 0.25s;
+        box-shadow: 0 0 20px rgba(96,165,250,0.15);
       }
       .btn-primary:hover {
-        background: #2ec94c;
-        box-shadow: 0 0 24px rgba(57,211,83,0.32), 0 4px 12px rgba(0,0,0,0.3);
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+        box-shadow: 0 0 40px rgba(96,165,250,0.4), 0 8px 20px rgba(0,0,0,0.4);
+        transform: translateY(-2px);
       }
       .btn-ghost {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.09);
-        color: #71717a;
+        background: rgba(148,163,184,0.04);
+        border: 1px solid rgba(148,163,184,0.1);
+        color: #64748b;
         transition: background 0.18s, color 0.18s, border-color 0.18s;
       }
-      .btn-ghost:hover { background: rgba(255,255,255,0.07); color: #fff; border-color: rgba(255,255,255,0.16); }
+      .btn-ghost:hover { background: rgba(148,163,184,0.08); color: #e2e8f0; border-color: rgba(148,163,184,0.2); }
+      .btn-term {
+        background: linear-gradient(135deg, rgba(52,211,153,0.12) 0%, rgba(34,211,238,0.08) 100%);
+        color: #34d399;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 13px;
+        border: 1px solid rgba(52,211,153,0.25);
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.25s;
+      }
+      .btn-term:hover {
+        background: linear-gradient(135deg, rgba(52,211,153,0.22) 0%, rgba(34,211,238,0.14) 100%);
+        box-shadow: 0 0 30px rgba(52,211,153,0.2), 0 0 60px rgba(52,211,153,0.06);
+        transform: translateY(-1px);
+        border-color: rgba(52,211,153,0.4);
+      }
 
       /* ── Nav ───────────────────────────────────────────── */
       .nav-link {
-        color: #52525b;
+        color: #64748b;
         font-size: 13px;
         font-weight: 500;
         transition: color 0.18s;
         letter-spacing: 0.01em;
       }
-      .nav-link:hover { color: #e4e4e7; }
-      .nav-link.active { color: #39d353; }
+      .nav-link:hover { color: #e2e8f0; }
+      .nav-link.active { color: #60a5fa; }
 
       /* ── Green top accent bar ──────────────────────────── */
       .accent-bar {
         position: absolute;
         top: 0; left: 0; width: 100%; height: 2px;
-        background: linear-gradient(90deg, #39d353 0%, #22c55e 50%, transparent 100%);
+        background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, transparent 100%);
         pointer-events: none;
       }
       /* Left accent bar variant */
@@ -211,26 +322,47 @@
       }
 
       /* ── Table ─────────────────────────────────────────── */
-      .tbl-row { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
-      .tbl-row:hover { background: rgba(57,211,83,0.025); }
-      .tbl-head { font-size: 10px; font-weight: 700; color: #3f3f46; text-transform: uppercase; letter-spacing: 0.08em; }
+      .tbl-row { border-bottom: 1px solid rgba(148,163,184,0.06); transition: background 0.15s; }
+      .tbl-row:hover { background: rgba(96,165,250,0.03); }
+      .tbl-head { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; }
 
       /* ── Section labels ────────────────────────────────── */
       .section-label {
         font-size: 10px;
         font-weight: 700;
-        color: #3f3f46;
+        color: #475569;
         text-transform: uppercase;
         letter-spacing: 0.1em;
       }
 
+      /* ── Terminal section label ─────────────────────────── */
+      .term-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .term-label::before {
+        content: '# ';
+        color: #60a5fa;
+      }
+
       /* ── Stat number ───────────────────────────────────── */
       .stat-num {
+        font-family: 'JetBrains Mono', monospace;
         font-size: clamp(1.75rem, 3vw, 2.5rem);
         font-weight: 900;
         letter-spacing: -0.03em;
         line-height: 1;
+        background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
+      .stat-num.text-primary { background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%); -webkit-background-clip: text; background-clip: text; }
+      .stat-num.text-white { background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%); -webkit-background-clip: text; background-clip: text; }
 
       /* ── Card bottom fade ──────────────────────────────── */
       .card-fade-bottom::after {
@@ -238,49 +370,68 @@
         position: absolute;
         bottom: 0; left: 0; right: 0;
         height: 40px;
-        background: linear-gradient(to top, rgba(17,17,17,0.9), transparent);
-        border-radius: 0 0 16px 16px;
+        background: linear-gradient(to top, rgba(17,24,39,0.9), transparent);
+        border-radius: 0 0 12px 12px;
         pointer-events: none;
       }
 
       /* ── Compatibility ring SVG ────────────────────────── */
       .compat-ring { transform: rotate(-90deg); }
+
+      /* ── Distro tags ───────────────────────────────────── */
+      .distro-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: rgba(148,163,184,0.06);
+        border: 1px solid rgba(148,163,184,0.1);
+        color: #94a3b8;
+      }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- ── Navigation ──────────────────────────────────── -->
-    <nav class="sticky top-0 z-50 glass">
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 flex justify-between items-center h-14">
+    <!-- ── Navigation (Terminal Bar) ──────────────────── -->
+    <nav class="sticky top-0 z-50" style="background:linear-gradient(180deg,rgba(11,15,25,0.95),rgba(11,15,25,0.88));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(148,163,184,0.08);">
+        <!-- Gradient accent line at very top -->
+        <div style="height:2px;background:linear-gradient(90deg,#60a5fa,#c084fc,#34d399,transparent);" class="w-full"></div>
+        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 flex justify-between items-center h-12">
 
             <!-- Brand -->
-            <div class="flex items-center gap-7">
-                <a href="{% url 'registry:homepage' %}" class="flex items-center gap-2.5 group shrink-0">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center relative"
-                         style="background:rgba(57,211,83,0.1);border:1px solid rgba(57,211,83,0.22);">
-                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-primary relative z-10"></i>
+            <div class="flex items-center gap-5">
+                <a href="{% url 'registry:homepage' %}" class="flex items-center gap-2 group shrink-0">
+                    <!-- Terminal dots in navbar -->
+                    <div class="flex gap-1.5 mr-1">
+                        <span class="w-[10px] h-[10px] rounded-full" style="background:#f87171;box-shadow:0 0 6px rgba(248,113,113,0.4);"></span>
+                        <span class="w-[10px] h-[10px] rounded-full" style="background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,0.4);"></span>
+                        <span class="w-[10px] h-[10px] rounded-full" style="background:#34d399;box-shadow:0 0 6px rgba(52,211,153,0.4);"></span>
                     </div>
-                    <span class="font-mono font-bold text-[13px] tracking-tight text-white hidden sm:inline">Silicon Registry</span>
+                    <div class="w-6 h-6 rounded flex items-center justify-center" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);box-shadow:0 0 12px rgba(96,165,250,0.15);">
+                        <i data-lucide="cpu" class="w-3 h-3 text-primary"></i>
+                    </div>
+                    <span class="font-mono font-bold text-[13px] tracking-tight hidden sm:inline"><span class="text-gradient-blue">Silicon</span><span class="text-slate-400">Registry</span></span>
                 </a>
 
-                <div class="hidden md:flex items-center gap-0.5 h-14">
-                    <a href="{% url 'registry:machine_list' %}"  class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all">Explore</a>
-                    <a href="{% url 'registry:report_submit' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all">Submit</a>
-                    <a href="{% url 'registry:leaderboard' %}"   class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all">Leaderboard</a>
+                <div class="hidden md:flex items-center gap-0.5 h-12 ml-2" style="border-left:1px solid rgba(148,163,184,0.08);padding-left:12px;">
+                    <a href="{% url 'registry:machine_list' %}"  class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">explore</a>
+                    <a href="{% url 'registry:report_submit' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">submit</a>
+                    <a href="{% url 'registry:leaderboard' %}"   class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">leaderboard</a>
                     {% if user.is_authenticated and user.role_type != 'CONTRIBUTOR' %}
-                    <a href="{% url 'registry:mod_dashboard' %}" class="h-full flex items-center gap-1.5 px-3 nav-link border-b-2 border-transparent" style="color:#39d353;">
-                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Mod
+                    <a href="{% url 'registry:mod_dashboard' %}" class="h-full flex items-center gap-1.5 px-3 nav-link border-b-2 border-transparent font-mono text-[12px]" style="color:#60a5fa;">
+                        <i data-lucide="shield-check" class="w-3 h-3"></i> mod
                     </a>
                     {% endif %}
-                    <a href="{% url 'registry:about' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all">About</a>
+                    <a href="{% url 'registry:about' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">about</a>
                 </div>
             </div>
 
             <!-- Right -->
             <div class="flex items-center gap-3">
                 <form action="{% url 'registry:search' %}" method="GET" class="relative hidden lg:block group">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-700 group-focus-within:text-primary transition-colors pointer-events-none"></i>
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 group-focus-within:text-primary transition-colors pointer-events-none"></i>
                     <input type="text" name="q" placeholder="Search hardware…"
                            class="input-dark rounded-lg py-1.5 pl-9 pr-3 text-[13px] w-40 focus:w-56 transition-all duration-300">
                 </form>
@@ -289,30 +440,30 @@
                 <div class="user-dropdown" id="userDropdown">
                     <button id="userDropdownBtn" class="flex items-center gap-2.5 group" aria-haspopup="true" aria-expanded="false">
                         <div class="text-right hidden sm:block">
-                            <div class="text-[12px] font-semibold leading-none text-zinc-300">{{ user.username }}</div>
-                            <div class="text-[10px] font-bold leading-none mt-0.5" style="color:#39d353;">{{ user.role_type }}</div>
+                            <div class="text-[12px] font-semibold leading-none text-slate-300">{{ user.username }}</div>
+                            <div class="text-[10px] font-bold leading-none mt-0.5" style="color:#60a5fa;">{{ user.role_type }}</div>
                         </div>
                         <a href="{% url 'registry:user_profile' user.username %}"
-                           class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden transition-all"
-                           style="border:1.5px solid rgba(57,211,83,0.2);"
+                           class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center overflow-hidden transition-all"
+                           style="border:1.5px solid rgba(96,165,250,0.2);"
                            title="View profile" onclick="event.stopPropagation()">
                             {% if user.avatar %}
                                 <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
                             {% else %}
-                                <span class="text-xs font-black text-zinc-400">{{ user.username|make_list|first|upper }}</span>
+                                <span class="text-xs font-black text-slate-400">{{ user.username|make_list|first|upper }}</span>
                             {% endif %}
                         </a>
                     </button>
                     <div class="user-dropdown-content" id="userDropdownMenu" role="menu">
                         <div class="user-dropdown-inner rounded-xl shadow-2xl shadow-black/80 overflow-hidden"
-                             style="background:#111;border:1px solid rgba(255,255,255,0.08);">
-                            <a href="{% url 'registry:user_profile' user.username %}" class="flex items-center gap-3 px-4 py-3 text-sm text-zinc-500 hover:text-white hover:bg-white/4 transition-all" role="menuitem">
+                             style="background:#111827;border:1px solid rgba(148,163,184,0.1);">
+                            <a href="{% url 'registry:user_profile' user.username %}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-500 hover:text-white hover:bg-white/4 transition-all" role="menuitem">
                                 <i data-lucide="user" class="w-4 h-4"></i> Profile
                             </a>
-                            <a href="{% url 'registry:profile_edit' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-zinc-500 hover:text-white hover:bg-white/4 transition-all" style="border-top:1px solid rgba(255,255,255,0.05);" role="menuitem">
+                            <a href="{% url 'registry:profile_edit' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-500 hover:text-white hover:bg-white/4 transition-all" style="border-top:1px solid rgba(148,163,184,0.06);" role="menuitem">
                                 <i data-lucide="settings" class="w-4 h-4"></i> Settings
                             </a>
-                            <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-red-500/80 hover:text-red-400 hover:bg-red-500/5 transition-all" style="border-top:1px solid rgba(255,255,255,0.05);" role="menuitem">
+                            <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/5 transition-all" style="border-top:1px solid rgba(148,163,184,0.06);" role="menuitem">
                                 <i data-lucide="log-out" class="w-4 h-4"></i> Sign out
                             </a>
                         </div>
@@ -331,13 +482,13 @@
     <!-- ── Flash Messages ────────────────────────────────── -->
     <main class="flex-grow">
         {% if messages %}
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 mt-4 space-y-2">
+        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 mt-4 space-y-2">
             {% for message in messages %}
             <div class="rounded-xl px-4 py-3 flex items-center justify-between border-l-2 fade-in
-                {% if message.tags == 'success' %}border-l-primary{% elif message.tags == 'error' %}border-l-red-500{% elif message.tags == 'warning' %}border-l-yellow-500{% else %}border-l-zinc-700{% endif %}"
-                 style="background:#111;border:1px solid rgba(255,255,255,0.07);border-left-width:2px;">
-                <span class="text-sm text-zinc-200">{{ message }}</span>
-                <button onclick="this.parentElement.remove()" class="text-zinc-700 hover:text-white ml-4 transition-colors">
+                {% if message.tags == 'success' %}border-l-primary{% elif message.tags == 'error' %}border-l-red-400{% elif message.tags == 'warning' %}border-l-yellow-400{% else %}border-l-slate-600{% endif %}"
+                 style="background:#111827;border:1px solid rgba(148,163,184,0.08);border-left-width:2px;">
+                <span class="text-sm text-slate-200">{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="text-slate-600 hover:text-white ml-4 transition-colors">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -349,21 +500,21 @@
     </main>
 
     <!-- ── Footer ────────────────────────────────────────── -->
-    <footer class="mt-24" style="border-top:1px solid rgba(255,255,255,0.05);">
-        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
+    <footer class="mt-24" style="border-top:1px solid rgba(148,163,184,0.06);">
+        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-2.5">
-                <div class="w-5 h-5 rounded flex items-center justify-center" style="background:rgba(57,211,83,0.07);border:1px solid rgba(57,211,83,0.14);">
+                <div class="w-5 h-5 rounded flex items-center justify-center" style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.14);">
                     <i data-lucide="cpu" class="w-3 h-3 text-primary/50"></i>
                 </div>
-                <span class="font-mono text-xs text-zinc-800">Silicon Registry v1.0</span>
+                <span class="font-mono text-xs text-slate-700">Silicon Registry v1.0</span>
             </div>
-            <div class="flex gap-8 text-xs text-zinc-700">
-                <a href="{% url 'registry:about' %}"  class="hover:text-zinc-400 transition-colors">About</a>
-                <a href="{% url 'registry:search' %}" class="hover:text-zinc-400 transition-colors">Search</a>
-                <a href="#" class="hover:text-zinc-400 transition-colors">API</a>
-                <a href="#" class="hover:text-zinc-400 transition-colors">GitHub</a>
+            <div class="flex gap-8 text-xs text-slate-600">
+                <a href="{% url 'registry:about' %}"  class="hover:text-slate-300 transition-colors">About</a>
+                <a href="{% url 'registry:search' %}" class="hover:text-slate-300 transition-colors">Search</a>
+                <a href="#" class="hover:text-slate-300 transition-colors">API</a>
+                <a href="#" class="hover:text-slate-300 transition-colors">GitHub</a>
             </div>
-            <div class="text-[11px] text-zinc-800">&copy; 2026 Silicon Registry. Community-powered.</div>
+            <div class="text-[11px] text-slate-700">&copy; 2026 Silicon Registry. Community-powered.</div>
         </div>
     </footer>
 

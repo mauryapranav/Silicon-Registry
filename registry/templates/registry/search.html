@@ -3,33 +3,44 @@
 {% block title %}Search Results | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-24">
+<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+  <!-- Ambient glows -->
+  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:15%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10" style="top:300px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
 
-  <!-- Search bar -->
-  <div class="mb-10 fade-in">
-    <form action="{% url 'registry:search' %}" method="GET" class="max-w-3xl">
-      <div class="card-surface rounded-2xl flex items-center p-1.5 gap-2 focus-within:border-primary/30 transition-all">
-        <i data-lucide="search" class="ml-3 text-zinc-600 w-4 h-4 shrink-0"></i>
-        <input type="text" name="q" value="{{ q }}"
-               placeholder="Search machines, components, distros…"
-               class="bg-transparent border-none focus:outline-none focus:ring-0 text-sm w-full px-3 py-2.5 placeholder:text-zinc-700 text-zinc-200">
-        {% if q %}
-        <a href="{% url 'registry:search' %}" class="px-2 text-zinc-600 hover:text-white transition-colors">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </a>
-        {% endif %}
-        <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-sm shrink-0">Search</button>
+  <!-- Search bar in terminal window -->
+  <div class="mb-8 fade-in">
+    <div class="term-window max-w-4xl">
+      <div class="term-titlebar">
+        <div class="term-dots"><span></span><span></span><span></span></div>
+        <span class="term-pid">[3] SEARCH</span>
+        <span class="term-branch">≡ MASTER</span>
+        <span class="term-path">~/search</span>
       </div>
-    </form>
-    <div class="mt-3 px-1 text-sm text-zinc-600">{{ total }} result{{ total|pluralize }} found</div>
+      <div class="p-4">
+        <form action="{% url 'registry:search' %}" method="GET" class="flex items-center gap-2 p-2.5 rounded-lg" style="background:#0d1220;border:1px solid rgba(148,163,184,0.08);">
+          <span class="font-mono text-sm text-slate-500 shrink-0"> <span class="text-gradient-blue">man -k</span></span>
+          <input type="text" name="q" value="{{ q }}"
+                 placeholder="describe your problem..."
+                 class="bg-transparent border-none outline-none text-sm w-full font-mono text-slate-300 placeholder:text-slate-600">
+          {% if q %}
+          <a href="{% url 'registry:search' %}" class="px-2 text-slate-600 hover:text-white transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </a>
+          {% endif %}
+          <button type="submit" class="btn-term px-4 py-1.5 text-xs shrink-0">Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="mt-3 px-1 text-sm text-slate-500 font-mono">{{ total }} result{{ total|pluralize }} found</div>
   </div>
 
   <!-- Did you mean -->
   {% if did_you_mean %}
-  <div class="max-w-3xl mb-6 px-4 py-3 rounded-xl flex items-center gap-3 fade-in"
-       style="background:rgba(57,211,83,0.06);border:1px solid rgba(57,211,83,0.15)">
+  <div class="max-w-4xl mb-6 px-4 py-3 rounded-lg flex items-center gap-3 fade-in"
+       style="background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15)">
     <i data-lucide="wand-sparkles" class="w-4 h-4 text-primary shrink-0"></i>
-    <p class="text-sm text-zinc-300">
+    <p class="text-sm text-slate-300">
       No exact match &mdash; did you mean
       <a href="{% url 'registry:search' %}?q={{ did_you_mean|urlencode }}"
          class="text-primary font-semibold hover:underline">&ldquo;{{ did_you_mean }}&rdquo;</a>?
@@ -37,25 +48,25 @@
   </div>
   {% endif %}
 
-  <div class="grid lg:grid-cols-12 gap-8">
+  <div class="grid lg:grid-cols-12 gap-3">
     <div class="lg:col-span-8 space-y-10">
 
       <!-- Machines -->
       {% if results.machines %}
       <section class="fade-in">
-        <h2 class="text-xs font-bold text-zinc-600 mb-4 flex items-center gap-2 uppercase tracking-widest">
-          <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Machines
+        <h2 class="term-label mb-4 flex items-center gap-2">
+          <i data-lucide="cpu" class="w-3.5 h-3.5 text-slate-600"></i> Machines
         </h2>
         <div class="grid sm:grid-cols-2 gap-3">
           {% for machine in results.machines %}
           <a href="{% url 'registry:machine_detail' machine.slug %}"
-             class="card-surface p-5 rounded-2xl transition-all group relative">
+             class="card-surface p-5 rounded-lg transition-all group relative">
             {% if machine.fuzzy_match %}
             <span class="absolute top-3 right-3 badge-fuzzy text-[10px] font-bold px-2 py-0.5 rounded-full">~fuzzy</span>
             {% endif %}
-            <div class="text-[11px] font-semibold text-primary mb-1 uppercase tracking-widest">{{ machine.vendor }}</div>
+            <div class="text-[11px] font-semibold text-primary mb-1 uppercase tracking-widest font-mono">{{ machine.vendor }}</div>
             <h3 class="text-sm font-semibold group-hover:text-primary transition-colors pr-12">{{ machine.model_name }}</h3>
-            <div class="text-xs text-zinc-700 mt-2">{{ machine.report_count }} reports · {{ machine.get_form_factor_display|default:"" }}</div>
+            <div class="text-xs text-slate-600 mt-2 font-mono">{{ machine.report_count }} reports · {{ machine.get_form_factor_display|default:"" }}</div>
           </a>
           {% endfor %}
         </div>
@@ -65,20 +76,20 @@
       <!-- Components -->
       {% if results.components %}
       <section class="fade-in">
-        <h2 class="text-xs font-bold text-zinc-600 mb-4 flex items-center gap-2 uppercase tracking-widest">
-          <i data-lucide="settings" class="w-3.5 h-3.5"></i> Components
+        <h2 class="term-label mb-4 flex items-center gap-2">
+          <i data-lucide="settings" class="w-3.5 h-3.5 text-slate-600"></i> Components
         </h2>
         <div class="grid sm:grid-cols-2 gap-3">
           {% for comp in results.components %}
           <a href="{% url 'registry:component_detail' comp.slug %}"
-             class="card-surface p-5 rounded-2xl transition-all group relative">
+             class="card-surface p-5 rounded-lg transition-all group relative">
             {% if comp.fuzzy_match %}
             <span class="absolute top-3 right-3 badge-fuzzy text-[10px] font-bold px-2 py-0.5 rounded-full">~fuzzy</span>
             {% endif %}
-            <div class="text-[11px] font-semibold text-primary mb-1 uppercase tracking-widest">{{ comp.get_type_display }}</div>
+            <div class="text-[11px] font-semibold text-primary mb-1 uppercase tracking-widest font-mono">{{ comp.get_type_display }}</div>
             <h3 class="text-sm font-semibold group-hover:text-primary transition-colors pr-12">{{ comp.name }}</h3>
             {% if comp.driver %}
-            <div class="text-xs text-zinc-700 mt-1 font-mono">{{ comp.driver }}</div>
+            <div class="text-xs text-slate-600 mt-1 font-mono">{{ comp.driver }}</div>
             {% endif %}
           </a>
           {% endfor %}
@@ -89,25 +100,25 @@
       <!-- Reports -->
       {% if results.reports %}
       <section class="fade-in">
-        <h2 class="text-xs font-bold text-zinc-600 mb-4 flex items-center gap-2 uppercase tracking-widest">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Reports
+        <h2 class="term-label mb-4 flex items-center gap-2">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-600"></i> Reports
         </h2>
         <div class="space-y-3">
           {% for report in results.reports %}
           <a href="{% url 'registry:report_detail' report.pk %}" class="block group">
-            <div class="card-surface p-5 rounded-2xl flex justify-between items-center transition-all
-              border-l-2 {% if report.boot_status == 'GOLD' %}border-l-yellow-500/60{% else %}border-l-zinc-800{% endif %}">
+            <div class="card-surface p-5 rounded-lg flex justify-between items-center transition-all
+              border-l-2 {% if report.boot_status == 'GOLD' %}border-l-yellow-400/60{% else %}border-l-slate-700{% endif %}">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
-                  <span class="text-xs text-primary font-semibold">{{ report.distro }}</span>
-                  <span class="text-[10px] font-bold {% if report.boot_status == 'GOLD' %}text-yellow-500{% else %}text-zinc-600{% endif %}">[{{ report.boot_status }}]</span>
+                  <span class="text-xs text-primary font-semibold font-mono">{{ report.distro }}</span>
+                  <span class="text-[10px] font-bold font-mono {% if report.boot_status == 'GOLD' %}text-yellow-400{% else %}text-slate-600{% endif %}">[{{ report.boot_status }}]</span>
                   {% if report.fuzzy_match %}
                   <span class="badge-fuzzy text-[10px] font-bold px-2 py-0.5 rounded-full">~fuzzy</span>
                   {% endif %}
                 </div>
                 <h3 class="text-sm font-semibold group-hover:text-primary transition-colors truncate">{{ report.title }}</h3>
               </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-800 group-hover:text-primary shrink-0 ml-3 transition-colors"></i>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-700 group-hover:text-primary shrink-0 ml-3 transition-colors"></i>
             </div>
           </a>
           {% endfor %}
@@ -117,53 +128,57 @@
 
       <!-- Empty state -->
       {% if total == 0 %}
-      <div class="text-center py-24 card-surface rounded-2xl fade-in">
-        <i data-lucide="search-x" class="w-12 h-12 text-zinc-800 mx-auto mb-4"></i>
+      <div class="text-center py-24 card-surface rounded-lg fade-in">
+        <i data-lucide="search-x" class="w-12 h-12 text-slate-700 mx-auto mb-4"></i>
         <h3 class="text-lg font-bold mb-1">No results found</h3>
-        <p class="text-zinc-600 text-sm">Try a different search term or browse the registry.</p>
+        <p class="text-slate-500 text-sm">Try a different search term or browse the registry.</p>
       </div>
       {% endif %}
     </div>
 
     <!-- Sidebar -->
     <div class="lg:col-span-4 space-y-5 fade-in" style="animation-delay:0.15s">
-      <div class="card-surface p-6 rounded-2xl">
-        <h3 class="tbl-head mb-4">Search Info</h3>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <span class="text-zinc-600">Machines</span>
-            <span class="font-semibold">{{ results.machines|length }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-zinc-600">Components</span>
-            <span class="font-semibold">{{ results.components|length }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-zinc-600">Reports</span>
-            <span class="font-semibold">{{ results.reports|length }}</span>
-          </div>
+      <div class="term-window">
+        <div class="term-titlebar py-2">
+          <span class="term-pid text-[9px]">[i]</span>
+          <span class="term-path text-[9px]">search info</span>
         </div>
-        {% if q %}
-        <div class="mt-5 pt-4 border-t border-white/5">
-          <div class="flex items-center gap-2 text-xs text-zinc-600">
-            <span class="badge-fuzzy text-[10px] font-bold px-2 py-0.5 rounded-full">~fuzzy</span>
-            <span>approximate / typo match</span>
+        <div class="p-5 space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-mono">Machines</span>
+            <span class="font-semibold font-mono">{{ results.machines|length }}</span>
           </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-mono">Components</span>
+            <span class="font-semibold font-mono">{{ results.components|length }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-mono">Reports</span>
+            <span class="font-semibold font-mono">{{ results.reports|length }}</span>
+          </div>
+          {% if q %}
+          <div class="mt-4 pt-3 border-t border-slate-800">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <span class="badge-fuzzy text-[10px] font-bold px-2 py-0.5 rounded-full">~fuzzy</span>
+              <span>approximate / typo match</span>
+            </div>
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
 
       {% if results.distros %}
-      <div class="card-surface p-6 rounded-2xl">
-        <h3 class="tbl-head mb-4">Related Distros</h3>
-        <div class="flex flex-wrap gap-2">
-          {% for distro in results.distros %}
-          <a href="{% url 'registry:distro_detail' distro.slug %}"
-             class="px-3 py-1 rounded-full text-xs font-medium text-zinc-500 hover:text-primary transition-colors"
-             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
-            {{ distro.name }}
-          </a>
-          {% endfor %}
+      <div class="term-window">
+        <div class="term-titlebar py-2">
+          <span class="term-pid text-[9px]">[i]</span>
+          <span class="term-path text-[9px]">related distros</span>
+        </div>
+        <div class="p-5">
+          <div class="flex flex-wrap gap-2">
+            {% for distro in results.distros %}
+            <a href="{% url 'registry:distro_detail' distro.slug %}" class="distro-tag hover:text-primary hover:border-primary/20 transition-colors">{{ distro.name }}</a>
+            {% endfor %}
+          </div>
         </div>
       </div>
       {% endif %}

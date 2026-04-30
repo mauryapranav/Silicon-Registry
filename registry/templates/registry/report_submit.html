@@ -1,46 +1,120 @@
 {% extends 'registry/base.html' %}
 {% block title %}Submit Report | Silicon Registry{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-20">
-    <div class="mb-8 fade-in">
-        <h1 class="text-3xl font-bold tracking-tight">Submit a Report</h1>
-        <p class="text-zinc-500 text-sm mt-1">Share your Linux hardware compatibility experience</p>
+<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+  <!-- Ambient glows -->
+  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:15%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10" style="top:300px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
+
+  <!-- Header terminal window -->
+  <div class="term-window mb-6 fade-in">
+    <div class="term-titlebar">
+      <div class="term-dots"><span></span><span></span><span></span></div>
+      <span class="term-pid">[4] +</span>
+      <span class="term-branch">≡ MASTER</span>
+      <span class="term-path">~/submit/intro</span>
+      <span class="term-label-right">kitty</span>
     </div>
-    <form method="POST" class="card-surface p-8 rounded-2xl space-y-5 fade-in" style="animation-delay:0.1s">
-        {% csrf_token %}
-        {% if duplicate_warning %}
-        <div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl">
-            <p class="text-sm text-yellow-400">You already have a similar report (#{{ existing_report.pk }}). Check the box below and submit again to confirm.</p>
-            <label class="flex items-center gap-2 mt-2 text-sm text-zinc-300">
-                <input type="checkbox" name="confirm_duplicate" value="1" class="rounded border-zinc-600">
-                I want to submit this anyway
-            </label>
+    <div class="term-body">
+      <h1 class="font-mono font-bold text-2xl tracking-tight mb-2">
+        <span class="text-slate-500">></span> contribute_to_the_db<span class="cursor-blink"></span>
+      </h1>
+      <p class="text-slate-500 text-sm leading-relaxed">Submissions are reviewed by maintainers before going live. The more detail you give,<br>the faster it lands.</p>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <!-- Main form -->
+    <div class="lg:col-span-2 fade-in" style="animation-delay:0.08s">
+      <div class="term-window">
+        <div class="term-titlebar">
+          <div class="term-dots"><span></span><span></span><span></span></div>
+          <span class="term-pid">[4] +</span>
+          <span class="term-branch">≡ MASTER</span>
+          <span class="term-path">~/submit/compat</span>
         </div>
-        {% endif %}
-        {% for field in form %}
-        <div>
-            <label for="{{ field.id_for_label }}" class="text-sm font-medium text-zinc-400 mb-1.5 block">{{ field.label }}</label>
-            {% if field.name == 'description' %}
-                <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="6" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full" placeholder="Describe your experience in detail... (min 30 characters)">{{ field.value|default:"" }}</textarea>
-            {% elif field.name == 'machine' or field.name == 'distro' or field.name == 'component' or field.name == 'report_type' or field.name == 'boot_status' %}
-                <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full" {% if field.name == 'component' %}{% endif %}>
-                    <option value="">---------</option>
-                    {% for option in field.field.queryset|default:field.field.choices %}
-                        {% if option.0 is not None %}
-                            <option value="{{ option.0 }}" {% if field.value|stringformat:"s" == option.0|stringformat:"s" %}selected{% endif %}>{{ option.1 }}</option>
-                        {% else %}
-                            <option value="{{ option.pk }}" {% if field.value|stringformat:"s" == option.pk|stringformat:"s" %}selected{% endif %}>{{ option }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            {% else %}
-                <input type="text" name="{{ field.html_name }}" id="{{ field.id_for_label }}" {% if field.value %}value="{{ field.value }}"{% endif %} class="input-dark rounded-lg py-2.5 px-3 text-sm w-full" {% if field.name == 'title' %}placeholder="e.g. ThinkPad X1 on Ubuntu 24.04 - Everything Works (min 10 chars)"{% elif field.name == 'kernel_version' %}placeholder="e.g. 6.8.0-45"{% endif %}>
+        <div class="term-body">
+          <form method="POST" class="space-y-5">
+            {% csrf_token %}
+            {% if duplicate_warning %}
+            <div class="bg-yellow-400/10 border border-yellow-400/20 p-4 rounded-xl">
+                <p class="text-sm text-yellow-300">You already have a similar report (#{{ existing_report.pk }}). Check the box below and submit again to confirm.</p>
+                <label class="flex items-center gap-2 mt-2 text-sm text-slate-300">
+                    <input type="checkbox" name="confirm_duplicate" value="1" class="rounded border-slate-600">
+                    I want to submit this anyway
+                </label>
+            </div>
             {% endif %}
-            {% if field.errors %}<p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>{% endif %}
-            {% if field.help_text %}<p class="text-xs text-zinc-600 mt-1">{{ field.help_text }}</p>{% endif %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="term-label mb-2 block">{{ field.label }}</label>
+                {% if field.name == 'description' %}
+                    <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="6" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono" placeholder="$ anything special you did to make it work...">{{ field.value|default:"" }}</textarea>
+                {% elif field.name == 'machine' or field.name == 'distro' or field.name == 'component' or field.name == 'report_type' or field.name == 'boot_status' %}
+                    <div class="relative">
+                    <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono">
+                        <option value="">---------</option>
+                        {% for option in field.field.queryset|default:field.field.choices %}
+                            {% if option.0 is not None %}
+                                <option value="{{ option.0 }}" {% if field.value|stringformat:"s" == option.0|stringformat:"s" %}selected{% endif %}>{{ option.1 }}</option>
+                            {% else %}
+                                <option value="{{ option.pk }}" {% if field.value|stringformat:"s" == option.pk|stringformat:"s" %}selected{% endif %}>{{ option }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <i data-lucide="chevron-down" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 pointer-events-none"></i>
+                    </div>
+                {% else %}
+                    <div class="flex items-center gap-2 rounded-lg overflow-hidden" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
+                        <span class="font-mono text-xs text-green pl-3 shrink-0">$</span>
+                        <input type="text" name="{{ field.html_name }}" id="{{ field.id_for_label }}" {% if field.value %}value="{{ field.value }}"{% endif %} class="bg-transparent border-none outline-none py-2.5 text-sm w-full font-mono text-slate-300 placeholder:text-slate-600" {% if field.name == 'title' %}placeholder="e.g. Intel AX211"{% elif field.name == 'kernel_version' %}placeholder="uname ≥ 6.6"{% endif %}>
+                    </div>
+                {% endif %}
+                {% if field.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ field.errors.0 }}</p>{% endif %}
+                {% if field.help_text %}<p class="text-xs text-slate-600 mt-1">{{ field.help_text }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <div class="flex items-center gap-4 pt-2">
+              <button type="submit" class="btn-term">$ submit</button>
+              <span class="text-xs text-slate-600 font-mono">// reviewed before publishing</span>
+            </div>
+          </form>
         </div>
-        {% endfor %}
-        <button type="submit" class="w-full bg-primary text-black py-3.5 rounded-xl font-semibold text-sm hover:bg-accent transition-colors">Submit Report for Review</button>
-    </form>
+      </div>
+    </div>
+
+    <!-- Guidelines sidebar -->
+    <div class="fade-in" style="animation-delay:0.15s">
+      <div class="term-window lg:sticky lg:top-20">
+        <div class="term-titlebar">
+          <span class="term-pid">[4] +/DOCS</span>
+          <span class="term-branch">≡ MASTER</span>
+          <span class="term-path">~/guidelines.txt</span>
+        </div>
+        <div class="term-body space-y-4 text-sm text-slate-400">
+          <div class="flex gap-2.5">
+            <span class="text-green shrink-0">✓</span>
+            <span>be specific: vendor + exact model number.</span>
+          </div>
+          <div class="flex gap-2.5">
+            <span class="text-green shrink-0">✓</span>
+            <span>include kernel version you tested on.</span>
+          </div>
+          <div class="flex gap-2.5">
+            <span class="text-green shrink-0">✓</span>
+            <span>mark partial honestly — what works, what doesn't.</span>
+          </div>
+          <div class="flex gap-2.5">
+            <span class="text-green shrink-0">✓</span>
+            <span>for fixes: keep commands copy-pasteable. one action per line.</span>
+          </div>
+          <div class="flex gap-2.5">
+            <span class="text-green shrink-0">✓</span>
+            <span>no LLM-generated boilerplate. real experience only.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

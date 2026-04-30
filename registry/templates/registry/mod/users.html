@@ -2,10 +2,10 @@
 {% block mod_content %}
 <h1 class="text-2xl font-black tracking-tight mb-8">Manage Users</h1>
 
-<div class="card-surface rounded-2xl overflow-hidden">
+<div class="term-window rounded-xl overflow-hidden">
   <table class="w-full text-sm">
     <thead>
-      <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+      <tr style="border-bottom:1px solid rgba(148,163,184,0.06);">
         <th class="tbl-head text-left px-5 py-4">User</th>
         <th class="tbl-head text-left px-5 py-4">Role</th>
         <th class="tbl-head text-right px-5 py-4">Trust</th>
@@ -18,13 +18,13 @@
         <td class="px-5 py-3.5">
           <a href="{% url 'registry:user_profile' u.username %}"
              class="font-semibold hover:text-primary transition-colors">{{ u.username }}</a>
-          <div class="text-[11px] text-zinc-700 mt-0.5">{{ u.email }}</div>
+          <div class="text-[11px] text-slate-700 mt-0.5">{{ u.email }}</div>
         </td>
         <td class="px-5 py-3.5">
           <span class="badge-primary text-[10px] px-2.5 py-1 rounded-full font-bold">{{ u.role_type }}</span>
         </td>
         <td class="px-5 py-3.5 text-right font-semibold
-          {% if u.trust_ratio >= 80 %}text-primary{% elif u.trust_ratio >= 50 %}text-yellow-500{% else %}text-zinc-600{% endif %}">
+          {% if u.trust_ratio >= 80 %}text-primary{% elif u.trust_ratio >= 50 %}text-yellow-500{% else %}text-slate-600{% endif %}">
           {{ u.trust_ratio }}%
         </td>
         <td class="px-5 py-3.5 text-right">
@@ -37,12 +37,12 @@
                   <option value="{{ val }}" {% if val == u.role_type %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
               </select>
-              <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-600 pointer-events-none"></i>
+              <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none"></i>
             </div>
             <button class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-              style="background:rgba(57,211,83,0.08);color:#39d353;border:1px solid rgba(57,211,83,0.2);"
-              onmouseenter="this.style.background='rgba(57,211,83,0.16)'"
-              onmouseleave="this.style.background='rgba(57,211,83,0.08)'">Save</button>
+              style="background:rgba(96,165,250,0.08);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);"
+              onmouseenter="this.style.background='rgba(96,165,250,0.16)'"
+              onmouseleave="this.style.background='rgba(96,165,250,0.08)'">Save</button>
           </form>
         </td>
       </tr>

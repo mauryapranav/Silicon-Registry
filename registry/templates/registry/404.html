@@ -1,10 +1,17 @@
 {% extends 'registry/base.html' %}
 {% block title %}404 — Not Found | Silicon Registry{% endblock %}
 {% block content %}
-<div class="max-w-lg mx-auto px-4 py-32 text-center fade-in">
-    <div class="text-8xl font-black text-zinc-800 mb-4">404</div>
-    <h1 class="text-2xl font-bold mb-2">Page not found</h1>
-    <p class="text-zinc-500 mb-8">The page you're looking for doesn't exist or has been moved.</p>
-    <a href="{% url 'registry:homepage' %}" class="bg-primary text-black px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-accent transition-colors">Go home</a>
+<div class="max-w-lg mx-auto px-4 py-24 text-center fade-in">
+    <div class="term-window">
+        <div class="term-titlebar justify-center">
+            <span class="font-mono text-[10px] text-red-400 font-bold">ERROR</span>
+        </div>
+        <div class="term-body py-12">
+            <div class="font-mono text-7xl font-black text-slate-700 mb-4">404</div>
+            <h1 class="text-2xl font-bold mb-2 font-mono">Page not found</h1>
+            <p class="text-slate-500 mb-8 font-mono text-sm">$ cat /page → error: no such file or directory</p>
+            <a href="{% url 'registry:homepage' %}" class="btn-term">$ cd ~/home</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

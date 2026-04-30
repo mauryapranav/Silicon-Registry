@@ -1,65 +1,61 @@
 {% extends 'registry/base.html' %}
 {% block title %}About | Silicon Registry{% endblock %}
 {% block content %}
-<div class="max-w-3xl mx-auto px-5 sm:px-8 pt-14 pb-24 fade-in">
+<div class="max-w-4xl mx-auto px-5 sm:px-8 pt-10 pb-24 fade-in">
 
-  <h1 class="text-4xl font-black tracking-tight mb-3">About Silicon Registry</h1>
-  <p class="text-zinc-500 text-lg leading-relaxed mb-10">
-    A community-powered database for Linux hardware compatibility. Find out if your laptop, GPU, WiFi card, or other hardware works on Linux before you buy.
-  </p>
+  <div class="term-window mb-6">
+    <div class="term-titlebar">
+      <div class="term-dots"><span></span><span></span><span></span></div>
+      <span class="term-pid">[i] ABOUT</span>
+      <span class="term-branch">≡ MASTER</span>
+      <span class="term-path">~/about</span>
+    </div>
+    <div class="term-body">
+      <h1 class="font-mono font-bold text-3xl tracking-tight mb-3">
+        <span class="text-slate-500">></span> <span class="text-gradient">about</span><span class="cursor-blink"></span>
+      </h1>
+      <p class="text-slate-500 text-base leading-relaxed">
+        A community-powered database for Linux hardware compatibility. Find out if your laptop, GPU, WiFi card, or other hardware works on Linux before you buy.
+      </p>
+    </div>
+  </div>
 
   <div class="space-y-5">
-
-    <div class="card-surface p-7 rounded-2xl relative overflow-hidden">
-      <div class="accent-bar"></div>
-      <h2 class="text-lg font-bold mb-4">How It Works</h2>
-      <div class="space-y-4 text-sm text-zinc-400">
-        <div class="flex gap-4">
-          <span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0">1.</span>
-          <span>Users submit compatibility reports for their hardware + Linux distro combination.</span>
-        </div>
-        <div class="flex gap-4">
-          <span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0">2.</span>
-          <span>Maintainers review and approve reports to ensure quality.</span>
-        </div>
-        <div class="flex gap-4">
-          <span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0">3.</span>
-          <span>Community members vote on reports and add driver fixes.</span>
-        </div>
-        <div class="flex gap-4">
-          <span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0">4.</span>
-          <span>Everyone benefits from a growing database of verified compatibility data.</span>
-        </div>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-pid text-[9px]">[1]</span>
+        <span class="term-path text-[9px]">how it works</span>
+      </div>
+      <div class="p-7 space-y-4 text-sm text-slate-400">
+        <div class="flex gap-4"><span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0 font-mono">1.</span><span>Users submit compatibility reports for their hardware + Linux distro combination.</span></div>
+        <div class="flex gap-4"><span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0 font-mono">2.</span><span>Maintainers review and approve reports to ensure quality.</span></div>
+        <div class="flex gap-4"><span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0 font-mono">3.</span><span>Community members vote on reports and add driver fixes.</span></div>
+        <div class="flex gap-4"><span class="text-primary font-black text-base leading-none mt-0.5 w-5 shrink-0 font-mono">4.</span><span>Everyone benefits from a growing database of verified compatibility data.</span></div>
       </div>
     </div>
 
-    <div class="card-surface p-7 rounded-2xl">
-      <h2 class="text-lg font-bold mb-5">Compatibility Ratings</h2>
-      <div class="space-y-3 text-sm">
-        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.1);">
-          <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 shrink-0"></span>
-          <div><strong class="text-yellow-500">Gold</strong> <span class="text-zinc-500">— Everything works out of the box</span></div>
-        </div>
-        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(163,163,163,0.04);border:1px solid rgba(163,163,163,0.1);">
-          <span class="w-2.5 h-2.5 rounded-full bg-zinc-400 shrink-0"></span>
-          <div><strong class="text-zinc-300">Silver</strong> <span class="text-zinc-500">— Most things work, minor issues</span></div>
-        </div>
-        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(234,88,12,0.04);border:1px solid rgba(234,88,12,0.1);">
-          <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
-          <div><strong class="text-orange-500">Bronze</strong> <span class="text-zinc-500">— Usable with significant workarounds</span></div>
-        </div>
-        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.1);">
-          <span class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>
-          <div><strong class="text-red-500">Broken</strong> <span class="text-zinc-500">— Does not boot or unusable</span></div>
-        </div>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-pid text-[9px]">[2]</span>
+        <span class="term-path text-[9px]">compatibility ratings</span>
+      </div>
+      <div class="p-7 space-y-3 text-sm">
+        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.1);"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0"></span><div><strong class="text-yellow-400 font-mono">Gold</strong> <span class="text-slate-500">— Everything works out of the box</span></div></div>
+        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(148,163,184,0.04);border:1px solid rgba(148,163,184,0.1);"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0"></span><div><strong class="text-slate-300 font-mono">Silver</strong> <span class="text-slate-500">— Most things work, minor issues</span></div></div>
+        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(251,146,60,0.04);border:1px solid rgba(251,146,60,0.1);"><span class="w-2.5 h-2.5 rounded-full bg-orange-400 shrink-0"></span><div><strong class="text-orange-400 font-mono">Bronze</strong> <span class="text-slate-500">— Usable with significant workarounds</span></div></div>
+        <div class="flex items-center gap-4 p-3 rounded-xl" style="background:rgba(248,113,113,0.04);border:1px solid rgba(248,113,113,0.1);"><span class="w-2.5 h-2.5 rounded-full bg-red-400 shrink-0"></span><div><strong class="text-red-400 font-mono">Broken</strong> <span class="text-slate-500">— Does not boot or unusable</span></div></div>
       </div>
     </div>
 
-    <div class="card-surface p-7 rounded-2xl">
-      <h2 class="text-lg font-bold mb-3">Tech Stack</h2>
-      <p class="text-sm text-zinc-500">Built with Django, MySQL, Tailwind CSS, and HTMX. Open source and community-driven.</p>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-pid text-[9px]">[3]</span>
+        <span class="term-path text-[9px]">tech stack</span>
+      </div>
+      <div class="p-7">
+        <p class="text-sm text-slate-500">Built with Django, MySQL, Tailwind CSS, and HTMX. Open source and community-driven.</p>
+      </div>
     </div>
-
   </div>
 </div>
 {% endblock %}

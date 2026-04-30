@@ -7,11 +7,11 @@
           hx-swap="outerHTML"
           class="flex flex-col items-center gap-1.5 group">
     <div class="w-11 h-11 rounded-xl border flex items-center justify-center transition-all
-      {% if user_vote and user_vote.vote_type == 'UPVOTE' %}border-primary/40{% else %}border-white/8 hover:border-primary/25{% endif %}"
-      style="background:{% if user_vote and user_vote.vote_type == 'UPVOTE' %}rgba(57,211,83,0.12){% else %}rgba(255,255,255,0.04){% endif %}">
-      <i data-lucide="arrow-up" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-zinc-500 group-hover:text-primary{% endif %} transition-colors"></i>
+      {% if user_vote and user_vote.vote_type == 'UPVOTE' %}border-primary/40{% else %}border-slate-700 hover:border-primary/25{% endif %}"
+      style="background:{% if user_vote and user_vote.vote_type == 'UPVOTE' %}rgba(96,165,250,0.12){% else %}rgba(148,163,184,0.04){% endif %}">
+      <i data-lucide="arrow-up" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-slate-500 group-hover:text-primary{% endif %} transition-colors"></i>
     </div>
-    <span class="text-xs font-bold {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-zinc-600{% endif %}">{{ upvotes }}</span>
+    <span class="text-xs font-bold font-mono {% if user_vote and user_vote.vote_type == 'UPVOTE' %}text-primary{% else %}text-slate-600{% endif %}">{{ upvotes }}</span>
   </button>
 
   <button type="button"
@@ -20,11 +20,11 @@
           hx-swap="outerHTML"
           class="flex flex-col items-center gap-1.5 group">
     <div class="w-11 h-11 rounded-xl border flex items-center justify-center transition-all
-      {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}border-red-500/40{% else %}border-white/8 hover:border-red-500/25{% endif %}"
-      style="background:{% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}rgba(239,68,68,0.12){% else %}rgba(255,255,255,0.04){% endif %}">
-      <i data-lucide="arrow-down" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-500{% else %}text-zinc-500 group-hover:text-red-500{% endif %} transition-colors"></i>
+      {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}border-red-400/40{% else %}border-slate-700 hover:border-red-400/25{% endif %}"
+      style="background:{% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}rgba(248,113,113,0.12){% else %}rgba(148,163,184,0.04){% endif %}">
+      <i data-lucide="arrow-down" class="w-5 h-5 {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-400{% else %}text-slate-500 group-hover:text-red-400{% endif %} transition-colors"></i>
     </div>
-    <span class="text-xs font-bold {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-500{% else %}text-zinc-600{% endif %}">{{ downvotes }}</span>
+    <span class="text-xs font-bold font-mono {% if user_vote and user_vote.vote_type == 'DOWNVOTE' %}text-red-400{% else %}text-slate-600{% endif %}">{{ downvotes }}</span>
   </button>
 </form>
 <script>lucide.createIcons();</script>
@@ -32,16 +32,16 @@
 {% else %}
 <div class="flex gap-4">
   <div class="flex flex-col items-center gap-1.5">
-    <div class="w-11 h-11 rounded-xl border border-white/8 flex items-center justify-center" style="background:rgba(255,255,255,0.04);">
-      <i data-lucide="arrow-up" class="w-5 h-5 text-zinc-700"></i>
+    <div class="w-11 h-11 rounded-xl border border-slate-700 flex items-center justify-center" style="background:rgba(148,163,184,0.04);">
+      <i data-lucide="arrow-up" class="w-5 h-5 text-slate-600"></i>
     </div>
-    <span class="text-xs text-zinc-700">{{ upvotes }}</span>
+    <span class="text-xs text-slate-600 font-mono">{{ upvotes }}</span>
   </div>
   <div class="flex flex-col items-center gap-1.5">
-    <div class="w-11 h-11 rounded-xl border border-white/8 flex items-center justify-center" style="background:rgba(255,255,255,0.04);">
-      <i data-lucide="arrow-down" class="w-5 h-5 text-zinc-700"></i>
+    <div class="w-11 h-11 rounded-xl border border-slate-700 flex items-center justify-center" style="background:rgba(148,163,184,0.04);">
+      <i data-lucide="arrow-down" class="w-5 h-5 text-slate-600"></i>
     </div>
-    <span class="text-xs text-zinc-700">{{ downvotes }}</span>
+    <span class="text-xs text-slate-600 font-mono">{{ downvotes }}</span>
   </div>
 </div>
 {% endif %}

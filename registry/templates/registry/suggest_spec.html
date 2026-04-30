@@ -2,28 +2,45 @@
 {% block title %}Suggest Spec | Silicon Registry{% endblock %}
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-20">
-    <h1 class="text-2xl font-bold tracking-tight mb-2 fade-in">Suggest Spec</h1>
-    <p class="text-zinc-500 text-sm mb-8 fade-in">Contribute specification data for <span class="text-white font-medium">{{ machine.vendor }} {{ machine.model_name }}</span></p>
-    <form method="POST" class="card-surface p-8 rounded-2xl space-y-5 fade-in" style="animation-delay:0.1s">
-        {% csrf_token %}
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Field</label>
-            <select name="field_name" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
-                <option value="">Select field...</option>
-                {% for val, label in spec_fields %}
-                <option value="{{ val }}">{{ label }}</option>
-                {% endfor %}
-            </select>
+    <div class="term-window fade-in">
+        <div class="term-titlebar">
+            <div class="term-dots"><span></span><span></span><span></span></div>
+            <span class="term-pid">[1] SPEC</span>
+            <span class="term-branch">≡ MASTER</span>
+            <span class="term-path">~/suggest-spec</span>
         </div>
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Suggested Value</label>
-            <input type="text" name="suggested_value" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full" placeholder="e.g. Core i7-1365U">
+        <div class="term-body">
+            <h1 class="font-mono font-bold text-2xl tracking-tight mb-2"><span class="text-slate-500">></span> suggest_spec</h1>
+            <p class="text-slate-500 text-sm mb-8 font-mono">Contributing spec for <span class="text-white font-medium">{{ machine.vendor }} {{ machine.model_name }}</span></p>
+            <form method="POST" class="space-y-5">
+                {% csrf_token %}
+                <div>
+                    <label class="term-label mb-2 block">Field</label>
+                    <div class="relative">
+                        <select name="field_name" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono">
+                            <option value="">Select field...</option>
+                            {% for val, label in spec_fields %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 pointer-events-none"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="term-label mb-2 block">Suggested Value</label>
+                    <div class="flex items-center gap-2 rounded-lg overflow-hidden" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
+                        <span class="font-mono text-xs text-green pl-3 shrink-0">$</span>
+                        <input type="text" name="suggested_value" required class="bg-transparent border-none outline-none py-2.5 text-sm w-full font-mono text-slate-300 placeholder:text-slate-600" placeholder="e.g. Core i7-1365U">
+                    </div>
+                </div>
+                <div>
+                    <label class="term-label mb-2 block">Source URL (optional)</label>
+                    <div class="flex items-center gap-2 rounded-lg overflow-hidden" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
+                        <span class="font-mono text-xs text-green pl-3 shrink-0">$</span>
+                        <input type="url" name="source_url" class="bg-transparent border-none outline-none py-2.5 text-sm w-full font-mono text-slate-300 placeholder:text-slate-600" placeholder="https://psref.lenovo.com/...">
+                    </div>
+                </div>
+                <button type="submit" class="btn-term w-full text-center">$ submit suggestion</button>
+            </form>
         </div>
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Source URL (optional)</label>
-            <input type="url" name="source_url" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full" placeholder="https://psref.lenovo.com/...">
-        </div>
-        <button type="submit" class="w-full bg-primary text-black py-3 rounded-xl font-semibold text-sm hover:bg-accent transition-colors">Submit Suggestion</button>
-    </form>
+    </div>
 </div>
 {% endblock %}

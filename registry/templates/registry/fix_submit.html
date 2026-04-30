@@ -1,38 +1,73 @@
 {% extends 'registry/base.html' %}
-
 {% block title %}Submit a Driver Fix | Silicon Registry{% endblock %}
-
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-20">
-    <div class="mb-8 fade-in">
-        <h1 class="text-3xl font-bold tracking-tight">Submit a Driver Fix</h1>
-        <p class="text-zinc-500 text-sm mt-1">Share workarounds and driver commands for broken components</p>
+<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+  <!-- Ambient glows -->
+  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:15%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10" style="top:300px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 fade-in">
+      <div class="term-window">
+        <div class="term-titlebar">
+          <div class="term-dots"><span></span><span></span><span></span></div>
+          <span class="term-pid">[4] FIX</span>
+          <span class="term-branch">≡ MASTER</span>
+          <span class="term-path">~/submit/fix</span>
+        </div>
+        <div class="term-body">
+          <h1 class="font-mono font-bold text-2xl tracking-tight mb-2">
+            <span class="text-slate-500">></span> submit_driver_fix<span class="cursor-blink"></span>
+          </h1>
+          <p class="text-slate-500 text-sm mb-8">Share workarounds and driver commands for broken components</p>
+          <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            <div>
+              <label class="term-label mb-2 block">Component</label>
+              <div class="relative">
+                <select name="component_id" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono">
+                  <option value="">Select component...</option>
+                  {% for comp in components %}<option value="{{ comp.pk }}">{{ comp.get_type_display }} — {{ comp.name }}</option>{% endfor %}
+                </select>
+                <i data-lucide="chevron-down" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 pointer-events-none"></i>
+              </div>
+            </div>
+            <div>
+              <label class="term-label mb-2 block">Title</label>
+              <div class="flex items-center gap-2 rounded-lg overflow-hidden" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
+                <span class="font-mono text-xs text-green pl-3 shrink-0">$</span>
+                <input type="text" name="title" required minlength="10" placeholder="e.g. Fix WiFi disconnects on kernel 6.8+" class="bg-transparent border-none outline-none py-2.5 text-sm w-full font-mono text-slate-300 placeholder:text-slate-600">
+              </div>
+            </div>
+            <div>
+              <label class="term-label mb-2 block">Fix commands & instructions</label>
+              <textarea name="body" rows="8" required placeholder="Include terminal commands, config file changes, and any prerequisites..." class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono"></textarea>
+            </div>
+            <div>
+              <label class="term-label mb-2 block">External URL (optional)</label>
+              <div class="flex items-center gap-2 rounded-lg overflow-hidden" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
+                <span class="font-mono text-xs text-green pl-3 shrink-0">$</span>
+                <input type="url" name="external_url" placeholder="https://wiki.archlinux.org/..." class="bg-transparent border-none outline-none py-2.5 text-sm w-full font-mono text-slate-300 placeholder:text-slate-600">
+              </div>
+            </div>
+            <button type="submit" class="btn-term w-full text-center">$ submit fix</button>
+          </form>
+        </div>
+      </div>
     </div>
-
-    <form method="POST" class="card-surface p-8 rounded-2xl space-y-6 fade-in" style="animation-delay:0.1s">
-        {% csrf_token %}
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Component *</label>
-            <select name="component_id" required class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
-                <option value="">Select component...</option>
-                {% for comp in components %}
-                    <option value="{{ comp.pk }}">{{ comp.get_type_display }} — {{ comp.name }}</option>
-                {% endfor %}
-            </select>
+    <div class="fade-in" style="animation-delay:0.12s">
+      <div class="term-window lg:sticky lg:top-20">
+        <div class="term-titlebar">
+          <span class="term-pid text-[9px]">[i]</span>
+          <span class="term-path text-[9px]">~/guidelines.txt</span>
         </div>
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Title *</label>
-            <input type="text" name="title" required minlength="10" placeholder="e.g. Fix WiFi disconnects on kernel 6.8+" class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
+        <div class="term-body space-y-4 text-sm text-slate-400">
+          <div class="flex gap-2.5"><span class="text-green shrink-0">✓</span><span>keep commands copy-pasteable.</span></div>
+          <div class="flex gap-2.5"><span class="text-green shrink-0">✓</span><span>one action per line.</span></div>
+          <div class="flex gap-2.5"><span class="text-green shrink-0">✓</span><span>include any prerequisites or dependencies.</span></div>
+          <div class="flex gap-2.5"><span class="text-green shrink-0">✓</span><span>test on your own machine first.</span></div>
         </div>
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">Fix commands & instructions *</label>
-            <textarea name="body" rows="8" required placeholder="Include terminal commands, config file changes, and any prerequisites..." class="input-dark rounded-lg py-2.5 px-3 text-sm w-full font-mono"></textarea>
-        </div>
-        <div>
-            <label class="text-sm font-medium text-zinc-400 mb-1.5 block">External URL (optional)</label>
-            <input type="url" name="external_url" placeholder="https://wiki.archlinux.org/..." class="input-dark rounded-lg py-2.5 px-3 text-sm w-full">
-        </div>
-        <button type="submit" class="w-full bg-primary text-black py-3 rounded-xl font-semibold text-sm hover:bg-accent transition-colors">Submit Fix for Review</button>
-    </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

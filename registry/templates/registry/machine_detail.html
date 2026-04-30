@@ -3,43 +3,49 @@
 {% block title %}{{ machine.vendor }} {{ machine.model_name }} | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-24">
+<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+  <!-- Ambient glows -->
+  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:15%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10" style="top:300px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
 
   <!-- Breadcrumb -->
-  <div class="flex items-center gap-2 mb-8 text-sm text-zinc-700 fade-in">
-    <a href="{% url 'registry:homepage' %}" class="hover:text-white transition-colors">Home</a>
-    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
-    <a href="{% url 'registry:machine_list' %}" class="hover:text-white transition-colors">Machines</a>
-    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-800"></i>
-    <span class="text-zinc-500">{{ machine.vendor }} {{ machine.model_name }}</span>
+  <div class="flex items-center gap-2 mb-6 text-sm text-slate-600 fade-in font-mono">
+    <a href="{% url 'registry:homepage' %}" class="hover:text-white transition-colors">~</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700"></i>
+    <a href="{% url 'registry:machine_list' %}" class="hover:text-white transition-colors">machines</a>
+    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700"></i>
+    <span class="text-slate-400">{{ machine.slug }}</span>
   </div>
 
-  <div class="grid lg:grid-cols-3 gap-8">
+  <div class="grid lg:grid-cols-3 gap-3">
 
     <!-- ── Left Sidebar ──────────────────────── -->
-    <div class="lg:col-span-1 space-y-4 fade-in" style="animation-delay:0.06s">
+    <div class="lg:col-span-1 space-y-3 fade-in" style="animation-delay:0.06s">
 
       <!-- Identity hero card -->
-      <div class="rounded-2xl relative overflow-hidden" style="background:linear-gradient(180deg,#161616 0%,#111 100%);border:1px solid rgba(255,255,255,0.08);">
-        <div class="accent-bar"></div>
-        <!-- Subtle ambient top glow -->
-        <div class="absolute top-0 left-0 right-0 h-24 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(57,211,83,0.06),transparent 70%);"></div>
-
+      <div class="term-window">
+        <div class="term-titlebar">
+          <div class="term-dots"><span></span><span></span><span></span></div>
+          <span class="term-pid">[1] HW</span>
+          <span class="term-branch">≡ MASTER</span>
+          <span class="term-path">~/machine</span>
+        </div>
         <div class="p-7 relative">
-          <div class="section-label mb-2">{{ machine.vendor }}{% if machine.series %} · {{ machine.series }}{% endif %}</div>
+          <div class="absolute top-0 left-0 right-0 h-24 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(96,165,250,0.05),transparent 70%);"></div>
+          <div class="section-label mb-2 font-mono">{{ machine.vendor }}{% if machine.series %} · {{ machine.series }}{% endif %}</div>
           <h1 class="text-2xl font-black tracking-tight mb-5">{{ machine.model_name }}</h1>
 
           <!-- Compat pill -->
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-6
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold font-mono mb-6
             {% if compat == 'gold' or compat == 'mostly_gold' %}badge-gold
             {% elif compat == 'broken' %}badge-broken
             {% elif compat == 'mixed' %}badge-silver
-            {% else %}text-zinc-700 border border-zinc-800{% endif %}">
+            {% else %}text-slate-600 border border-slate-700{% endif %}">
             <span class="w-1.5 h-1.5 rounded-full
-              {% if compat == 'gold' or compat == 'mostly_gold' %}bg-yellow-500
-              {% elif compat == 'broken' %}bg-red-500
-              {% elif compat == 'mixed' %}bg-zinc-400
-              {% else %}bg-zinc-700{% endif %}"></span>
+              {% if compat == 'gold' or compat == 'mostly_gold' %}bg-yellow-400
+              {% elif compat == 'broken' %}bg-red-400
+              {% elif compat == 'mixed' %}bg-slate-400
+              {% else %}bg-slate-600{% endif %}"></span>
             {% if compat == 'gold' %}Gold compatible
             {% elif compat == 'mostly_gold' %}Mostly Gold
             {% elif compat == 'broken' %}Broken
@@ -47,33 +53,34 @@
             {% else %}No data yet{% endif %}
           </div>
 
-          <div class="space-y-0 text-sm" style="border-top:1px solid rgba(255,255,255,0.06);">
-            <div class="flex justify-between py-3" style="border-bottom:1px solid rgba(255,255,255,0.05);">
-              <span class="text-zinc-600">Reports</span>
-              <span class="font-bold">{{ report_count }}</span>
+          <div class="space-y-0 text-sm" style="border-top:1px solid rgba(148,163,184,0.08);">
+            <div class="flex justify-between py-3" style="border-bottom:1px solid rgba(148,163,184,0.06);">
+              <span class="text-slate-500 font-mono">Reports</span>
+              <span class="font-bold font-mono">{{ report_count }}</span>
             </div>
             {% if machine.form_factor %}
             <div class="flex justify-between py-3">
-              <span class="text-zinc-600">Form factor</span>
-              <span class="font-bold">{{ machine.get_form_factor_display }}</span>
+              <span class="text-slate-500 font-mono">Form factor</span>
+              <span class="font-bold font-mono">{{ machine.get_form_factor_display }}</span>
             </div>
             {% endif %}
           </div>
         </div>
       </div>
 
-      <!-- Spec card — icon grid layout -->
-      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
-        <div class="px-5 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-          <span class="section-label">Hardware Specs</span>
+      <!-- Spec card -->
+      <div class="term-window">
+        <div class="term-titlebar">
+          <span class="term-pid text-[9px]">[2] SPEC</span>
+          <span class="term-path text-[9px]">~/hardware</span>
         </div>
         {% if spec %}
-        <div class="divide-y" style="divide-color:rgba(255,255,255,0.05);">
+        <div class="divide-y" style="divide-color:rgba(148,163,184,0.06);">
           {% if spec.cpu_name %}
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="cpu" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow min-w-0">
-              <div class="section-label text-[9px] mb-0.5">CPU</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">CPU</div>
               <div class="text-xs font-semibold truncate">{{ spec.cpu_name }}</div>
             </div>
           </div>
@@ -82,7 +89,7 @@
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="monitor" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow min-w-0">
-              <div class="section-label text-[9px] mb-0.5">GPU</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">GPU</div>
               <div class="text-xs font-semibold truncate">{{ spec.gpu_name }}</div>
             </div>
           </div>
@@ -91,7 +98,7 @@
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="memory-stick" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5">Memory</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">Memory</div>
               <div class="text-xs font-semibold">{{ spec.ram_base_gb }}GB {{ spec.get_ram_type_display|default:"" }}</div>
             </div>
           </div>
@@ -100,7 +107,7 @@
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5">Storage</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">Storage</div>
               <div class="text-xs font-semibold">{{ spec.storage_base_gb }}GB {{ spec.get_storage_type_display|default:"" }}</div>
             </div>
           </div>
@@ -109,7 +116,7 @@
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="tablet" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5">Display</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">Display</div>
               <div class="text-xs font-semibold">{{ spec.display_size_inches }}" {{ spec.display_resolution }} {{ spec.get_display_panel_type_display|default:"" }}</div>
             </div>
           </div>
@@ -118,18 +125,18 @@
           <div class="flex items-center gap-3 px-5 py-3.5">
             <i data-lucide="battery" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5">Battery</div>
+              <div class="section-label text-[9px] mb-0.5 font-mono">Battery</div>
               <div class="text-xs font-semibold">{{ spec.battery_wh }}Wh</div>
             </div>
           </div>
           {% endif %}
         </div>
         {% else %}
-        <p class="text-xs text-zinc-700 text-center py-8">No specs recorded yet.</p>
+        <p class="text-xs text-slate-600 text-center py-8 font-mono">No specs recorded yet.</p>
         {% endif %}
         <div class="p-4">
           <a href="{% url 'registry:suggest_spec' machine.pk %}"
-             class="btn-ghost flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold">
+             class="btn-ghost flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-semibold font-mono">
             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Contribute spec
           </a>
         </div>
@@ -137,16 +144,17 @@
 
       <!-- Related machines -->
       {% if related %}
-      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
-        <div class="px-5 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-          <span class="section-label">Related</span>
+      <div class="term-window">
+        <div class="term-titlebar py-2">
+          <span class="term-pid text-[9px]">[i]</span>
+          <span class="term-path text-[9px]">related</span>
         </div>
         {% for r in related %}
         <a href="{% url 'registry:machine_detail' r.slug %}"
-           class="flex items-center justify-between px-5 py-3 group transition-colors hover:bg-white/3"
-           style="{% if not forloop.last %}border-bottom:1px solid rgba(255,255,255,0.04);{% endif %}">
+           class="flex items-center justify-between px-5 py-3 group transition-colors hover:bg-slate-800/30"
+           style="{% if not forloop.last %}border-bottom:1px solid rgba(148,163,184,0.05);{% endif %}">
           <span class="text-sm font-medium group-hover:text-primary transition-colors">{{ r.model_name }}</span>
-          <span class="text-[11px] text-zinc-700">{{ r.report_count }}</span>
+          <span class="text-[11px] text-slate-600 font-mono">{{ r.report_count }}</span>
         </a>
         {% endfor %}
       </div>
@@ -154,68 +162,62 @@
     </div>
 
     <!-- ── Main Content ──────────────────────── -->
-    <div class="lg:col-span-2 space-y-6 fade-in" style="animation-delay:0.14s">
+    <div class="lg:col-span-2 space-y-3 fade-in" style="animation-delay:0.14s">
 
       <!-- Component Status matrix -->
-      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
-        <div class="px-6 py-4 flex justify-between items-center" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-          <span class="font-bold text-sm">Component Matrix</span>
-          <span class="section-label">{{ comp_summary|length }} components tracked</span>
+      <div class="term-window">
+        <div class="term-titlebar">
+          <div class="term-dots"><span></span><span></span><span></span></div>
+          <span class="term-pid">[3] COMP</span>
+          <span class="term-branch">≡ MASTER</span>
+          <span class="term-path">~/components</span>
+          <span class="term-label-right">{{ comp_summary|length }} tracked</span>
         </div>
 
         {% if comp_summary %}
-        <div class="grid sm:grid-cols-2 gap-px" style="background:rgba(255,255,255,0.05);">
+        <div class="grid sm:grid-cols-2 gap-px" style="background:rgba(148,163,184,0.06);">
           {% for comp_id, info in comp_summary.items %}
           <a href="{% if info.slug %}{% url 'registry:component_detail' info.slug %}{% else %}#{% endif %}"
              class="flex gap-4 p-5 group transition-all hover:bg-primary/4"
-             style="background:#0e0e0e;">
-            <!-- Status dot bar -->
-            <div class="flex flex-col gap-1 w-1.5 rounded-full shrink-0 overflow-hidden" style="background:rgba(255,255,255,0.05);">
-              {% if info.working > 0 %}
-              <div class="w-full rounded-full flex-1" style="background:#39d353;min-height:6px;"></div>
-              {% endif %}
-              {% if info.issues > 0 %}
-              <div class="w-full rounded-full flex-1" style="background:#eab308;min-height:6px;"></div>
-              {% endif %}
-              {% if info.broken > 0 %}
-              <div class="w-full rounded-full flex-1" style="background:#ef4444;min-height:6px;"></div>
-              {% endif %}
+             style="background:#111827;">
+            <div class="flex flex-col gap-1 w-1.5 rounded-full shrink-0 overflow-hidden" style="background:rgba(148,163,184,0.06);">
+              {% if info.working > 0 %}<div class="w-full rounded-full flex-1" style="background:#34d399;min-height:6px;"></div>{% endif %}
+              {% if info.issues > 0 %}<div class="w-full rounded-full flex-1" style="background:#fbbf24;min-height:6px;"></div>{% endif %}
+              {% if info.broken > 0 %}<div class="w-full rounded-full flex-1" style="background:#f87171;min-height:6px;"></div>{% endif %}
             </div>
-
             <div class="flex-grow min-w-0">
-              <div class="section-label mb-0.5">{{ info.type }}</div>
+              <div class="section-label mb-0.5 font-mono">{{ info.type }}</div>
               <div class="text-sm font-semibold truncate group-hover:text-primary transition-colors">{{ info.name }}</div>
-              <!-- Status pill row -->
               <div class="flex gap-1.5 mt-2.5">
-                {% if info.working > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-working">✓ {{ info.working }}</span>{% endif %}
-                {% if info.issues  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-issues">! {{ info.issues }}</span>{% endif %}
-                {% if info.broken  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-broken">✗ {{ info.broken }}</span>{% endif %}
+                {% if info.working > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-working font-mono">✓ {{ info.working }}</span>{% endif %}
+                {% if info.issues  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-issues font-mono">! {{ info.issues }}</span>{% endif %}
+                {% if info.broken  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-broken font-mono">✗ {{ info.broken }}</span>{% endif %}
               </div>
             </div>
-
-            <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-800 group-hover:text-primary transition-colors shrink-0 self-center"></i>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-700 group-hover:text-primary transition-colors shrink-0 self-center"></i>
           </a>
           {% endfor %}
         </div>
         {% else %}
-        <p class="text-sm text-zinc-700 text-center py-12">No component data linked yet.</p>
+        <p class="text-sm text-slate-600 text-center py-12 font-mono">No component data linked yet.</p>
         {% endif %}
       </div>
 
       <!-- Known Fixes -->
       {% if driver_fixes %}
-      <div class="rounded-2xl overflow-hidden" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
-        <div class="px-6 py-4" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-          <span class="font-bold text-sm">Known Fixes</span>
+      <div class="term-window">
+        <div class="term-titlebar">
+          <span class="term-pid text-[9px]">[4] FIX</span>
+          <span class="term-path text-[9px]">~/fixes</span>
         </div>
-        <div class="p-5 space-y-4">
+        <div class="p-5 space-y-3">
           {% for fix in driver_fixes %}
-          <div class="rounded-xl p-5 relative overflow-hidden" style="background:#111;border:1px solid rgba(255,255,255,0.06);">
+          <div class="rounded-lg p-5 relative overflow-hidden" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
             <div class="flex items-center gap-2 mb-3">
-              <span class="badge-working text-[10px] px-2.5 py-1 rounded-full font-bold">{{ fix.component.name }}</span>
+              <span class="badge-working text-[10px] px-2.5 py-1 rounded-full font-bold font-mono">{{ fix.component.name }}</span>
             </div>
             <h4 class="text-sm font-bold mb-3">{{ fix.title }}</h4>
-            <pre class="font-mono text-[11px] text-zinc-500 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap" style="background:#080808;">{{ fix.body }}</pre>
+            <pre class="font-mono text-[11px] text-slate-500 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap" style="background:#0d1220;">{{ fix.body }}</pre>
           </div>
           {% endfor %}
         </div>
@@ -225,47 +227,44 @@
       <!-- Reports list -->
       <div>
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-bold">Compatibility Reports</h2>
-          <a href="{% url 'registry:report_submit' %}?machine_id={{ machine.pk }}"
-             class="btn-primary px-4 py-2 rounded-xl text-sm">Submit Report</a>
+          <h2 class="text-lg font-bold font-mono">Compatibility Reports</h2>
+          <a href="{% url 'registry:report_submit' %}?machine_id={{ machine.pk }}" class="btn-term text-xs px-4 py-2">Submit Report</a>
         </div>
         <div class="space-y-3">
           {% for report in reports %}
           <a href="{% url 'registry:report_detail' report.pk %}" class="block group">
-            <div class="card-inner rounded-2xl p-5 flex gap-5 items-start border-l-2
-              {% if report.boot_status == 'GOLD' %}border-l-yellow-500/60
-              {% elif report.boot_status == 'SILVER' %}border-l-zinc-600/60
-              {% elif report.boot_status == 'BRONZE' %}border-l-orange-500/60
-              {% else %}border-l-red-500/60{% endif %}">
-              <!-- Status badge circle -->
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[13px] shrink-0
+            <div class="card-inner rounded-lg p-5 flex gap-5 items-start border-l-2
+              {% if report.boot_status == 'GOLD' %}border-l-yellow-400/60
+              {% elif report.boot_status == 'SILVER' %}border-l-slate-500/60
+              {% elif report.boot_status == 'BRONZE' %}border-l-orange-400/60
+              {% else %}border-l-red-400/60{% endif %}">
+              <div class="w-11 h-11 rounded-lg flex items-center justify-center font-black text-[13px] shrink-0 font-mono
                 {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %}">
                 {{ report.boot_status|slice:":1" }}
               </div>
               <div class="flex-grow min-w-0">
                 <div class="flex items-center gap-2 mb-1 text-[11px]">
-                  <span class="font-bold text-primary">{{ report.distro }}</span>
-                  <span class="text-zinc-700">Kernel&nbsp;{{ report.kernel_version|default:"–" }}</span>
+                  <span class="font-bold text-primary font-mono">{{ report.distro }}</span>
+                  <span class="text-slate-600 font-mono">Kernel&nbsp;{{ report.kernel_version|default:"–" }}</span>
                 </div>
                 <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">{{ report.title }}</h4>
-                <div class="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-700">
+                <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-600 font-mono">
                   <span>{{ report.user.username }}</span>
-                  <span class="w-1 h-1 rounded-full bg-zinc-800"></span>
+                  <span class="w-1 h-1 rounded-full bg-slate-700"></span>
                   <span>{{ report.created_at|date:"M d, Y" }}</span>
                 </div>
               </div>
-              <i data-lucide="arrow-right" class="w-4 h-4 text-zinc-800 group-hover:text-primary shrink-0 transition-colors hidden sm:block mt-3"></i>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-slate-700 group-hover:text-primary shrink-0 transition-colors hidden sm:block mt-3"></i>
             </div>
           </a>
           {% empty %}
-          <div class="text-center py-20 rounded-2xl" style="background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);">
-            <i data-lucide="file-warning" class="w-10 h-10 text-zinc-800 mx-auto mb-3"></i>
-            <p class="text-zinc-600 text-sm">No compatibility reports yet.</p>
+          <div class="text-center py-20 rounded-lg" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
+            <i data-lucide="file-warning" class="w-10 h-10 text-slate-700 mx-auto mb-3"></i>
+            <p class="text-slate-500 text-sm font-mono">No compatibility reports yet.</p>
           </div>
           {% endfor %}
         </div>
       </div>
-
     </div>
   </div>
 </div>
