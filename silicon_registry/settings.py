@@ -95,6 +95,10 @@ WSGI_APPLICATION = 'silicon_registry.wsgi.application'
 _db_url = os.environ.get('DATABASE_URL', '')
 
 if _db_url:
+    # If the prefix was accidentally missed during copy-paste (e.g. started from '://')
+    if _db_url.startswith('://'):
+        _db_url = 'postgresql' + _db_url
+        
     DATABASES = {
         'default': dj_database_url.config(
             default=_db_url,
