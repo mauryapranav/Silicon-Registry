@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters, status
+from rest_framework import viewsets, permissions, filters, status, pagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Count, Q
@@ -11,6 +11,11 @@ from .serializers import (
     ReportSerializer, CommentSerializer, VoteSerializer, DriverFixSerializer, 
     HelpGroupSerializer
 )
+
+class SmallResultsPagination(pagination.PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'limit'
+    max_page_size = 20
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
@@ -25,6 +30,7 @@ class MachineViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MachineSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['vendor', 'model_name', 'series']
+    pagination_class = SmallResultsPagination
 
 class DistroViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Distro.objects.annotate(
@@ -39,6 +45,7 @@ class ComponentViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ComponentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'driver']
+    pagination_class = SmallResultsPagination
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.filter(status='APPROVED').select_related(

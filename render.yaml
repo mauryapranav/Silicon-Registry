@@ -1,0 +1,27 @@
+databases:
+  - name: silicon-registry-db
+    databaseName: silicon_registry
+    plan: free
+
+services:
+  - type: web
+    name: silicon-registry
+    plan: free
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "python manage.py migrate && gunicorn silicon_registry.wsgi --bind 0.0.0.0:$PORT --workers 2 --log-file -"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: silicon-registry-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.12.0"

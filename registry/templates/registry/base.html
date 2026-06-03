@@ -12,7 +12,7 @@
     <meta property="og:title" content="{% block og_title %}Silicon Registry — Linux Hardware Compatibility{% endblock %}">
     <meta property="og:description" content="{% block og_desc %}Community-tested Linux hardware compatibility reports. Find out if your machine works on Ubuntu, Fedora, Arch and more.{% endblock %}">
     <meta name="description" content="{% block meta_desc %}Silicon Registry — crowdsourced Linux hardware compatibility database{% endblock %}">
-    <meta name="theme-color" content="#60a5fa">
+    <meta name="theme-color" content="#00ff88">
     <link rel="icon" type="image/svg+xml" href="{% static 'registry/img/favicon.svg' %}">
 
     <!-- Stack -->
@@ -26,15 +26,17 @@
         theme: {
           extend: {
             colors: {
-              primary:   '#60a5fa',
-              accent:    '#3b82f6',
-              green:     '#34d399',
-              surface:   '#111827',
-              'surface-hi': '#1a2235',
-              base:      '#0b0f19',
-              card:      '#111827',
-              'card-hi': '#1a2235',
-              dim:       '#475569',
+              primary:    '#60a5fa',
+              accent:     '#3b82f6',
+              green:      '#00ff88',
+              rice:       '#00ff88',
+              purple:     '#bd93f9',
+              surface:    '#0e1117',
+              'surface-hi':'#161b27',
+              base:       '#0a0d14',
+              card:       '#0e1117',
+              'card-hi':  '#161b27',
+              dim:        '#475569',
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
@@ -46,134 +48,207 @@
     </script>
 
     <style>
-      /* ── Base ──────────────────────────────────────────── */
-      *, *::before, *::after { box-sizing: border-box; }
+      /* ── Reset ─────────────────────────────────────────── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: 'Inter', sans-serif;
-        background: #0b0f19;
+        background: #0a0d14;
         color: #e2e8f0;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+
+      /* ── Scanline CRT overlay ──────────────────────────── */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,0,0,0.03) 2px,
+          rgba(0,0,0,0.03) 4px
+        );
       }
 
       /* ── Dot-grid texture ──────────────────────────────── */
       .dot-grid {
-        background-image: radial-gradient(circle, rgba(148,163,184,0.04) 1px, transparent 1px);
-        background-size: 28px 28px;
+        background-image: radial-gradient(circle, rgba(148,163,184,0.035) 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+
+      /* ── Aurora animated background glow ──────────────── */
+      @keyframes aurora {
+        0%   { opacity: 0.5; transform: scale(1)   translateX(0)     rotate(0deg); }
+        33%  { opacity: 0.8; transform: scale(1.05) translateX(-20px) rotate(1deg); }
+        66%  { opacity: 0.6; transform: scale(0.98) translateX(15px)  rotate(-1deg); }
+        100% { opacity: 0.5; transform: scale(1)   translateX(0)     rotate(0deg); }
+      }
+      .aurora-glow {
+        animation: aurora 8s ease-in-out infinite;
       }
 
       /* ── Surfaces ──────────────────────────────────────── */
       .glass {
-        background: rgba(11,15,25,0.88);
+        background: rgba(10,13,20,0.92);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        border-bottom: 1px solid rgba(148,163,184,0.08);
+        border-bottom: 1px solid rgba(148,163,184,0.07);
       }
       .card-surface {
-        background: linear-gradient(180deg, rgba(96,165,250,0.02) 0%, #111827 60%);
-        border: 1px solid rgba(148,163,184,0.08);
-        border-radius: 8px;
-        transition: border-color 0.3s, transform 0.3s ease, box-shadow 0.3s;
+        background: linear-gradient(180deg, rgba(96,165,250,0.015) 0%, #0e1117 60%);
+        border: 1px solid rgba(148,163,184,0.07);
+        border-radius: 6px;
+        transition: border-color 0.25s, transform 0.25s ease, box-shadow 0.25s;
       }
       .card-surface:hover {
-        border-color: rgba(96,165,250,0.35);
-        transform: translateY(-6px) scale(1.015);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(96,165,250,0.15), 0 0 50px rgba(96,165,250,0.12), 0 0 80px rgba(96,165,250,0.04);
+        border-color: rgba(96,165,250,0.3);
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px rgba(96,165,250,0.1);
       }
       .no-lift:hover { transform: none !important; box-shadow: none !important; }
 
-      .card-hi {
-        background: #1a2235;
-        border: 1px solid rgba(148,163,184,0.1);
-      }
-
       .card-inner {
-        background: linear-gradient(180deg, rgba(96,165,250,0.04) 0%, transparent 40%), #111827;
-        border: 1px solid rgba(148,163,184,0.08);
-        border-radius: 8px;
-        transition: border-color 0.3s, transform 0.3s ease, box-shadow 0.3s;
+        background: linear-gradient(180deg, rgba(96,165,250,0.03) 0%, transparent 40%), #0e1117;
+        border: 1px solid rgba(148,163,184,0.07);
+        border-radius: 6px;
+        transition: border-color 0.25s, transform 0.25s ease, box-shadow 0.25s;
       }
       .card-inner:hover {
-        border-color: rgba(96,165,250,0.3);
-        transform: translateY(-6px) scale(1.015);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 50px rgba(96,165,250,0.1);
+        border-color: rgba(96,165,250,0.25);
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px rgba(96,165,250,0.08);
       }
 
       /* ── Terminal Window Chrome ─────────────────────────── */
       .term-window {
-        background: linear-gradient(180deg, rgba(96,165,250,0.015) 0%, #111827 50%);
-        border: 1px solid rgba(148,163,184,0.08);
-        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(96,165,250,0.01) 0%, #0e1117 50%);
+        border: 1px solid rgba(148,163,184,0.07);
+        border-radius: 6px;
         overflow: hidden;
-        transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        transition: border-color 0.25s, box-shadow 0.25s;
       }
       .term-window:hover {
-        border-color: rgba(96,165,250,0.18);
-        box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 40px rgba(96,165,250,0.06);
+        border-color: rgba(96,165,250,0.14);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 30px rgba(96,165,250,0.05);
       }
       .term-titlebar {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        background: rgba(148,163,184,0.03);
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(148,163,184,0.025);
         border-bottom: 1px solid rgba(148,163,184,0.06);
         font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
+        font-size: 10px;
         color: #64748b;
         user-select: none;
       }
-      .term-dots {
-        display: flex;
-        gap: 5px;
-      }
+      .term-dots { display: flex; gap: 4px; }
       .term-dots span {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
+        width: 9px; height: 9px; border-radius: 50%;
       }
-      .term-dots span:nth-child(1) { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.4); }
-      .term-dots span:nth-child(2) { background: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.4); }
-      .term-dots span:nth-child(3) { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+      .term-dots span:nth-child(1) { background: #f87171; box-shadow: 0 0 5px rgba(248,113,113,0.4); }
+      .term-dots span:nth-child(2) { background: #fbbf24; box-shadow: 0 0 5px rgba(251,191,36,0.4); }
+      .term-dots span:nth-child(3) { background: #00ff88; box-shadow: 0 0 5px rgba(0,255,136,0.4); }
       .term-pid {
-        background: rgba(96,165,250,0.12);
+        background: rgba(96,165,250,0.1);
         color: #60a5fa;
-        padding: 1px 6px;
+        padding: 1px 5px;
         border-radius: 3px;
         font-weight: 700;
-        font-size: 10px;
+        font-size: 9px;
       }
       .term-branch {
-        background: rgba(52,211,153,0.1);
-        color: #34d399;
-        padding: 1px 6px;
+        background: rgba(0,255,136,0.08);
+        color: #00ff88;
+        padding: 1px 5px;
         border-radius: 3px;
         font-weight: 500;
-        font-size: 10px;
+        font-size: 9px;
       }
-      .term-path {
-        color: #94a3b8;
-        font-weight: 400;
+      .term-path { color: #94a3b8; font-weight: 400; }
+      .term-body { padding: 16px; }
+      .term-label-right { margin-left: auto; color: #475569; font-size: 9px; }
+
+      /* ── Waybar nav ─────────────────────────────────────── */
+      .waybar {
+        height: 36px;
+        background: rgba(8,10,16,0.97);
+        backdrop-filter: blur(32px);
+        -webkit-backdrop-filter: blur(32px);
+        border-bottom: 1px solid rgba(148,163,184,0.06);
+        position: sticky;
+        top: 0;
+        z-index: 100;
       }
-      .term-body {
-        padding: 24px;
+      .waybar-accent {
+        height: 1px;
+        background: linear-gradient(90deg, #00ff88 0%, #60a5fa 30%, #bd93f9 60%, transparent 100%);
       }
-      .term-label-right {
-        margin-left: auto;
+      .waybar-module {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 10px;
+        height: 100%;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
         color: #475569;
+        border-right: 1px solid rgba(148,163,184,0.05);
+        transition: color 0.15s, background 0.15s;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .waybar-module:hover { color: #e2e8f0; background: rgba(148,163,184,0.04); }
+      .waybar-module.active { color: #00ff88; }
+      .waybar-workspace {
+        font-size: 9px;
+        font-weight: 700;
+        color: #60a5fa;
+        background: rgba(96,165,250,0.08);
+        border: 1px solid rgba(96,165,250,0.15);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+      .waybar-ws-green { color: #00ff88 !important; background: rgba(0,255,136,0.08) !important; border-color: rgba(0,255,136,0.15) !important; }
+      .waybar-ws-purple { color: #bd93f9 !important; background: rgba(189,147,249,0.08) !important; border-color: rgba(189,147,249,0.15) !important; }
+      .waybar-right {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        height: 100%;
+        border-left: 1px solid rgba(148,163,184,0.05);
+      }
+      .waybar-clock {
+        font-family: 'JetBrains Mono', monospace;
         font-size: 10px;
+        color: #475569;
+        padding: 0 10px;
+        border-left: 1px solid rgba(148,163,184,0.05);
       }
 
       /* ── Typography ────────────────────────────────────── */
       .font-mono { font-family: 'JetBrains Mono', monospace; }
 
+      /* ── Glow text ─────────────────────────────────────── */
+      @keyframes glow-pulse {
+        0%, 100% { text-shadow: 0 0 20px rgba(0,255,136,0.4), 0 0 40px rgba(0,255,136,0.15); }
+        50%       { text-shadow: 0 0 30px rgba(0,255,136,0.6), 0 0 60px rgba(0,255,136,0.25); }
+      }
+      .glow-text { animation: glow-pulse 3s ease-in-out infinite; }
+
       /* ── Blinking terminal cursor ──────────────────────── */
       .cursor-blink {
         display: inline-block;
-        width: 0.55em;
-        height: 1.05em;
-        background: #60a5fa;
-        margin-left: 4px;
+        width: 0.5em;
+        height: 0.9em;
+        background: #00ff88;
+        margin-left: 3px;
         vertical-align: text-bottom;
         animation: blink-cursor 1s step-end infinite;
       }
@@ -183,31 +258,27 @@
       }
 
       /* ── Animations ────────────────────────────────────── */
-      .fade-in { animation: fadeIn 0.45s ease-out both; }
+      .fade-in { animation: fadeIn 0.35s ease-out both; }
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(6px); }
         to   { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(96,165,250,0.4); }
-        50%       { box-shadow: 0 0 0 6px rgba(96,165,250,0); }
       }
 
       /* ── Glows ─────────────────────────────────────────── */
-      .glow-sm  { box-shadow: 0 0 24px rgba(96,165,250,0.2), 0 0 60px rgba(96,165,250,0.06); }
-      .glow-md  { box-shadow: 0 0 50px rgba(96,165,250,0.3), 0 0 100px rgba(96,165,250,0.08); }
-      .glow-btn { box-shadow: 0 0 30px rgba(96,165,250,0.4), 0 0 80px rgba(96,165,250,0.12); }
-      .glow-green { box-shadow: 0 0 24px rgba(52,211,153,0.25), 0 0 60px rgba(52,211,153,0.06); }
-      .glow-gold { box-shadow: 0 0 24px rgba(251,191,36,0.25), 0 0 60px rgba(251,191,36,0.06); }
-      .glow-purple { box-shadow: 0 0 24px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.06); }
+      .glow-sm    { box-shadow: 0 0 20px rgba(96,165,250,0.18), 0 0 50px rgba(96,165,250,0.05); }
+      .glow-md    { box-shadow: 0 0 40px rgba(96,165,250,0.25), 0 0 80px rgba(96,165,250,0.07); }
+      .glow-green { box-shadow: 0 0 20px rgba(0,255,136,0.2),   0 0 50px rgba(0,255,136,0.05); }
+      .glow-purple{ box-shadow: 0 0 20px rgba(189,147,249,0.2), 0 0 50px rgba(189,147,249,0.05); }
+
       /* ── Gradient text ──────────────────────────────────── */
-      .text-gradient { background: linear-gradient(135deg, #60a5fa 0%, #c084fc 50%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-      .text-gradient-blue { background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-      .text-gradient-green { background: linear-gradient(135deg, #34d399 0%, #22d3ee 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient       { background: linear-gradient(135deg, #60a5fa 0%, #bd93f9 50%, #00ff88 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient-blue  { background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient-green { background: linear-gradient(135deg, #00ff88 0%, #22d3ee 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .text-gradient-rice  { background: linear-gradient(135deg, #00ff88 0%, #bd93f9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
       /* ── Scrollbar ─────────────────────────────────────── */
-      ::-webkit-scrollbar       { width: 5px; height: 5px; }
-      ::-webkit-scrollbar-track { background: #0b0f19; }
+      ::-webkit-scrollbar       { width: 4px; height: 4px; }
+      ::-webkit-scrollbar-track { background: #0a0d14; }
       ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
       ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
@@ -218,14 +289,14 @@
         position: absolute;
         right: 0;
         top: 100%;
-        padding-top: 0.5rem;
-        min-width: 200px;
+        padding-top: 4px;
+        min-width: 180px;
         z-index: 200;
       }
       .user-dropdown-content.open { display: block; }
-      .user-dropdown-inner { animation: dropdownIn 0.18s ease-out; }
+      .user-dropdown-inner { animation: dropdownIn 0.15s ease-out; }
       @keyframes dropdownIn {
-        from { opacity: 0; transform: translateY(-8px); }
+        from { opacity: 0; transform: translateY(-6px); }
         to   { opacity: 1; transform: translateY(0); }
       }
 
@@ -234,125 +305,89 @@
       .badge-silver  { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
       .badge-bronze  { background: rgba(251,146,60,0.1);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
       .badge-broken  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-      .badge-working { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+      .badge-working { background: rgba(0,255,136,0.08);  color: #00ff88; border: 1px solid rgba(0,255,136,0.2); }
       .badge-issues  { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
       .badge-primary { background: rgba(96,165,250,0.08); color: #60a5fa; border: 1px solid rgba(96,165,250,0.18); }
-      .badge-fuzzy   { background: rgba(192,132,252,0.1); color: #c084fc; border: 1px solid rgba(192,132,252,0.2); }
-      .badge-works   { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.2); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
-      .badge-partial { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
+      .badge-fuzzy   { background: rgba(189,147,249,0.1); color: #bd93f9; border: 1px solid rgba(189,147,249,0.2); }
+      .badge-works   { background: rgba(0,255,136,0.1);   color: #00ff88; border: 1px solid rgba(0,255,136,0.2); font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; }
+      .badge-partial { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; }
 
       /* ── Inputs ────────────────────────────────────────── */
       .input-dark {
-        background: #0d1220;
+        background: #080a10;
         border: 1px solid rgba(148,163,184,0.1);
         color: #e2e8f0;
         transition: border-color 0.2s, box-shadow 0.2s;
       }
       .input-dark:focus {
         outline: none;
-        border-color: rgba(96,165,250,0.4);
-        box-shadow: 0 0 0 3px rgba(96,165,250,0.07);
+        border-color: rgba(0,255,136,0.3);
+        box-shadow: 0 0 0 2px rgba(0,255,136,0.05);
       }
-      .input-dark::placeholder { color: rgba(148,163,184,0.3); }
-      select.input-dark { appearance: none; background-color: #0d1220; color: #e2e8f0; }
-      select.input-dark option { background-color: #0d1220; color: #e2e8f0; }
+      .input-dark::placeholder { color: rgba(148,163,184,0.25); }
+      select.input-dark { appearance: none; background-color: #080a10; color: #e2e8f0; }
+      select.input-dark option { background-color: #080a10; color: #e2e8f0; }
 
       /* ── Buttons ───────────────────────────────────────── */
       .btn-primary {
         background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
-        color: #0b0f19;
+        color: #0a0d14;
         font-weight: 700;
         letter-spacing: -0.01em;
-        transition: all 0.25s;
-        box-shadow: 0 0 20px rgba(96,165,250,0.15);
+        transition: all 0.2s;
+        box-shadow: 0 0 16px rgba(96,165,250,0.12);
       }
       .btn-primary:hover {
         background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        box-shadow: 0 0 40px rgba(96,165,250,0.4), 0 8px 20px rgba(0,0,0,0.4);
-        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(96,165,250,0.35), 0 6px 16px rgba(0,0,0,0.4);
+        transform: translateY(-1px);
       }
       .btn-ghost {
-        background: rgba(148,163,184,0.04);
-        border: 1px solid rgba(148,163,184,0.1);
+        background: rgba(148,163,184,0.03);
+        border: 1px solid rgba(148,163,184,0.09);
         color: #64748b;
-        transition: background 0.18s, color 0.18s, border-color 0.18s;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
       }
-      .btn-ghost:hover { background: rgba(148,163,184,0.08); color: #e2e8f0; border-color: rgba(148,163,184,0.2); }
+      .btn-ghost:hover { background: rgba(148,163,184,0.07); color: #e2e8f0; border-color: rgba(148,163,184,0.18); }
       .btn-term {
-        background: linear-gradient(135deg, rgba(52,211,153,0.12) 0%, rgba(34,211,238,0.08) 100%);
-        color: #34d399;
+        background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(34,211,238,0.06) 100%);
+        color: #00ff88;
         font-family: 'JetBrains Mono', monospace;
         font-weight: 700;
-        font-size: 13px;
-        border: 1px solid rgba(52,211,153,0.25);
-        padding: 8px 20px;
-        border-radius: 8px;
-        transition: all 0.25s;
+        font-size: 12px;
+        border: 1px solid rgba(0,255,136,0.2);
+        padding: 6px 16px;
+        border-radius: 6px;
+        transition: all 0.2s;
       }
       .btn-term:hover {
-        background: linear-gradient(135deg, rgba(52,211,153,0.22) 0%, rgba(34,211,238,0.14) 100%);
-        box-shadow: 0 0 30px rgba(52,211,153,0.2), 0 0 60px rgba(52,211,153,0.06);
+        background: linear-gradient(135deg, rgba(0,255,136,0.18) 0%, rgba(34,211,238,0.1) 100%);
+        box-shadow: 0 0 24px rgba(0,255,136,0.18), 0 0 50px rgba(0,255,136,0.05);
         transform: translateY(-1px);
-        border-color: rgba(52,211,153,0.4);
+        border-color: rgba(0,255,136,0.35);
       }
 
-      /* ── Nav ───────────────────────────────────────────── */
-      .nav-link {
-        color: #64748b;
-        font-size: 13px;
-        font-weight: 500;
-        transition: color 0.18s;
-        letter-spacing: 0.01em;
-      }
+      /* ── Nav link ──────────────────────────────────────── */
+      .nav-link { color: #475569; font-size: 12px; font-weight: 500; transition: color 0.15s; }
       .nav-link:hover { color: #e2e8f0; }
-      .nav-link.active { color: #60a5fa; }
-
-      /* ── Green top accent bar ──────────────────────────── */
-      .accent-bar {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 2px;
-        background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, transparent 100%);
-        pointer-events: none;
-      }
-      /* Left accent bar variant */
-      .accent-bar-left {
-        position: absolute;
-        top: 0; left: 0; width: 3px; height: 100%;
-        border-radius: 0 2px 2px 0;
-      }
-
-      /* ── Table ─────────────────────────────────────────── */
-      .tbl-row { border-bottom: 1px solid rgba(148,163,184,0.06); transition: background 0.15s; }
-      .tbl-row:hover { background: rgba(96,165,250,0.03); }
-      .tbl-head { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; }
+      .nav-link.active { color: #00ff88; }
 
       /* ── Section labels ────────────────────────────────── */
       .section-label {
-        font-size: 10px;
-        font-weight: 700;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
+        font-size: 9px; font-weight: 700;
+        color: #475569; text-transform: uppercase; letter-spacing: 0.1em;
       }
-
-      /* ── Terminal section label ─────────────────────────── */
       .term-label {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        font-weight: 700;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
+        font-size: 10px; font-weight: 700;
+        color: #475569; text-transform: uppercase; letter-spacing: 0.06em;
       }
-      .term-label::before {
-        content: '# ';
-        color: #60a5fa;
-      }
+      .term-label::before { content: '# '; color: #00ff88; }
 
-      /* ── Stat number ───────────────────────────────────── */
+      /* ── Stat numbers ──────────────────────────────────── */
       .stat-num {
         font-family: 'JetBrains Mono', monospace;
-        font-size: clamp(1.75rem, 3vw, 2.5rem);
+        font-size: clamp(1.5rem, 2.5vw, 2rem);
         font-weight: 900;
         letter-spacing: -0.03em;
         line-height: 1;
@@ -362,134 +397,260 @@
         background-clip: text;
       }
       .stat-num.text-primary { background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%); -webkit-background-clip: text; background-clip: text; }
-      .stat-num.text-white { background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%); -webkit-background-clip: text; background-clip: text; }
+      .stat-num.text-white   { background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%); -webkit-background-clip: text; background-clip: text; }
+      .stat-num.text-green   { background: linear-gradient(135deg, #00ff88 0%, #22d3ee 100%); -webkit-background-clip: text; background-clip: text; }
 
-      /* ── Card bottom fade ──────────────────────────────── */
-      .card-fade-bottom::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 40px;
-        background: linear-gradient(to top, rgba(17,24,39,0.9), transparent);
-        border-radius: 0 0 12px 12px;
-        pointer-events: none;
-      }
-
-      /* ── Compatibility ring SVG ────────────────────────── */
-      .compat-ring { transform: rotate(-90deg); }
+      /* ── Table ─────────────────────────────────────────── */
+      .tbl-row { border-bottom: 1px solid rgba(148,163,184,0.05); transition: background 0.12s; }
+      .tbl-row:hover { background: rgba(96,165,250,0.025); }
+      .tbl-head { font-size: 9px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; }
 
       /* ── Distro tags ───────────────────────────────────── */
       .distro-tag {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        font-weight: 500;
-        padding: 2px 8px;
-        border-radius: 4px;
-        background: rgba(148,163,184,0.06);
-        border: 1px solid rgba(148,163,184,0.1);
+        font-size: 10px; font-weight: 500;
+        padding: 2px 7px; border-radius: 3px;
+        background: rgba(148,163,184,0.05);
+        border: 1px solid rgba(148,163,184,0.09);
         color: #94a3b8;
+      }
+
+      /* ── Compat ring ───────────────────────────────────── */
+      .compat-ring { transform: rotate(-90deg); }
+
+      /* ── Accent bar ────────────────────────────────────── */
+      .accent-bar {
+        position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+        background: linear-gradient(90deg, #00ff88 0%, #60a5fa 50%, transparent 100%);
+        pointer-events: none;
+      }
+
+      /* ═══════════════════════════════════════════════════
+           COMMAND PALETTE  (Ctrl+K / ⌘K)
+         ═══════════════════════════════════════════════════ */
+      #cmd-palette-backdrop {
+        position: fixed; inset: 0; z-index: 9990;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 80px;
+      }
+      #cmd-palette-backdrop.open { display: flex; }
+      #cmd-palette {
+        width: 100%;
+        max-width: 560px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #0e1117;
+        border: 1px solid rgba(0,255,136,0.15);
+        box-shadow: 0 0 0 1px rgba(0,255,136,0.05), 0 24px 80px rgba(0,0,0,0.7), 0 0 60px rgba(0,255,136,0.06);
+        animation: paletteIn 0.12s ease-out;
+      }
+      @keyframes paletteIn {
+        from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      #cmd-titlebar {
+        display: flex; align-items: center; gap: 6px;
+        padding: 8px 12px;
+        background: rgba(0,255,136,0.03);
+        border-bottom: 1px solid rgba(148,163,184,0.07);
+        font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #475569;
+      }
+      #cmd-input-wrap {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(148,163,184,0.07);
+      }
+      #cmd-input {
+        background: transparent; border: none; outline: none;
+        font-family: 'JetBrains Mono', monospace; font-size: 13px;
+        color: #e2e8f0; width: 100%;
+      }
+      #cmd-input::placeholder { color: rgba(148,163,184,0.25); }
+      #cmd-results {
+        max-height: 360px; overflow-y: auto;
+        padding: 6px 0;
+      }
+      .cmd-section-label {
+        padding: 6px 14px 3px;
+        font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+        color: #475569; text-transform: uppercase; letter-spacing: 0.1em;
+      }
+      .cmd-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 7px 14px; cursor: pointer;
+        transition: background 0.1s;
+        font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #94a3b8;
+        text-decoration: none;
+      }
+      .cmd-item:hover, .cmd-item.selected {
+        background: rgba(0,255,136,0.07); color: #e2e8f0;
+      }
+      .cmd-item .cmd-icon {
+        width: 20px; height: 20px; border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(148,163,184,0.06); border: 1px solid rgba(148,163,184,0.09);
+        flex-shrink: 0;
+      }
+      .cmd-item .cmd-label { flex-grow: 1; truncate; }
+      .cmd-item .cmd-type {
+        font-size: 9px; color: #475569;
+        background: rgba(148,163,184,0.05); padding: 1px 5px; border-radius: 3px;
+      }
+      #cmd-footer {
+        display: flex; align-items: center; gap: 12px;
+        padding: 7px 14px;
+        border-top: 1px solid rgba(148,163,184,0.07);
+        font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #475569;
+      }
+      .cmd-key {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 1px 5px; border-radius: 3px;
+        background: rgba(148,163,184,0.07); border: 1px solid rgba(148,163,184,0.12);
+        font-size: 9px; color: #64748b;
+      }
+      #cmd-empty {
+        padding: 20px 14px;
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569;
       }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- ── Navigation (Terminal Bar) ──────────────────── -->
-    <nav class="sticky top-0 z-50" style="background:linear-gradient(180deg,rgba(11,15,25,0.95),rgba(11,15,25,0.88));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(148,163,184,0.08);">
-        <!-- Gradient accent line at very top -->
-        <div style="height:2px;background:linear-gradient(90deg,#60a5fa,#c084fc,#34d399,transparent);" class="w-full"></div>
-        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 flex justify-between items-center h-12">
+    <!-- ── Waybar Navigation ──────────────────────────── -->
+    <div class="waybar-accent w-full"></div>
+    <nav class="waybar">
+        <div class="max-w-[1440px] mx-auto px-3 flex items-center h-full">
 
-            <!-- Brand -->
-            <div class="flex items-center gap-5">
-                <a href="{% url 'registry:homepage' %}" class="flex items-center gap-2 group shrink-0">
-                    <!-- Terminal dots in navbar -->
-                    <div class="flex gap-1.5 mr-1">
-                        <span class="w-[10px] h-[10px] rounded-full" style="background:#f87171;box-shadow:0 0 6px rgba(248,113,113,0.4);"></span>
-                        <span class="w-[10px] h-[10px] rounded-full" style="background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,0.4);"></span>
-                        <span class="w-[10px] h-[10px] rounded-full" style="background:#34d399;box-shadow:0 0 6px rgba(52,211,153,0.4);"></span>
-                    </div>
-                    <div class="w-6 h-6 rounded flex items-center justify-center" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);box-shadow:0 0 12px rgba(96,165,250,0.15);">
-                        <i data-lucide="cpu" class="w-3 h-3 text-primary"></i>
-                    </div>
-                    <span class="font-mono font-bold text-[13px] tracking-tight hidden sm:inline"><span class="text-gradient-blue">Silicon</span><span class="text-slate-400">Registry</span></span>
+            <!-- Brand module -->
+            <a href="{% url 'registry:homepage' %}" class="waybar-module" style="border-left:1px solid rgba(148,163,184,0.05);">
+                <span class="waybar-workspace">󰣇</span>
+                <span class="font-mono font-bold text-[11px]"><span class="text-gradient-blue">Silicon</span><span class="text-slate-600">Registry</span></span>
+            </a>
+
+            <!-- Nav links as Waybar workspace modules -->
+            <div class="hidden md:flex items-center h-full">
+                <a href="{% url 'registry:machine_list' %}"  class="waybar-module nav-link">
+                    <span class="waybar-workspace">[1]</span> explore
                 </a>
-
-                <div class="hidden md:flex items-center gap-0.5 h-12 ml-2" style="border-left:1px solid rgba(148,163,184,0.08);padding-left:12px;">
-                    <a href="{% url 'registry:machine_list' %}"  class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">explore</a>
-                    <a href="{% url 'registry:report_submit' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">submit</a>
-                    <a href="{% url 'registry:leaderboard' %}"   class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">leaderboard</a>
-                    {% if user.is_authenticated and user.role_type != 'CONTRIBUTOR' %}
-                    <a href="{% url 'registry:mod_dashboard' %}" class="h-full flex items-center gap-1.5 px-3 nav-link border-b-2 border-transparent font-mono text-[12px]" style="color:#60a5fa;">
-                        <i data-lucide="shield-check" class="w-3 h-3"></i> mod
-                    </a>
-                    {% endif %}
-                    <a href="{% url 'registry:about' %}" class="nav-link h-full flex items-center px-3 border-b-2 border-transparent hover:border-primary/40 transition-all font-mono text-[12px]">about</a>
-                </div>
+                <a href="{% url 'registry:report_submit' %}" class="waybar-module nav-link">
+                    <span class="waybar-workspace waybar-ws-green">[2]</span> submit
+                </a>
+                <a href="{% url 'registry:leaderboard' %}"   class="waybar-module nav-link">
+                    <span class="waybar-workspace waybar-ws-purple">[3]</span> board
+                </a>
+                {% if user.is_authenticated and user.role_type != 'CONTRIBUTOR' %}
+                <a href="{% url 'registry:mod_dashboard' %}" class="waybar-module" style="color:#60a5fa;">
+                    <span class="waybar-workspace">[M]</span> mod
+                </a>
+                {% endif %}
+                <a href="{% url 'registry:about' %}" class="waybar-module nav-link">
+                    <span class="waybar-workspace">[?]</span> about
+                </a>
             </div>
 
-            <!-- Right -->
-            <div class="flex items-center gap-3">
-                <form action="{% url 'registry:search' %}" method="GET" class="relative hidden lg:block group">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 group-focus-within:text-primary transition-colors pointer-events-none"></i>
-                    <input type="text" name="q" placeholder="Search hardware…"
-                           class="input-dark rounded-lg py-1.5 pl-9 pr-3 text-[13px] w-40 focus:w-56 transition-all duration-300">
-                </form>
+            <!-- Right modules -->
+            <div class="waybar-right">
 
+                <!-- ⌘K shortcut button -->
+                <button id="cmd-open-btn" onclick="openPalette()"
+                        class="waybar-module gap-1.5" style="cursor:pointer;"
+                        title="Command palette (Ctrl+K)">
+                    <span class="cmd-key">ctrl</span>
+                    <span class="cmd-key">k</span>
+                </button>
+
+                <!-- Inline search (desktop) -->
+                <div class="hidden lg:flex waybar-module" style="padding:0 8px;">
+                    <form action="{% url 'registry:search' %}" method="GET" class="flex items-center gap-1.5">
+                        <i data-lucide="search" class="w-3 h-3 text-slate-700"></i>
+                        <input type="text" name="q" placeholder="search…"
+                               class="bg-transparent border-none outline-none text-[11px] font-mono text-slate-400 placeholder:text-slate-700 w-24 focus:w-36 transition-all duration-200">
+                    </form>
+                </div>
+
+                <!-- User area -->
                 {% if user.is_authenticated %}
-                <div class="user-dropdown" id="userDropdown">
-                    <button id="userDropdownBtn" class="flex items-center gap-2.5 group" aria-haspopup="true" aria-expanded="false">
-                        <div class="text-right hidden sm:block">
-                            <div class="text-[12px] font-semibold leading-none text-slate-300">{{ user.username }}</div>
-                            <div class="text-[10px] font-bold leading-none mt-0.5" style="color:#60a5fa;">{{ user.role_type }}</div>
-                        </div>
+                <div class="user-dropdown waybar-module" id="userDropdown" style="cursor:pointer;">
+                    <button id="userDropdownBtn" class="flex items-center gap-1.5" aria-haspopup="true" aria-expanded="false">
                         <a href="{% url 'registry:user_profile' user.username %}"
-                           class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center overflow-hidden transition-all"
-                           style="border:1.5px solid rgba(96,165,250,0.2);"
+                           class="w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center overflow-hidden"
+                           style="border:1px solid rgba(0,255,136,0.2);"
                            title="View profile" onclick="event.stopPropagation()">
                             {% if user.avatar %}
                                 <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
                             {% else %}
-                                <span class="text-xs font-black text-slate-400">{{ user.username|make_list|first|upper }}</span>
+                                <span class="text-[8px] font-black text-slate-400">{{ user.username|make_list|first|upper }}</span>
                             {% endif %}
                         </a>
+                        <span class="hidden sm:block text-[10px] font-mono text-slate-500">{{ user.username }}</span>
                     </button>
                     <div class="user-dropdown-content" id="userDropdownMenu" role="menu">
-                        <div class="user-dropdown-inner rounded-xl shadow-2xl shadow-black/80 overflow-hidden"
-                             style="background:#111827;border:1px solid rgba(148,163,184,0.1);">
-                            <a href="{% url 'registry:user_profile' user.username %}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-500 hover:text-white hover:bg-white/4 transition-all" role="menuitem">
-                                <i data-lucide="user" class="w-4 h-4"></i> Profile
+                        <div class="user-dropdown-inner rounded-lg shadow-2xl shadow-black/80 overflow-hidden"
+                             style="background:#0e1117;border:1px solid rgba(148,163,184,0.09);">
+                            <a href="{% url 'registry:user_profile' user.username %}" class="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-500 hover:text-white hover:bg-white/4 transition-all font-mono" role="menuitem">
+                                <i data-lucide="user" class="w-3 h-3"></i> profile
                             </a>
-                            <a href="{% url 'registry:profile_edit' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-500 hover:text-white hover:bg-white/4 transition-all" style="border-top:1px solid rgba(148,163,184,0.06);" role="menuitem">
-                                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+                            <a href="{% url 'registry:profile_edit' %}" class="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-500 hover:text-white hover:bg-white/4 transition-all font-mono" style="border-top:1px solid rgba(148,163,184,0.05);" role="menuitem">
+                                <i data-lucide="settings" class="w-3 h-3"></i> settings
                             </a>
-                            <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-4 py-3 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/5 transition-all" style="border-top:1px solid rgba(148,163,184,0.06);" role="menuitem">
-                                <i data-lucide="log-out" class="w-4 h-4"></i> Sign out
+                            <a href="{% url 'account_logout' %}" class="flex items-center gap-2 px-3 py-2.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all font-mono" style="border-top:1px solid rgba(148,163,184,0.05);" role="menuitem">
+                                <i data-lucide="log-out" class="w-3 h-3"></i> logout
                             </a>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="flex items-center gap-3">
-                    <a href="{% url 'account_login' %}" class="nav-link px-3 py-1.5">Sign in</a>
-                    <a href="{% url 'account_signup' %}" class="btn-primary px-4 py-1.5 rounded-lg text-[13px]">Sign up</a>
-                </div>
+                <a href="{% url 'account_login' %}"  class="waybar-module nav-link">sign_in</a>
+                <a href="{% url 'account_signup' %}" class="waybar-module" style="color:#00ff88;">register</a>
                 {% endif %}
+
+                <!-- Live clock -->
+                <div class="waybar-clock hidden lg:block" id="waybar-clock"></div>
             </div>
         </div>
     </nav>
 
+    <!-- ── Command Palette (Ctrl+K) ────────────────────── -->
+    <div id="cmd-palette-backdrop" role="dialog" aria-modal="true" aria-label="Command palette" onclick="if(event.target===this)closePalette()">
+        <div id="cmd-palette">
+            <div id="cmd-titlebar">
+                <div class="term-dots" style="display:flex;gap:4px;">
+                    <span></span><span></span><span></span>
+                </div>
+                <span class="term-pid">[K] CMD</span>
+                <span class="term-branch">≡ PALETTE</span>
+                <span style="margin-left:auto;">silicon registry</span>
+            </div>
+            <div id="cmd-input-wrap">
+                <i data-lucide="terminal" class="w-4 h-4 text-green" style="color:#00ff88;flex-shrink:0;"></i>
+                <input type="text" id="cmd-input" placeholder="search pages, machines, components…" autocomplete="off" spellcheck="false">
+            </div>
+            <div id="cmd-results" role="listbox"></div>
+            <div id="cmd-footer">
+                <span><span class="cmd-key">↑↓</span> navigate</span>
+                <span><span class="cmd-key">↵</span> open</span>
+                <span><span class="cmd-key">esc</span> close</span>
+            </div>
+        </div>
+    </div>
+
     <!-- ── Flash Messages ────────────────────────────────── -->
     <main class="flex-grow">
         {% if messages %}
-        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 mt-4 space-y-2">
+        <div class="max-w-[1440px] mx-auto px-3 sm:px-5 mt-2 space-y-1.5">
             {% for message in messages %}
-            <div class="rounded-xl px-4 py-3 flex items-center justify-between border-l-2 fade-in
-                {% if message.tags == 'success' %}border-l-primary{% elif message.tags == 'error' %}border-l-red-400{% elif message.tags == 'warning' %}border-l-yellow-400{% else %}border-l-slate-600{% endif %}"
-                 style="background:#111827;border:1px solid rgba(148,163,184,0.08);border-left-width:2px;">
-                <span class="text-sm text-slate-200">{{ message }}</span>
-                <button onclick="this.parentElement.remove()" class="text-slate-600 hover:text-white ml-4 transition-colors">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+            <div class="rounded-lg px-3 py-2 flex items-center justify-between border-l-2 fade-in
+                {% if message.tags == 'success' %}border-l-green-400{% elif message.tags == 'error' %}border-l-red-400{% elif message.tags == 'warning' %}border-l-yellow-400{% else %}border-l-slate-600{% endif %}"
+                 style="background:#0e1117;border:1px solid rgba(148,163,184,0.07);border-left-width:2px;">
+                <span class="text-xs text-slate-200 font-mono">{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="text-slate-600 hover:text-white ml-3 transition-colors">
+                    <i data-lucide="x" class="w-3 h-3"></i>
                 </button>
             </div>
             {% endfor %}
@@ -500,27 +661,29 @@
     </main>
 
     <!-- ── Footer ────────────────────────────────────────── -->
-    <footer class="mt-24" style="border-top:1px solid rgba(148,163,184,0.06);">
-        <div class="max-w-[1440px] mx-auto px-5 sm:px-8 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-2.5">
-                <div class="w-5 h-5 rounded flex items-center justify-center" style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.14);">
-                    <i data-lucide="cpu" class="w-3 h-3 text-primary/50"></i>
-                </div>
-                <span class="font-mono text-xs text-slate-700">Silicon Registry v1.0</span>
+    <footer style="border-top:1px solid rgba(148,163,184,0.05);">
+        <div class="max-w-[1440px] mx-auto px-3 sm:px-5 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <span class="waybar-workspace">󰣇</span>
+                <span class="font-mono text-[10px] text-slate-700">Silicon Registry v1.0</span>
             </div>
-            <div class="flex gap-8 text-xs text-slate-600">
-                <a href="{% url 'registry:about' %}"  class="hover:text-slate-300 transition-colors">About</a>
-                <a href="{% url 'registry:search' %}" class="hover:text-slate-300 transition-colors">Search</a>
-                <a href="#" class="hover:text-slate-300 transition-colors">API</a>
-                <a href="#" class="hover:text-slate-300 transition-colors">GitHub</a>
+            <div class="flex gap-6 text-[10px] text-slate-700 font-mono">
+                <a href="{% url 'registry:about' %}"  class="hover:text-slate-400 transition-colors">about</a>
+                <a href="{% url 'registry:search' %}" class="hover:text-slate-400 transition-colors">search</a>
+                <a href="#" class="hover:text-slate-400 transition-colors">api</a>
+                <a href="#" class="hover:text-slate-400 transition-colors">github</a>
             </div>
-            <div class="text-[11px] text-slate-700">&copy; 2026 Silicon Registry. Community-powered.</div>
+            <div class="flex items-center gap-3 text-[10px] text-slate-700 font-mono">
+                <span><span class="cmd-key">ctrl+k</span> palette</span>
+                <span>© 2026 Silicon Registry</span>
+            </div>
         </div>
     </footer>
 
     <script>lucide.createIcons();</script>
     <script>
-      (function () {
+    /* ── Dropdown ──────────────────────────────────────── */
+    (function () {
         var btn  = document.getElementById('userDropdownBtn');
         var menu = document.getElementById('userDropdownMenu');
         if (!btn || !menu) return;
@@ -529,7 +692,161 @@
         btn.addEventListener('click', function(e){ e.stopPropagation(); menu.classList.contains('open') ? closeMenu() : openMenu(); });
         document.addEventListener('click',   function(e){ if (!document.getElementById('userDropdown').contains(e.target)) closeMenu(); });
         document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMenu(); });
-      })();
+    })();
+
+    /* ── Waybar Clock ─────────────────────────────────── */
+    (function () {
+        var el = document.getElementById('waybar-clock');
+        if (!el) return;
+        function tick() {
+            var now = new Date();
+            var h = String(now.getHours()).padStart(2,'0');
+            var m = String(now.getMinutes()).padStart(2,'0');
+            var s = String(now.getSeconds()).padStart(2,'0');
+            el.textContent = h + ':' + m + ':' + s;
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+
+    /* ════════════════════════════════════════════════════
+         Command Palette — Ctrl+K / ⌘K
+       ════════════════════════════════════════════════════ */
+    const PAGES = [
+        { label: 'Home',            url: '/',              icon: 'home',        type: 'page' },
+        { label: 'Explore Machines',url: '/machines/',     icon: 'cpu',         type: 'page' },
+        { label: 'Submit Report',   url: '/reports/submit/',icon:'file-plus',   type: 'page' },
+        { label: 'Leaderboard',     url: '/leaderboard/',  icon: 'trophy',      type: 'page' },
+        { label: 'Search',          url: '/search/',       icon: 'search',      type: 'page' },
+        { label: 'About',           url: '/about/',        icon: 'info',        type: 'page' },
+    ];
+
+    var paletteOpen = false;
+    var cmdItems    = [];
+    var selectedIdx = -1;
+    var searchTimer = null;
+
+    function openPalette() {
+        document.getElementById('cmd-palette-backdrop').classList.add('open');
+        document.getElementById('cmd-input').value = '';
+        paletteOpen = true;
+        renderPages('');
+        setTimeout(function(){ document.getElementById('cmd-input').focus(); }, 60);
+        selectedIdx = -1;
+    }
+    function closePalette() {
+        document.getElementById('cmd-palette-backdrop').classList.remove('open');
+        paletteOpen = false;
+        selectedIdx = -1;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            paletteOpen ? closePalette() : openPalette();
+        }
+        if (!paletteOpen) return;
+        if (e.key === 'Escape')     closePalette();
+        if (e.key === 'ArrowDown')  { e.preventDefault(); moveSelection(1); }
+        if (e.key === 'ArrowUp')    { e.preventDefault(); moveSelection(-1); }
+        if (e.key === 'Enter')      { e.preventDefault(); activateSelected(); }
+    });
+
+    document.getElementById('cmd-input').addEventListener('input', function() {
+        var q = this.value.trim();
+        clearTimeout(searchTimer);
+        selectedIdx = -1;
+        if (q.length < 2) { renderPages(q); return; }
+        searchTimer = setTimeout(function(){ fetchResults(q); }, 180);
+    });
+
+    function renderPages(q) {
+        var filtered = q
+            ? PAGES.filter(p => p.label.toLowerCase().includes(q.toLowerCase()))
+            : PAGES;
+        var html = '';
+        if (filtered.length) {
+            html += '<div class="cmd-section-label">Pages</div>';
+            filtered.forEach(function(p, i) {
+                html += '<a href="' + p.url + '" class="cmd-item" data-idx="' + i + '">'
+                    + '<span class="cmd-icon"><i data-lucide="' + p.icon + '" style="width:10px;height:10px;"></i></span>'
+                    + '<span class="cmd-label">' + p.label + '</span>'
+                    + '<span class="cmd-type">' + p.type + '</span>'
+                    + '</a>';
+            });
+        } else {
+            html = '<div id="cmd-empty">no results — try something else</div>';
+        }
+        document.getElementById('cmd-results').innerHTML = html;
+        lucide.createIcons();
+        cmdItems = document.querySelectorAll('.cmd-item');
+    }
+
+    function fetchResults(q) {
+        var enc = encodeURIComponent(q);
+        Promise.all([
+            fetch('/api/machines/?search=' + enc + '&limit=5').then(r => r.ok ? r.json() : {results:[]}).catch(() => ({results:[]})),
+            fetch('/api/components/?search=' + enc + '&limit=5').then(r => r.ok ? r.json() : {results:[]}).catch(() => ({results:[]}))
+        ]).then(function([machines, components]) {
+            var html = '';
+            var mList = Array.isArray(machines)    ? machines    : (machines.results    || []);
+            var cList = Array.isArray(components)  ? components  : (components.results  || []);
+
+            var filteredPages = PAGES.filter(p => p.label.toLowerCase().includes(q.toLowerCase()));
+            if (filteredPages.length) {
+                html += '<div class="cmd-section-label">Pages</div>';
+                filteredPages.forEach(function(p) {
+                    html += '<a href="' + p.url + '" class="cmd-item">'
+                        + '<span class="cmd-icon"><i data-lucide="' + p.icon + '" style="width:10px;height:10px;"></i></span>'
+                        + '<span class="cmd-label">' + p.label + '</span>'
+                        + '<span class="cmd-type">page</span></a>';
+                });
+            }
+            if (mList.length) {
+                html += '<div class="cmd-section-label">Machines</div>';
+                mList.forEach(function(m) {
+                    var slug = m.slug || '';
+                    var name = (m.vendor || '') + ' ' + (m.model_name || m.name || '');
+                    html += '<a href="/machines/' + slug + '/" class="cmd-item">'
+                        + '<span class="cmd-icon"><i data-lucide="cpu" style="width:10px;height:10px;"></i></span>'
+                        + '<span class="cmd-label">' + name + '</span>'
+                        + '<span class="cmd-type">machine</span></a>';
+                });
+            }
+            if (cList.length) {
+                html += '<div class="cmd-section-label">Components</div>';
+                cList.forEach(function(c) {
+                    var slug = c.slug || '';
+                    html += '<a href="/components/' + slug + '/" class="cmd-item">'
+                        + '<span class="cmd-icon"><i data-lucide="settings" style="width:10px;height:10px;"></i></span>'
+                        + '<span class="cmd-label">' + (c.name || '') + '</span>'
+                        + '<span class="cmd-type">' + (c.type || 'component') + '</span></a>';
+                });
+            }
+            if (!html) html = '<div id="cmd-empty">no results for "' + q + '"</div>';
+            document.getElementById('cmd-results').innerHTML = html;
+            lucide.createIcons();
+            cmdItems = document.querySelectorAll('.cmd-item');
+            selectedIdx = -1;
+        });
+    }
+
+    function moveSelection(dir) {
+        cmdItems = document.querySelectorAll('.cmd-item');
+        if (!cmdItems.length) return;
+        if (selectedIdx >= 0) cmdItems[selectedIdx].classList.remove('selected');
+        selectedIdx = Math.max(0, Math.min(cmdItems.length - 1, selectedIdx + dir));
+        cmdItems[selectedIdx].classList.add('selected');
+        cmdItems[selectedIdx].scrollIntoView({ block: 'nearest' });
+    }
+    function activateSelected() {
+        if (selectedIdx >= 0 && cmdItems[selectedIdx]) {
+            cmdItems[selectedIdx].click();
+        } else {
+            var q = document.getElementById('cmd-input').value.trim();
+            if (q) window.location.href = '/search/?q=' + encodeURIComponent(q);
+        }
+    }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

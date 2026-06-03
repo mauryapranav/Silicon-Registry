@@ -3,13 +3,11 @@
 {% block title %}Leaderboard | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
-  <!-- Ambient background glows -->
-  <div class="pointer-events-none absolute -z-10" style="top:-100px;left:20%;width:600px;height:400px;background:radial-gradient(ellipse,rgba(96,165,250,0.06),transparent 65%);"></div>
-  <div class="pointer-events-none absolute -z-10" style="top:200px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
+<div class="max-w-[1440px] mx-auto px-3 sm:px-5 pt-2 pb-4 relative">
+  <div class="pointer-events-none absolute -z-10 aurora-glow" style="top:-60px;left:15%;width:500px;height:300px;background:radial-gradient(ellipse,rgba(189,147,249,0.05),transparent 65%);"></div>
 
-  <!-- Header -->
-  <div class="term-window mb-6 fade-in">
+  <!-- Compact header -->
+  <div class="term-window mb-2 fade-in">
     <div class="term-titlebar">
       <div class="term-dots"><span></span><span></span><span></span></div>
       <span class="term-pid">[5] RANK</span>
@@ -17,148 +15,141 @@
       <span class="term-path">~/leaderboard</span>
       <span class="term-label-right">nvim</span>
     </div>
-    <div class="term-body">
-      <h1 class="font-mono font-bold text-2xl tracking-tight mb-1">
-        <span class="text-slate-500">></span> <span class="text-gradient">leaderboard</span><span class="cursor-blink"></span>
+    <div class="px-4 py-2.5 flex items-center gap-3">
+      <h1 class="font-mono font-bold text-base tracking-tight">
+        <span class="text-slate-500">&gt;</span> <span class="text-gradient">leaderboard</span><span class="cursor-blink"></span>
       </h1>
-      <p class="text-slate-500 text-sm font-mono">$ sort --key=trust --reverse /db/users</p>
+      <span class="font-mono text-[10px] text-slate-500">$ sort --key=trust --reverse /db/users</span>
     </div>
   </div>
 
-  <!-- Podium: Top 3 -->
+  <!-- Podium: Top 3 (compact, horizontal) -->
   {% if users|length >= 3 %}
-  <div class="grid grid-cols-3 gap-4 mb-8 fade-in" style="animation-delay:0.08s">
-    <!-- 2nd place -->
-    <!-- Silver glow -->
-    <div class="term-window text-center pt-6">
-      <a href="{% url 'registry:user_profile' users.1.username %}" class="block group p-5">
-        <div class="relative inline-block mb-3">
-          <div class="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden mx-auto"
-               style="background:#1a2235;border:2px solid rgba(148,163,184,0.3);box-shadow:0 0 20px rgba(148,163,184,0.08);">
+  <div class="grid grid-cols-3 gap-2 mb-2 fade-in" style="animation-delay:0.06s">
+    <!-- 2nd -->
+    <div class="term-window">
+      <a href="{% url 'registry:user_profile' users.1.username %}" class="block group p-3 text-center">
+        <div class="relative inline-block mb-2">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden mx-auto"
+               style="background:#161b27;border:1.5px solid rgba(148,163,184,0.25);box-shadow:0 0 14px rgba(148,163,184,0.07);">
             {% if users.1.avatar %}
             <img src="{{ users.1.avatar.url }}" class="w-full h-full object-cover rounded-full">
             {% else %}
-            <span class="text-lg font-black text-slate-400">{{ users.1.username|make_list|first|upper }}</span>
+            <span class="text-sm font-black text-slate-400">{{ users.1.username|make_list|first|upper }}</span>
             {% endif %}
           </div>
-          <div class="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style="background:rgba(148,163,184,0.15);color:#94a3b8;border:1px solid rgba(148,163,184,0.2);">2</div>
+          <div class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black" style="background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.18);">2</div>
         </div>
-        <div class="font-bold text-sm group-hover:text-primary transition-colors">{{ users.1.username }}</div>
-        <div class="text-xs text-slate-600 font-mono mt-1">+{{ users.1.positive_score }} pts</div>
-        <div class="text-xs font-bold text-slate-400 mt-0.5">{{ users.1.trust_ratio }}% trust</div>
+        <div class="font-bold text-xs group-hover:text-primary transition-colors">{{ users.1.username }}</div>
+        <div class="text-[9px] text-slate-600 font-mono">+{{ users.1.positive_score }}pts · {{ users.1.trust_ratio }}%</div>
       </a>
     </div>
 
-    <!-- 1st place -->
-    <div class="term-window text-center" style="border-color:rgba(251,191,36,0.2);box-shadow:0 0 40px rgba(251,191,36,0.08),0 0 80px rgba(251,191,36,0.03);">
-      <div class="term-titlebar justify-center" style="background:rgba(251,191,36,0.04);">
-        <span class="font-mono text-[10px] text-yellow-400 font-bold">★ TOP CONTRIBUTOR ★</span>
+    <!-- 1st -->
+    <div class="term-window" style="border-color:rgba(251,191,36,0.2);box-shadow:0 0 24px rgba(251,191,36,0.06);">
+      <div class="term-titlebar justify-center py-1" style="background:rgba(251,191,36,0.03);">
+        <span class="font-mono text-[9px] text-yellow-400 font-bold">★ TOP CONTRIBUTOR ★</span>
       </div>
-      <a href="{% url 'registry:user_profile' users.0.username %}" class="block group p-5">
-        <div class="relative inline-block mb-3">
-          <div class="w-18 h-18 rounded-full flex items-center justify-center overflow-hidden mx-auto" style="width:72px;height:72px;background:#1a2235;border:2px solid rgba(251,191,36,0.3);box-shadow:0 0 30px rgba(251,191,36,0.1);">
+      <a href="{% url 'registry:user_profile' users.0.username %}" class="block group p-3 text-center">
+        <div class="relative inline-block mb-2">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden mx-auto"
+               style="background:#161b27;border:1.5px solid rgba(251,191,36,0.3);box-shadow:0 0 20px rgba(251,191,36,0.08);">
             {% if users.0.avatar %}
             <img src="{{ users.0.avatar.url }}" class="w-full h-full object-cover rounded-full">
             {% else %}
-            <span class="text-xl font-black text-yellow-400">{{ users.0.username|make_list|first|upper }}</span>
+            <span class="text-base font-black text-yellow-400">{{ users.0.username|make_list|first|upper }}</span>
             {% endif %}
           </div>
-          <div class="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black" style="background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);">1</div>
+          <div class="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black" style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.22);">1</div>
         </div>
-        <div class="font-bold text-base group-hover:text-primary transition-colors">{{ users.0.username }}</div>
-        <div class="text-xs text-yellow-400 font-mono mt-1 font-bold">+{{ users.0.positive_score }} pts</div>
-        <div class="text-sm font-black text-yellow-400 mt-0.5">{{ users.0.trust_ratio }}% trust</div>
+        <div class="font-bold text-sm group-hover:text-primary transition-colors">{{ users.0.username }}</div>
+        <div class="text-[9px] text-yellow-400 font-mono font-bold">+{{ users.0.positive_score }}pts · {{ users.0.trust_ratio }}%</div>
       </a>
     </div>
 
-    <!-- 3rd place -->
-    <div class="term-window text-center pt-6" style="border-color:rgba(251,146,60,0.15);box-shadow:0 0 30px rgba(251,146,60,0.05);">
-      <a href="{% url 'registry:user_profile' users.2.username %}" class="block group p-5">
-        <div class="relative inline-block mb-3">
-          <div class="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden mx-auto"
-               style="background:#1a2235;border:2px solid rgba(251,146,60,0.25);box-shadow:0 0 20px rgba(251,146,60,0.08);">
+    <!-- 3rd -->
+    <div class="term-window" style="border-color:rgba(251,146,60,0.12);">
+      <a href="{% url 'registry:user_profile' users.2.username %}" class="block group p-3 text-center">
+        <div class="relative inline-block mb-2">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden mx-auto"
+               style="background:#161b27;border:1.5px solid rgba(251,146,60,0.2);box-shadow:0 0 14px rgba(251,146,60,0.06);">
             {% if users.2.avatar %}
             <img src="{{ users.2.avatar.url }}" class="w-full h-full object-cover rounded-full">
             {% else %}
-            <span class="text-lg font-black text-orange-400">{{ users.2.username|make_list|first|upper }}</span>
+            <span class="text-sm font-black text-orange-400">{{ users.2.username|make_list|first|upper }}</span>
             {% endif %}
           </div>
-          <div class="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style="background:rgba(251,146,60,0.12);color:#fb923c;border:1px solid rgba(251,146,60,0.2);">3</div>
+          <div class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black" style="background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.18);">3</div>
         </div>
-        <div class="font-bold text-sm group-hover:text-primary transition-colors">{{ users.2.username }}</div>
-        <div class="text-xs text-slate-600 font-mono mt-1">+{{ users.2.positive_score }} pts</div>
-        <div class="text-xs font-bold text-orange-400 mt-0.5">{{ users.2.trust_ratio }}% trust</div>
+        <div class="font-bold text-xs group-hover:text-primary transition-colors">{{ users.2.username }}</div>
+        <div class="text-[9px] text-slate-600 font-mono">+{{ users.2.positive_score }}pts · {{ users.2.trust_ratio }}%</div>
       </a>
     </div>
   </div>
   {% endif %}
 
-  <!-- Full ranked table -->
-  <div class="term-window fade-in" style="animation-delay:0.15s">
+  <!-- Full ranked table — dense rows -->
+  <div class="term-window fade-in" style="animation-delay:0.12s">
     <div class="term-titlebar">
       <div class="term-dots"><span></span><span></span><span></span></div>
-      <span class="term-pid">[5] RANK</span>
+      <span class="term-pid">[DB] RANKINGS</span>
       <span class="term-branch">≡ MASTER</span>
       <span class="term-path">~/rankings</span>
     </div>
     <div class="overflow-x-auto">
-      <table class="w-full text-sm">
+      <table class="w-full text-xs">
         <thead>
-          <tr style="border-bottom:1px solid rgba(148,163,184,0.08);">
-            <th class="tbl-head text-left px-6 py-4 font-mono">#</th>
-            <th class="tbl-head text-left px-6 py-4 font-mono">Contributor</th>
-            <th class="tbl-head text-right px-6 py-4 font-mono">Reports</th>
-            <th class="tbl-head text-right px-6 py-4 font-mono">Fixes</th>
-            <th class="tbl-head text-right px-6 py-4 font-mono">Score</th>
-            <th class="tbl-head text-right px-6 py-4 font-mono">Trust</th>
+          <tr style="border-bottom:1px solid rgba(148,163,184,0.07);">
+            <th class="tbl-head text-left px-4 py-2.5 font-mono">#</th>
+            <th class="tbl-head text-left px-4 py-2.5 font-mono">Contributor</th>
+            <th class="tbl-head text-right px-4 py-2.5 font-mono">Reports</th>
+            <th class="tbl-head text-right px-4 py-2.5 font-mono">Fixes</th>
+            <th class="tbl-head text-right px-4 py-2.5 font-mono">Score</th>
+            <th class="tbl-head text-right px-4 py-2.5 font-mono">Trust</th>
           </tr>
         </thead>
         <tbody>
           {% for u in users %}
           <tr class="tbl-row">
-            <td class="px-6 py-4 font-mono font-bold">
+            <td class="px-4 py-2 font-mono font-bold">
               {% if forloop.counter == 1 %}<span class="text-yellow-400">01</span>
               {% elif forloop.counter == 2 %}<span class="text-slate-400">02</span>
               {% elif forloop.counter == 3 %}<span class="text-orange-400">03</span>
-              {% else %}<span class="text-slate-600">{{ forloop.counter|stringformat:"02d" }}</span>
+              {% else %}<span class="text-slate-700">{{ forloop.counter|stringformat:"02d" }}</span>
               {% endif %}
             </td>
-            <td class="px-6 py-4">
-              <a href="{% url 'registry:user_profile' u.username %}" class="flex items-center gap-3 group">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden shrink-0"
-                  style="background:#1a2235;border:1px solid rgba(148,163,184,0.1);">
+            <td class="px-4 py-2">
+              <a href="{% url 'registry:user_profile' u.username %}" class="flex items-center gap-2 group">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden shrink-0"
+                     style="background:#161b27;border:1px solid rgba(148,163,184,0.1);">
                   {% if u.avatar %}
                   <img src="{{ u.avatar.url }}" class="w-full h-full object-cover rounded-full">
                   {% else %}
-                  <span class="text-xs font-bold text-slate-500">{{ u.username|make_list|first|upper }}</span>
+                  <span class="text-[8px] font-bold text-slate-500">{{ u.username|make_list|first|upper }}</span>
                   {% endif %}
                 </div>
                 <div>
                   <span class="font-semibold group-hover:text-primary transition-colors">{{ u.username }}</span>
-                  {% if u.is_verified %}
-                  <i data-lucide="badge-check" class="inline w-3.5 h-3.5 text-primary ml-1"></i>
-                  {% endif %}
-                  <div class="text-[11px] text-slate-600 mt-0.5 font-mono">{{ u.role_type }}</div>
+                  {% if u.is_verified %}<i data-lucide="badge-check" class="inline w-3 h-3 text-primary ml-0.5"></i>{% endif %}
+                  <div class="text-[9px] text-slate-600 font-mono">{{ u.role_type }}</div>
                 </div>
               </a>
             </td>
-            <td class="px-6 py-4 text-right font-medium text-slate-300 font-mono">{{ u.report_count }}</td>
-            <td class="px-6 py-4 text-right font-medium text-slate-300 font-mono">{{ u.fix_count }}</td>
-            <td class="px-6 py-4 text-right font-bold text-green font-mono">+{{ u.positive_score }}</td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <div class="w-16 h-1.5 rounded-full overflow-hidden hidden sm:block" style="background:rgba(148,163,184,0.08);">
-                  <div class="h-full rounded-full" style="width:{{ u.trust_ratio }}%;background:{% if u.trust_ratio >= 80 %}#60a5fa{% elif u.trust_ratio >= 50 %}#fbbf24{% else %}#475569{% endif %};"></div>
+            <td class="px-4 py-2 text-right font-mono text-slate-300">{{ u.report_count }}</td>
+            <td class="px-4 py-2 text-right font-mono text-slate-300">{{ u.fix_count }}</td>
+            <td class="px-4 py-2 text-right font-bold font-mono" style="color:#00ff88;">+{{ u.positive_score }}</td>
+            <td class="px-4 py-2 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <div class="w-12 h-1 rounded-full overflow-hidden hidden sm:block" style="background:rgba(148,163,184,0.07);">
+                  <div class="h-full rounded-full" style="width:{{ u.trust_ratio }}%;background:{% if u.trust_ratio >= 80 %}#00ff88{% elif u.trust_ratio >= 50 %}#fbbf24{% else %}#475569{% endif %};"></div>
                 </div>
-                <span class="font-bold font-mono {% if u.trust_ratio >= 80 %}text-primary{% elif u.trust_ratio >= 50 %}text-yellow-400{% else %}text-slate-500{% endif %}">
-                  {{ u.trust_ratio }}%
-                </span>
+                <span class="font-bold font-mono {% if u.trust_ratio >= 80 %}text-green{% elif u.trust_ratio >= 50 %}text-yellow-400{% else %}text-slate-500{% endif %}">{{ u.trust_ratio }}%</span>
               </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6" class="px-6 py-20 text-center text-slate-600 font-mono">No contributors with approved reports yet.</td>
+            <td colspan="6" class="px-4 py-12 text-center text-slate-600 font-mono text-xs">No contributors with approved reports yet.</td>
           </tr>
           {% endfor %}
         </tbody>

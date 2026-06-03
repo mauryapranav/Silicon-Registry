@@ -3,26 +3,26 @@
 {% block title %}{{ machine.vendor }} {{ machine.model_name }} | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+<div class="max-w-[1440px] mx-auto px-3 sm:px-5 pt-2 pb-4 relative">
   <!-- Ambient glows -->
-  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:15%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
-  <div class="pointer-events-none absolute -z-10" style="top:300px;right:10%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(192,132,252,0.04),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10 aurora-glow" style="top:-60px;left:10%;width:400px;height:280px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
 
-  <!-- Breadcrumb -->
-  <div class="flex items-center gap-2 mb-6 text-sm text-slate-600 fade-in font-mono">
-    <a href="{% url 'registry:homepage' %}" class="hover:text-white transition-colors">~</a>
-    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700"></i>
+  <!-- Breadcrumb — compact mono trail -->
+  <div class="flex items-center gap-1.5 mb-2 text-[10px] text-slate-600 fade-in font-mono">
+    <a href="{% url 'registry:homepage' %}"    class="hover:text-white transition-colors">~</a>
+    <i data-lucide="chevron-right" class="w-3 h-3 text-slate-700"></i>
     <a href="{% url 'registry:machine_list' %}" class="hover:text-white transition-colors">machines</a>
-    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700"></i>
-    <span class="text-slate-400">{{ machine.slug }}</span>
+    <i data-lucide="chevron-right" class="w-3 h-3 text-slate-700"></i>
+    <span class="text-slate-500">{{ machine.slug }}</span>
   </div>
 
-  <div class="grid lg:grid-cols-3 gap-3">
+  <!-- Tiled 3-column layout — fills the screen -->
+  <div class="grid lg:grid-cols-3 gap-2">
 
-    <!-- ── Left Sidebar ──────────────────────── -->
-    <div class="lg:col-span-1 space-y-3 fade-in" style="animation-delay:0.06s">
+    <!-- ── Col 1: Identity + Spec + Related ──── -->
+    <div class="flex flex-col gap-2 fade-in" style="animation-delay:0.04s">
 
-      <!-- Identity hero card -->
+      <!-- Identity card -->
       <div class="term-window">
         <div class="term-titlebar">
           <div class="term-dots"><span></span><span></span><span></span></div>
@@ -30,13 +30,13 @@
           <span class="term-branch">≡ MASTER</span>
           <span class="term-path">~/machine</span>
         </div>
-        <div class="p-7 relative">
-          <div class="absolute top-0 left-0 right-0 h-24 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(96,165,250,0.05),transparent 70%);"></div>
-          <div class="section-label mb-2 font-mono">{{ machine.vendor }}{% if machine.series %} · {{ machine.series }}{% endif %}</div>
-          <h1 class="text-2xl font-black tracking-tight mb-5">{{ machine.model_name }}</h1>
+        <div class="p-4 relative">
+          <div class="absolute top-0 left-0 right-0 h-16 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(0,255,136,0.04),transparent 70%);"></div>
+          <div class="section-label mb-1 font-mono">{{ machine.vendor }}{% if machine.series %} · {{ machine.series }}{% endif %}</div>
+          <h1 class="text-lg font-black tracking-tight mb-3">{{ machine.model_name }}</h1>
 
           <!-- Compat pill -->
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold font-mono mb-6
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold font-mono mb-3
             {% if compat == 'gold' or compat == 'mostly_gold' %}badge-gold
             {% elif compat == 'broken' %}badge-broken
             {% elif compat == 'mixed' %}badge-silver
@@ -53,14 +53,14 @@
             {% else %}No data yet{% endif %}
           </div>
 
-          <div class="space-y-0 text-sm" style="border-top:1px solid rgba(148,163,184,0.08);">
-            <div class="flex justify-between py-3" style="border-bottom:1px solid rgba(148,163,184,0.06);">
+          <div class="space-y-0 text-xs" style="border-top:1px solid rgba(148,163,184,0.07);">
+            <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(148,163,184,0.05);">
               <span class="text-slate-500 font-mono">Reports</span>
               <span class="font-bold font-mono">{{ report_count }}</span>
             </div>
             {% if machine.form_factor %}
-            <div class="flex justify-between py-3">
-              <span class="text-slate-500 font-mono">Form factor</span>
+            <div class="flex justify-between py-2">
+              <span class="text-slate-500 font-mono">Form</span>
               <span class="font-bold font-mono">{{ machine.get_form_factor_display }}</span>
             </div>
             {% endif %}
@@ -69,75 +69,75 @@
       </div>
 
       <!-- Spec card -->
-      <div class="term-window">
+      <div class="term-window flex-1">
         <div class="term-titlebar">
           <span class="term-pid text-[9px]">[2] SPEC</span>
           <span class="term-path text-[9px]">~/hardware</span>
         </div>
         {% if spec %}
-        <div class="divide-y" style="divide-color:rgba(148,163,184,0.06);">
+        <div class="divide-y" style="divide-color:rgba(148,163,184,0.05);">
           {% if spec.cpu_name %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="cpu" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="cpu" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow min-w-0">
-              <div class="section-label text-[9px] mb-0.5 font-mono">CPU</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">CPU</div>
               <div class="text-xs font-semibold truncate">{{ spec.cpu_name }}</div>
             </div>
           </div>
           {% endif %}
           {% if spec.gpu_name %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="monitor" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="monitor" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow min-w-0">
-              <div class="section-label text-[9px] mb-0.5 font-mono">GPU</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">GPU</div>
               <div class="text-xs font-semibold truncate">{{ spec.gpu_name }}</div>
             </div>
           </div>
           {% endif %}
           {% if spec.ram_base_gb %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="memory-stick" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="memory-stick" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5 font-mono">Memory</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">RAM</div>
               <div class="text-xs font-semibold">{{ spec.ram_base_gb }}GB {{ spec.get_ram_type_display|default:"" }}</div>
             </div>
           </div>
           {% endif %}
           {% if spec.storage_base_gb %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="hard-drive" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5 font-mono">Storage</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">Storage</div>
               <div class="text-xs font-semibold">{{ spec.storage_base_gb }}GB {{ spec.get_storage_type_display|default:"" }}</div>
             </div>
           </div>
           {% endif %}
           {% if spec.display_size_inches %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="tablet" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="tablet" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5 font-mono">Display</div>
-              <div class="text-xs font-semibold">{{ spec.display_size_inches }}" {{ spec.display_resolution }} {{ spec.get_display_panel_type_display|default:"" }}</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">Display</div>
+              <div class="text-xs font-semibold">{{ spec.display_size_inches }}" {{ spec.display_resolution }}</div>
             </div>
           </div>
           {% endif %}
           {% if spec.battery_wh %}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <i data-lucide="battery" class="w-3.5 h-3.5 text-primary/60 shrink-0"></i>
+          <div class="flex items-center gap-2.5 px-4 py-2.5">
+            <i data-lucide="battery" class="w-3 h-3 text-primary/50 shrink-0"></i>
             <div class="flex-grow">
-              <div class="section-label text-[9px] mb-0.5 font-mono">Battery</div>
+              <div class="section-label text-[8px] mb-0.5 font-mono">Battery</div>
               <div class="text-xs font-semibold">{{ spec.battery_wh }}Wh</div>
             </div>
           </div>
           {% endif %}
         </div>
         {% else %}
-        <p class="text-xs text-slate-600 text-center py-8 font-mono">No specs recorded yet.</p>
+        <p class="text-[10px] text-slate-600 text-center py-6 font-mono">No specs recorded yet.</p>
         {% endif %}
-        <div class="p-4">
+        <div class="p-3">
           <a href="{% url 'registry:suggest_spec' machine.pk %}"
-             class="btn-ghost flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-semibold font-mono">
-            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Contribute spec
+             class="btn-ghost flex items-center justify-center gap-1.5 w-full py-2 rounded text-[11px] font-semibold font-mono">
+            <i data-lucide="edit-3" class="w-3 h-3"></i> Contribute spec
           </a>
         </div>
       </div>
@@ -145,26 +145,26 @@
       <!-- Related machines -->
       {% if related %}
       <div class="term-window">
-        <div class="term-titlebar py-2">
+        <div class="term-titlebar py-1">
           <span class="term-pid text-[9px]">[i]</span>
           <span class="term-path text-[9px]">related</span>
         </div>
         {% for r in related %}
         <a href="{% url 'registry:machine_detail' r.slug %}"
-           class="flex items-center justify-between px-5 py-3 group transition-colors hover:bg-slate-800/30"
-           style="{% if not forloop.last %}border-bottom:1px solid rgba(148,163,184,0.05);{% endif %}">
-          <span class="text-sm font-medium group-hover:text-primary transition-colors">{{ r.model_name }}</span>
-          <span class="text-[11px] text-slate-600 font-mono">{{ r.report_count }}</span>
+           class="flex items-center justify-between px-4 py-2 group transition-colors hover:bg-slate-800/25"
+           style="{% if not forloop.last %}border-bottom:1px solid rgba(148,163,184,0.04);{% endif %}">
+          <span class="text-xs font-medium group-hover:text-primary transition-colors truncate">{{ r.model_name }}</span>
+          <span class="text-[10px] text-slate-600 font-mono ml-2 shrink-0">{{ r.report_count }}</span>
         </a>
         {% endfor %}
       </div>
       {% endif %}
     </div>
 
-    <!-- ── Main Content ──────────────────────── -->
-    <div class="lg:col-span-2 space-y-3 fade-in" style="animation-delay:0.14s">
+    <!-- ── Col 2+3: Components + Reports ─────────── -->
+    <div class="lg:col-span-2 flex flex-col gap-2 fade-in" style="animation-delay:0.1s">
 
-      <!-- Component Status matrix -->
+      <!-- Component status matrix -->
       <div class="term-window">
         <div class="term-titlebar">
           <div class="term-dots"><span></span><span></span><span></span></div>
@@ -175,31 +175,30 @@
         </div>
 
         {% if comp_summary %}
-        <div class="grid sm:grid-cols-2 gap-px" style="background:rgba(148,163,184,0.06);">
+        <div class="grid sm:grid-cols-2 gap-px" style="background:rgba(148,163,184,0.05);">
           {% for comp_id, info in comp_summary.items %}
           <a href="{% if info.slug %}{% url 'registry:component_detail' info.slug %}{% else %}#{% endif %}"
-             class="flex gap-4 p-5 group transition-all hover:bg-primary/4"
-             style="background:#111827;">
-            <div class="flex flex-col gap-1 w-1.5 rounded-full shrink-0 overflow-hidden" style="background:rgba(148,163,184,0.06);">
-              {% if info.working > 0 %}<div class="w-full rounded-full flex-1" style="background:#34d399;min-height:6px;"></div>{% endif %}
-              {% if info.issues > 0 %}<div class="w-full rounded-full flex-1" style="background:#fbbf24;min-height:6px;"></div>{% endif %}
-              {% if info.broken > 0 %}<div class="w-full rounded-full flex-1" style="background:#f87171;min-height:6px;"></div>{% endif %}
+             class="flex gap-3 p-3 group transition-all hover:bg-primary/3"
+             style="background:#0e1117;">
+            <div class="flex flex-col gap-0.5 w-1 rounded-full shrink-0 overflow-hidden" style="background:rgba(148,163,184,0.05);">
+              {% if info.working > 0 %}<div class="w-full rounded-full flex-1" style="background:#00ff88;min-height:4px;"></div>{% endif %}
+              {% if info.issues  > 0 %}<div class="w-full rounded-full flex-1" style="background:#fbbf24;min-height:4px;"></div>{% endif %}
+              {% if info.broken  > 0 %}<div class="w-full rounded-full flex-1" style="background:#f87171;min-height:4px;"></div>{% endif %}
             </div>
             <div class="flex-grow min-w-0">
-              <div class="section-label mb-0.5 font-mono">{{ info.type }}</div>
-              <div class="text-sm font-semibold truncate group-hover:text-primary transition-colors">{{ info.name }}</div>
-              <div class="flex gap-1.5 mt-2.5">
-                {% if info.working > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-working font-mono">✓ {{ info.working }}</span>{% endif %}
-                {% if info.issues  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-issues font-mono">! {{ info.issues }}</span>{% endif %}
-                {% if info.broken  > 0 %}<span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-broken font-mono">✗ {{ info.broken }}</span>{% endif %}
+              <div class="section-label mb-0.5 text-[8px] font-mono">{{ info.type }}</div>
+              <div class="text-xs font-semibold truncate group-hover:text-primary transition-colors">{{ info.name }}</div>
+              <div class="flex gap-1 mt-1.5">
+                {% if info.working > 0 %}<span class="text-[9px] font-bold px-1.5 py-0.5 rounded badge-working font-mono">✓ {{ info.working }}</span>{% endif %}
+                {% if info.issues  > 0 %}<span class="text-[9px] font-bold px-1.5 py-0.5 rounded badge-issues font-mono">! {{ info.issues }}</span>{% endif %}
+                {% if info.broken  > 0 %}<span class="text-[9px] font-bold px-1.5 py-0.5 rounded badge-broken font-mono">✗ {{ info.broken }}</span>{% endif %}
               </div>
             </div>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-700 group-hover:text-primary transition-colors shrink-0 self-center"></i>
           </a>
           {% endfor %}
         </div>
         {% else %}
-        <p class="text-sm text-slate-600 text-center py-12 font-mono">No component data linked yet.</p>
+        <p class="text-xs text-slate-600 text-center py-8 font-mono">No component data linked yet.</p>
         {% endif %}
       </div>
 
@@ -210,14 +209,14 @@
           <span class="term-pid text-[9px]">[4] FIX</span>
           <span class="term-path text-[9px]">~/fixes</span>
         </div>
-        <div class="p-5 space-y-3">
+        <div class="p-3 space-y-2">
           {% for fix in driver_fixes %}
-          <div class="rounded-lg p-5 relative overflow-hidden" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="badge-working text-[10px] px-2.5 py-1 rounded-full font-bold font-mono">{{ fix.component.name }}</span>
+          <div class="rounded-md p-3 relative overflow-hidden" style="background:rgba(148,163,184,0.015);border:1px solid rgba(148,163,184,0.06);">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-working text-[9px] px-2 py-0.5 rounded font-bold font-mono">{{ fix.component.name }}</span>
             </div>
-            <h4 class="text-sm font-bold mb-3">{{ fix.title }}</h4>
-            <pre class="font-mono text-[11px] text-slate-500 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap" style="background:#0d1220;">{{ fix.body }}</pre>
+            <h4 class="text-xs font-bold mb-2">{{ fix.title }}</h4>
+            <pre class="font-mono text-[10px] text-slate-500 p-2.5 rounded overflow-x-auto whitespace-pre-wrap" style="background:#080a10;">{{ fix.body }}</pre>
           </div>
           {% endfor %}
         </div>
@@ -225,42 +224,42 @@
       {% endif %}
 
       <!-- Reports list -->
-      <div>
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-bold font-mono">Compatibility Reports</h2>
-          <a href="{% url 'registry:report_submit' %}?machine_id={{ machine.pk }}" class="btn-term text-xs px-4 py-2">Submit Report</a>
+      <div class="flex-1">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-sm font-bold font-mono">Compatibility Reports</h2>
+          <a href="{% url 'registry:report_submit' %}?machine_id={{ machine.pk }}" class="btn-term text-[11px] px-3 py-1.5">Submit Report</a>
         </div>
-        <div class="space-y-3">
+        <div class="space-y-2">
           {% for report in reports %}
           <a href="{% url 'registry:report_detail' report.pk %}" class="block group">
-            <div class="card-inner rounded-lg p-5 flex gap-5 items-start border-l-2
-              {% if report.boot_status == 'GOLD' %}border-l-yellow-400/60
-              {% elif report.boot_status == 'SILVER' %}border-l-slate-500/60
-              {% elif report.boot_status == 'BRONZE' %}border-l-orange-400/60
-              {% else %}border-l-red-400/60{% endif %}">
-              <div class="w-11 h-11 rounded-lg flex items-center justify-center font-black text-[13px] shrink-0 font-mono
+            <div class="card-inner rounded-md p-3 flex gap-3 items-start border-l-2
+              {% if report.boot_status == 'GOLD' %}border-l-yellow-400/50
+              {% elif report.boot_status == 'SILVER' %}border-l-slate-500/50
+              {% elif report.boot_status == 'BRONZE' %}border-l-orange-400/50
+              {% else %}border-l-red-400/50{% endif %}">
+              <div class="w-8 h-8 rounded flex items-center justify-center font-black text-[11px] shrink-0 font-mono
                 {% if report.boot_status == 'GOLD' %}badge-gold{% elif report.boot_status == 'SILVER' %}badge-silver{% elif report.boot_status == 'BRONZE' %}badge-bronze{% else %}badge-broken{% endif %}">
                 {{ report.boot_status|slice:":1" }}
               </div>
               <div class="flex-grow min-w-0">
-                <div class="flex items-center gap-2 mb-1 text-[11px]">
+                <div class="flex items-center gap-2 mb-0.5 text-[10px]">
                   <span class="font-bold text-primary font-mono">{{ report.distro }}</span>
-                  <span class="text-slate-600 font-mono">Kernel&nbsp;{{ report.kernel_version|default:"–" }}</span>
+                  <span class="text-slate-600 font-mono">{{ report.kernel_version|default:"–" }}</span>
                 </div>
-                <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">{{ report.title }}</h4>
-                <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-600 font-mono">
+                <h4 class="text-xs font-bold group-hover:text-primary transition-colors truncate">{{ report.title }}</h4>
+                <div class="flex items-center gap-1.5 mt-1 text-[10px] text-slate-600 font-mono">
                   <span>{{ report.user.username }}</span>
-                  <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                  <span class="w-0.5 h-0.5 rounded-full bg-slate-700"></span>
                   <span>{{ report.created_at|date:"M d, Y" }}</span>
                 </div>
               </div>
-              <i data-lucide="arrow-right" class="w-4 h-4 text-slate-700 group-hover:text-primary shrink-0 transition-colors hidden sm:block mt-3"></i>
+              <i data-lucide="arrow-right" class="w-3 h-3 text-slate-700 group-hover:text-primary shrink-0 transition-colors hidden sm:block mt-2"></i>
             </div>
           </a>
           {% empty %}
-          <div class="text-center py-20 rounded-lg" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
-            <i data-lucide="file-warning" class="w-10 h-10 text-slate-700 mx-auto mb-3"></i>
-            <p class="text-slate-500 text-sm font-mono">No compatibility reports yet.</p>
+          <div class="text-center py-12 rounded-md font-mono text-xs text-slate-600" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.05);">
+            <i data-lucide="file-warning" class="w-8 h-8 text-slate-700 mx-auto mb-2"></i>
+            No compatibility reports yet.
           </div>
           {% endfor %}
         </div>

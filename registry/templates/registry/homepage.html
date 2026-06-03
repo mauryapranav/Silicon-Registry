@@ -3,19 +3,20 @@
 {% block content %}
 <div class="relative overflow-hidden">
 
-  <!-- ── Dot grid + ambient glow backdrop ──────────── -->
-  <div class="pointer-events-none absolute inset-0 -z-10 dot-grid" style="mask-image:radial-gradient(ellipse 80% 70% at 50% 0%, black 0%, transparent 100%);"></div>
-  <div class="pointer-events-none absolute -z-10" style="top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:700px;background:radial-gradient(ellipse at 50% 20%,rgba(96,165,250,0.07) 0%,transparent 65%);"></div>
+  <!-- ── Dot grid + animated aurora backdrop ──────────── -->
+  <div class="pointer-events-none absolute inset-0 -z-10 dot-grid" style="mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 100%);"></div>
+  <div class="pointer-events-none absolute -z-10 aurora-glow" style="top:-120px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse at 50% 20%,rgba(0,255,136,0.06) 0%,rgba(96,165,250,0.04) 40%,transparent 70%);"></div>
+  <div class="pointer-events-none absolute -z-10 aurora-glow" style="top:-60px;right:0;width:500px;height:400px;background:radial-gradient(ellipse at 80% 10%,rgba(189,147,249,0.05) 0%,transparent 65%);animation-delay:3s;"></div>
 
   <!-- ═══════════════════════════════════════════════════
-       HERO
+       HERO + NEOFETCH — full-width tiled row
   ═══════════════════════════════════════════════════ -->
-  <section class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-10 pb-3">
-    <div class="grid lg:grid-cols-5 gap-3 items-start">
+  <section class="max-w-[1440px] mx-auto px-3 sm:px-5 pt-3 pb-2">
+    <div class="grid lg:grid-cols-5 gap-2 items-stretch">
 
-      <!-- Left: Hero content in terminal window -->
+      <!-- Left: Hero terminal window -->
       <div class="lg:col-span-3 fade-in">
-        <div class="term-window">
+        <div class="term-window h-full">
           <div class="term-titlebar">
             <div class="term-dots"><span></span><span></span><span></span></div>
             <span class="term-pid">[1] HERO</span>
@@ -24,202 +25,158 @@
             <span class="term-label-right">kitty</span>
           </div>
           <div class="term-body relative">
-            <!-- Ambient glow behind hero content -->
-            <div class="absolute -z-10 pointer-events-none" style="top:-40px;left:-60px;width:400px;height:300px;background:radial-gradient(ellipse,rgba(96,165,250,0.08),transparent 65%);"></div>
-            <div class="absolute -z-10 pointer-events-none" style="top:40px;right:-40px;width:300px;height:200px;background:radial-gradient(ellipse,rgba(192,132,252,0.06),transparent 65%);"></div>
+            <!-- Ambient glow -->
+            <div class="absolute -z-10 pointer-events-none" style="top:-20px;left:-40px;width:300px;height:200px;background:radial-gradient(ellipse,rgba(0,255,136,0.06),transparent 65%);"></div>
 
-            <!-- ASCII art logo — slant style -->
-            <pre class="font-mono text-[10px] sm:text-xs leading-[1.2] mb-6 select-none hidden sm:block" style="opacity:0.7;" aria-hidden="true"><span style="color:#60a5fa;">   _____ _  __                    </span><span style="color:#c084fc;">____             _      __</span>
-<span style="color:#60a5fa;">  / ___/(_)/ /_  _________  ____  </span><span style="color:#c084fc;">/ __ \___  ____ _(_)____/ /________  __</span>
-<span style="color:#60a5fa;">  \__ \/ // / / / / / ___/ __ \/ __ \</span><span style="color:#c084fc;">/ /_/ / _ \/ __ `/ / ___/ __/ ___/ / / /</span>
-<span style="color:#60a5fa;"> ___/ / // / /_/ / /__/ /_/ / / / </span><span style="color:#c084fc;">/ _, _/  __/ /_/ / (__  ) /_/ /  / /_/ /</span>
-<span style="color:#60a5fa;">/____/_//_/\__,_/\___/\____/_/ /_/</span><span style="color:#c084fc;">/_/ |_|\___/\__, /_/____/\__/_/   \__, /</span>
+            <!-- ASCII art logo -->
+            <pre class="font-mono text-[9px] sm:text-[10px] leading-[1.2] mb-4 select-none hidden sm:block" style="opacity:0.65;" aria-hidden="true"><span style="color:#00ff88;">   _____ _  __                    </span><span style="color:#bd93f9;">____             _      __</span>
+<span style="color:#00ff88;">  / ___/(_)/ /_  _________  ____  </span><span style="color:#bd93f9;">/ __ \___  ____ _(_)____/ /________  __</span>
+<span style="color:#00ff88;">  \__ \/ // / / / / / ___/ __ \/ __ \</span><span style="color:#bd93f9;">/ /_/ / _ \/ __ `/ / ___/ __/ ___/ / / /</span>
+<span style="color:#00ff88;"> ___/ / // / /_/ / /__/ /_/ / / / </span><span style="color:#bd93f9;">/ _, _/  __/ /_/ / (__  ) /_/ /  / /_/ /</span>
+<span style="color:#00ff88;">/____/_//_/\__,_/\___/\____/_/ /_/</span><span style="color:#bd93f9;">/_/ |_|\___/\__, /_/____/\__/_/   \__, /</span>
 <span style="color:#475569;">                                              /____/                /____/</span></pre>
 
-            <!-- Display headline -->
-            <h1 class="font-mono font-bold text-[clamp(1.8rem,5vw,3.2rem)] tracking-tight leading-[1.12] mb-5">
-              <span class="text-slate-500">></span>
+            <!-- Headline with glow -->
+            <h1 class="font-mono font-bold text-[clamp(1.5rem,4vw,2.6rem)] tracking-tight leading-[1.1] mb-3">
+              <span class="text-slate-500">&gt;</span>
               <span class="text-slate-300"> the linux </span>
-              <span class="text-gradient" style="background:linear-gradient(135deg,#c084fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">hardware</span><br>
-              <span class="text-slate-300">&nbsp;&nbsp;compatibility </span>
-              <span class="text-gradient-blue" style="text-shadow:0 0 40px rgba(96,165,250,0.3);">database</span><span class="text-slate-600">,</span>
-              <span class="text-gradient-green">riced</span><span class="text-slate-600">.</span><span class="cursor-blink"></span>
+              <span style="background:linear-gradient(135deg,#bd93f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">hardware</span><br>
+              <span class="text-slate-300">&nbsp;&nbsp;compat </span>
+              <span class="text-gradient-blue glow-text" style="text-shadow:0 0 30px rgba(96,165,250,0.25);">database</span><span class="text-slate-600">,</span>
+              <span class="text-gradient-rice">riced</span><span class="text-slate-600">.</span><span class="cursor-blink"></span>
             </h1>
 
-            <p class="text-slate-500 text-sm leading-relaxed mb-8 max-w-lg">
+            <p class="text-slate-500 text-xs leading-relaxed mb-4 max-w-md">
               Hardware support, distro-by-distro. Real fixes that actually work, contributed by
               people who run Linux daily. <span class="text-slate-400">Built by ricers, for ricers.</span>
             </p>
 
-            <!-- Search prompt with glow -->
-            <div class="flex items-center gap-3 mb-8 p-3 rounded-lg transition-all focus-within:border-primary/30" style="background:#0d1220;border:1px solid rgba(148,163,184,0.08);box-shadow:0 0 0 0 transparent;transition:box-shadow 0.3s;" onfocus="this.style.boxShadow='0 0 30px rgba(96,165,250,0.1)'" onblur="this.style.boxShadow='none'">
-              <span class="font-mono text-sm text-slate-500 shrink-0">user@silicon:~$</span>
-              <span class="font-mono text-sm text-primary shrink-0">search</span>
+            <!-- Search prompt -->
+            <div class="flex items-center gap-2 mb-4 p-2.5 rounded-md" style="background:#080a10;border:1px solid rgba(148,163,184,0.08);">
+              <span class="font-mono text-xs text-slate-500 shrink-0">user@silicon:~$</span>
+              <span class="font-mono text-xs shrink-0" style="color:#00ff88;">search</span>
               <form action="{% url 'registry:search' %}" method="GET" class="flex-grow">
-                <input type="text" name="q" placeholder="rtx 4070, ax210, fingerprint..." class="bg-transparent border-none outline-none text-sm text-slate-300 w-full font-mono placeholder:text-slate-600" onfocus="this.closest('.flex').style.boxShadow='0 0 30px rgba(96,165,250,0.1)'" onblur="this.closest('.flex').style.boxShadow='none'">
+                <input type="text" name="q" placeholder="rtx 4070, ax210, fingerprint..."
+                       class="bg-transparent border-none outline-none text-xs text-slate-300 w-full font-mono placeholder:text-slate-700"
+                       onfocus="this.closest('.flex').style.boxShadow='0 0 20px rgba(0,255,136,0.08)'"
+                       onblur="this.closest('.flex').style.boxShadow='none'">
               </form>
             </div>
 
-            <!-- CTA buttons with glows -->
-            <div class="flex flex-wrap gap-3">
-              <a href="{% url 'registry:machine_list' %}" class="btn-term" style="box-shadow:0 0 20px rgba(52,211,153,0.12);">browse database →</a>
-              <a href="{% url 'registry:search' %}" class="btn-ghost px-5 py-2 rounded-lg text-sm font-mono font-medium hover:shadow-[0_0_20px_rgba(148,163,184,0.08)]">troubleshoot →</a>
-              <a href="{% url 'registry:report_submit' %}" class="btn-primary px-5 py-2 rounded-lg text-sm font-mono font-medium">+ contribute</a>
+            <!-- CTA buttons -->
+            <div class="flex flex-wrap gap-2">
+              <a href="{% url 'registry:machine_list' %}"  class="btn-term">browse →</a>
+              <a href="{% url 'registry:search' %}"        class="btn-ghost px-4 py-1.5 rounded-md text-xs font-mono">troubleshoot →</a>
+              <a href="{% url 'registry:report_submit' %}" class="btn-primary px-4 py-1.5 rounded-md text-xs font-mono">+ contribute</a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right: Neofetch-style info panel -->
-      <div class="lg:col-span-2 fade-in" style="animation-delay:0.12s">
-        <div class="term-window">
+      <!-- Right: Neofetch + stats tiled column -->
+      <div class="lg:col-span-2 flex flex-col gap-2 fade-in" style="animation-delay:0.1s">
+
+        <!-- Neofetch panel -->
+        <div class="term-window flex-1">
           <div class="term-titlebar">
             <div class="term-dots"><span></span><span></span><span></span></div>
-            <span class="term-pid">[1] SYS</span>
+            <span class="term-pid">[2] SYS</span>
             <span class="term-branch">≡ MASTER</span>
             <span class="term-path">~/neofetch</span>
             <span class="term-label-right">zsh</span>
           </div>
-          <div class="term-body font-mono text-sm">
-            <div class="text-primary mb-3">root@silicon:~$ neofetch</div>
-            <div class="space-y-1.5 text-slate-400">
-              <div><span style="color:#60a5fa;">os</span><span class="text-slate-600 mx-3">:</span>Silicon Registry 1.0</div>
-              <div><span style="color:#c084fc;">kernel</span><span class="text-slate-600 mx-3">:</span>Django 5.x</div>
-              <div><span style="color:#f472b6;">de/wm</span><span class="text-slate-600 mx-3">:</span>Tailwind + HTMX</div>
-              <div><span style="color:#22d3ee;">shell</span><span class="text-slate-600 mx-3">:</span>python 3.12</div>
-              <div><span style="color:#fb923c;">terminal</span><span class="text-slate-600 mx-3">:</span>kitty</div>
-              <div><span style="color:#a78bfa;">theme</span><span class="text-slate-600 mx-3">:</span>tokyo-night</div>
-              <div><span style="color:#fbbf24;">font</span><span class="text-slate-600 mx-3">:</span>JetBrains Mono</div>
-              <div class="pt-1 border-t border-slate-800 mt-2">
-                <span class="text-green">entries</span><span class="text-slate-600 mx-3">:</span><span class="text-white font-bold">{{ total_machines }}</span>
+          <div class="term-body font-mono text-xs">
+            <div class="mb-2" style="color:#00ff88;">root@silicon:~$ neofetch</div>
+            <div class="space-y-1 text-slate-400">
+              <div><span style="color:#60a5fa;">os</span><span class="text-slate-700 mx-2">:</span>Silicon Registry 1.0</div>
+              <div><span style="color:#bd93f9;">kernel</span><span class="text-slate-700 mx-2">:</span>Django 6.x</div>
+              <div><span style="color:#f472b6;">de/wm</span><span class="text-slate-700 mx-2">:</span>Tailwind + HTMX</div>
+              <div><span style="color:#22d3ee;">shell</span><span class="text-slate-700 mx-2">:</span>python 3.12</div>
+              <div><span style="color:#fb923c;">terminal</span><span class="text-slate-700 mx-2">:</span>kitty</div>
+              <div><span style="color:#a78bfa;">theme</span><span class="text-slate-700 mx-2">:</span>tokyo-night</div>
+              <div><span style="color:#fbbf24;">font</span><span class="text-slate-700 mx-2">:</span>JetBrains Mono</div>
+              <div class="pt-1.5 mt-1.5" style="border-top:1px solid rgba(148,163,184,0.07);">
+                <span style="color:#00ff88;">entries</span><span class="text-slate-700 mx-2">:</span><span class="text-white font-bold">{{ total_machines }}</span>
               </div>
-              <div><span class="text-green">reports</span><span class="text-slate-600 mx-3">:</span><span class="text-white font-bold">{{ total_reports }}</span></div>
-              <div><span class="text-green">users</span><span class="text-slate-600 mx-3">:</span><span class="text-white font-bold">{{ total_users }}</span></div>
-              <div><span class="text-green">uptime</span><span class="text-slate-600 mx-3">:</span>forever</div>
+              <div><span style="color:#00ff88;">reports</span><span class="text-slate-700 mx-2">:</span><span class="text-white font-bold">{{ total_reports }}</span></div>
+              <div><span style="color:#00ff88;">users</span><span class="text-slate-700 mx-2">:</span><span class="text-white font-bold">{{ total_users }}</span></div>
+              <div><span style="color:#00ff88;">uptime</span><span class="text-slate-700 mx-2">:</span>forever</div>
             </div>
           </div>
         </div>
+
+        <!-- Compact stats strip — 2x2 grid -->
+        <div class="grid grid-cols-2 gap-2">
+          {% for stat in stats_data %}
+          <div class="term-window" style="border-radius:5px;">
+            <div class="term-titlebar py-1">
+              <span class="term-pid text-[8px]">[STAT]</span>
+              <span class="term-path text-[8px]">~/{{ stat.path }}</span>
+            </div>
+            <div class="px-3 py-2 flex items-center gap-2">
+              <div class="stat-num text-white text-[1.1rem]">{{ stat.value }}</div>
+              <div class="section-label text-[8px] leading-tight">{{ stat.label }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <!-- Fallback if no stats_data context variable -->
+          <div class="term-window col-span-2">
+            <div class="px-3 py-2 flex gap-4 font-mono text-xs">
+              <span><span style="color:#00ff88;">machines</span><span class="text-slate-600 mx-1">:</span>{{ total_machines }}</span>
+              <span><span style="color:#60a5fa;">reports</span><span class="text-slate-600 mx-1">:</span>{{ total_reports }}</span>
+              <span><span style="color:#bd93f9;">distros</span><span class="text-slate-600 mx-1">:</span>{{ total_distros }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════
-       STATS STRIP
+       RECENT + DISTROS — tiled, no wasted space
   ═══════════════════════════════════════════════════ -->
-  <section class="max-w-[1440px] mx-auto px-5 sm:px-8 pb-3 fade-in" style="animation-delay:0.18s">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-      <div class="term-window group">
-        <div class="term-titlebar py-2">
-          <span class="term-pid text-[9px]">[1] STAT</span>
-          <span class="term-branch text-[9px]">≡ STACK</span>
-          <span class="term-path text-[9px]">~/machines</span>
-        </div>
-        <div class="p-6 flex items-center gap-4">
-          <div class="stat-num text-white">{{ total_machines }}</div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.15);box-shadow:0 0 20px rgba(96,165,250,0.12);">
-            <i data-lucide="cpu" class="w-5 h-5 text-primary"></i>
-          </div>
-        </div>
-        <div class="px-6 pb-4 section-label">MACHINES TRACKED</div>
-      </div>
-
-      <div class="term-window group">
-        <div class="term-titlebar py-2">
-          <span class="term-pid text-[9px]">[1] STAT</span>
-          <span class="term-branch text-[9px]">≡ STACK</span>
-          <span class="term-path text-[9px]">~/reports</span>
-        </div>
-        <div class="p-6 flex items-center gap-4">
-          <div class="stat-num text-white">{{ total_reports }}</div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.15);">
-            <i data-lucide="file-text" class="w-5 h-5 text-primary"></i>
-          </div>
-        </div>
-        <div class="px-6 pb-4 section-label">COMPAT REPORTS</div>
-      </div>
-
-      <div class="term-window group">
-        <div class="term-titlebar py-2">
-          <span class="term-pid text-[9px]">[1] STAT</span>
-          <span class="term-branch text-[9px]">≡ STACK</span>
-          <span class="term-path text-[9px]">~/users</span>
-        </div>
-        <div class="p-6 flex items-center gap-4">
-          <div class="stat-num text-white">{{ total_users }}</div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.15);">
-            <i data-lucide="users" class="w-5 h-5 text-primary"></i>
-          </div>
-        </div>
-        <div class="px-6 pb-4 section-label">CONTRIBUTORS</div>
-      </div>
-
-      <div class="term-window group">
-        <div class="term-titlebar py-2">
-          <span class="term-pid text-[9px]">[1] STAT</span>
-          <span class="term-branch text-[9px]">≡ STACK</span>
-          <span class="term-path text-[9px]">~/distros</span>
-        </div>
-        <div class="p-6 flex items-center gap-4">
-          <div class="stat-num text-white">{{ total_distros }}</div>
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.15);">
-            <i data-lucide="box" class="w-5 h-5 text-primary"></i>
-          </div>
-        </div>
-        <div class="px-6 pb-4 section-label">DISTROS TRACKED</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       TOP HARDWARE + RECENT ENTRIES
-  ═══════════════════════════════════════════════════ -->
-  <section class="max-w-[1440px] mx-auto px-5 sm:px-8 pb-16">
-    <div class="grid lg:grid-cols-5 gap-3">
+  <section class="max-w-[1440px] mx-auto px-3 sm:px-5 pb-4">
+    <div class="grid lg:grid-cols-5 gap-2">
 
       <!-- Recent entries -->
-      <div class="lg:col-span-3 fade-in" style="animation-delay:0.24s">
+      <div class="lg:col-span-3 fade-in" style="animation-delay:0.2s">
         <div class="term-window">
           <div class="term-titlebar">
             <div class="term-dots"><span></span><span></span><span></span></div>
-            <span class="term-pid">[2] DB</span>
+            <span class="term-pid">[3] DB</span>
             <span class="term-branch">≡ MASTER</span>
             <span class="term-path">~/db/recent</span>
             <span class="term-label-right">firefox</span>
           </div>
-          <div class="term-body">
-            <div class="flex justify-between items-center mb-5">
-              <h2 class="font-mono font-bold text-base text-slate-200">latest compatibility entries</h2>
-              <a href="{% url 'registry:machine_list' %}" class="text-sm font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 font-mono">
-                view all <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          <div class="term-body p-0">
+            <div class="flex justify-between items-center px-4 py-2.5" style="border-bottom:1px solid rgba(148,163,184,0.06);">
+              <h2 class="font-mono font-bold text-xs text-slate-300">latest compatibility entries</h2>
+              <a href="{% url 'registry:machine_list' %}" class="text-[10px] font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 font-mono">
+                view all <i data-lucide="arrow-right" class="w-3 h-3"></i>
               </a>
             </div>
 
-            <div class="space-y-3">
+            <div class="divide-y" style="--tw-divide-opacity:1;">
               {% for machine in top_machines %}
-              <a href="{% url 'registry:machine_detail' machine.slug %}" class="block group">
-                <div class="rounded-xl p-4 flex items-center gap-4 transition-all hover:bg-slate-800/40" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span class="font-mono text-[10px] font-bold text-slate-600 uppercase px-2 py-0.5 rounded" style="background:rgba(148,163,184,0.06);">{{ machine.get_form_factor_display|default:"hw" }}</span>
-                  </div>
-                  <div class="flex-grow min-w-0">
-                    <div class="text-sm font-bold group-hover:text-primary transition-colors">{{ machine.vendor }} {{ machine.model_name }}</div>
-                    {% if machine.spec.cpu_name %}
-                    <div class="text-xs text-slate-600 mt-0.5">{{ machine.spec.cpu_name }}</div>
-                    {% endif %}
-                  </div>
-                  {% if machine.gold_count > 0 %}
-                  <span class="badge-works px-2 py-0.5 rounded-full shrink-0">● WORKS</span>
-                  {% elif machine.report_count > 0 %}
-                  <span class="badge-partial px-2 py-0.5 rounded-full shrink-0">● PARTIAL</span>
+              <a href="{% url 'registry:machine_detail' machine.slug %}" class="flex items-center gap-3 px-4 py-2.5 group hover:bg-primary/3 transition-colors" style="border-bottom:1px solid rgba(148,163,184,0.04);">
+                <span class="font-mono text-[9px] font-bold text-slate-600 uppercase px-1.5 py-0.5 rounded shrink-0" style="background:rgba(148,163,184,0.05);">{{ machine.get_form_factor_display|default:"hw" }}</span>
+                <div class="flex-grow min-w-0">
+                  <div class="text-xs font-bold group-hover:text-primary transition-colors truncate">{{ machine.vendor }} {{ machine.model_name }}</div>
+                  {% if machine.spec.cpu_name %}
+                  <div class="text-[10px] text-slate-600 font-mono truncate">{{ machine.spec.cpu_name }}</div>
                   {% endif %}
                 </div>
+                {% if machine.gold_count > 0 %}
+                <span class="badge-works px-1.5 py-0.5 rounded shrink-0 text-[9px]">WORKS</span>
+                {% elif machine.report_count > 0 %}
+                <span class="badge-partial px-1.5 py-0.5 rounded shrink-0 text-[9px]">PARTIAL</span>
+                {% endif %}
               </a>
               {% empty %}
-              <div class="text-center py-12 rounded-xl" style="background:rgba(148,163,184,0.02);">
-                <i data-lucide="inbox" class="w-10 h-10 text-slate-700 mx-auto mb-3"></i>
-                <p class="text-slate-600 text-sm">No machines yet. Be the first to submit a report!</p>
+              <div class="text-center py-8 font-mono text-xs text-slate-600">
+                <i data-lucide="inbox" class="w-8 h-8 text-slate-700 mx-auto mb-2"></i>
+                No machines yet — be the first to contribute!
               </div>
               {% endfor %}
             </div>
@@ -227,33 +184,34 @@
         </div>
       </div>
 
-      <!-- Popular Distros panel -->
-      <div class="lg:col-span-2 fade-in" style="animation-delay:0.3s">
-        <div class="term-window">
+      <!-- Popular Distros -->
+      <div class="lg:col-span-2 fade-in" style="animation-delay:0.25s">
+        <div class="term-window h-full">
           <div class="term-titlebar">
             <div class="term-dots"><span></span><span></span><span></span></div>
-            <span class="term-pid">[3] PKG</span>
+            <span class="term-pid">[4] PKG</span>
             <span class="term-branch">≡ STACK</span>
             <span class="term-path">~/distros/top</span>
             <span class="term-label-right">nvim</span>
           </div>
-          <div class="term-body">
-            <h2 class="font-mono font-bold text-base text-slate-200 mb-5">popular distros</h2>
-
+          <div class="p-0">
+            <div class="px-4 py-2.5" style="border-bottom:1px solid rgba(148,163,184,0.06);">
+              <h2 class="font-mono font-bold text-xs text-slate-300">popular distros</h2>
+            </div>
             {% if featured_distros %}
-            <div class="space-y-2.5">
+            <div class="divide-y">
               {% for distro in featured_distros %}
-              <a href="{% url 'registry:distro_detail' distro.slug %}" class="flex items-center justify-between p-3.5 rounded-lg group transition-all hover:bg-slate-800/40" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(148,163,184,0.05);border:1px solid rgba(148,163,184,0.08);">
-                    <i data-lucide="terminal" class="w-4 h-4 text-slate-600 group-hover:text-primary transition-colors"></i>
+              <a href="{% url 'registry:distro_detail' distro.slug %}" class="flex items-center justify-between px-4 py-2.5 group hover:bg-primary/3 transition-colors" style="border-bottom:1px solid rgba(148,163,184,0.04);">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-6 h-6 rounded flex items-center justify-center shrink-0" style="background:rgba(148,163,184,0.04);border:1px solid rgba(148,163,184,0.08);">
+                    <i data-lucide="terminal" class="w-3 h-3 text-slate-600 group-hover:text-primary transition-colors"></i>
                   </div>
                   <div>
-                    <div class="text-sm font-semibold group-hover:text-primary transition-colors">{{ distro.name }}</div>
-                    <div class="text-[11px] text-slate-600">{{ distro.version }}</div>
+                    <div class="text-xs font-semibold group-hover:text-primary transition-colors">{{ distro.name }}</div>
+                    <div class="text-[9px] text-slate-600 font-mono">{{ distro.version }}</div>
                   </div>
                 </div>
-                <span class="font-mono text-xs font-bold text-primary">{{ distro.report_count }}</span>
+                <span class="font-mono text-[10px] font-bold text-primary">{{ distro.report_count }}</span>
               </a>
               {% endfor %}
             </div>
@@ -261,7 +219,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </section>
 

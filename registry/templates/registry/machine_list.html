@@ -3,142 +3,139 @@
 {% block title %}Explore Machines | Silicon Registry{% endblock %}
 
 {% block content %}
-<div class="max-w-[1440px] mx-auto px-5 sm:px-8 pt-8 pb-24 relative">
+<div class="max-w-[1440px] mx-auto px-3 sm:px-5 pt-2 pb-4 relative">
   <!-- Ambient glows -->
-  <div class="pointer-events-none absolute -z-10" style="top:-80px;left:10%;width:500px;height:350px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
-  <div class="pointer-events-none absolute -z-10" style="top:400px;right:5%;width:400px;height:300px;background:radial-gradient(ellipse,rgba(52,211,153,0.04),transparent 65%);"></div>
+  <div class="pointer-events-none absolute -z-10 aurora-glow" style="top:-60px;left:5%;width:400px;height:280px;background:radial-gradient(ellipse,rgba(96,165,250,0.05),transparent 65%);"></div>
 
-  <div class="grid lg:grid-cols-12 gap-3">
+  <div class="grid lg:grid-cols-12 gap-2">
 
     <!-- ── Left Sidebar: Filters ──────────────────── -->
     <div class="lg:col-span-3 fade-in">
-      <div class="term-window lg:sticky lg:top-20">
+      <div class="term-window lg:sticky lg:top-12">
         <div class="term-titlebar">
           <div class="term-dots"><span></span><span></span><span></span></div>
-          <span class="term-pid">[2] DB</span>
+          <span class="term-pid">[F] FILTER</span>
           <span class="term-branch">≡ MASTER</span>
           <span class="term-path">~/db/filters</span>
         </div>
-        <div class="term-body space-y-3">
+        <div class="p-3 space-y-3">
           <form method="GET" id="filter-form">
             <!-- Search -->
-            <div class="relative mb-6">
-              <div class="flex items-center gap-2 p-2.5 rounded-lg" style="background:#0d1220;border:1px solid rgba(148,163,184,0.1);">
-                <span class="font-mono text-xs text-green shrink-0">grep</span>
-                <input type="text" name="q" value="{{ q }}" placeholder="search..."
-                       class="bg-transparent border-none outline-none text-sm text-slate-300 w-full font-mono placeholder:text-slate-600">
-              </div>
+            <div class="flex items-center gap-2 p-2 rounded-md mb-3" style="background:#080a10;border:1px solid rgba(148,163,184,0.09);">
+              <span class="font-mono text-[10px] shrink-0" style="color:#00ff88;">grep</span>
+              <input type="text" name="q" value="{{ q }}" placeholder="search..."
+                     class="bg-transparent border-none outline-none text-xs text-slate-300 w-full font-mono placeholder:text-slate-700">
             </div>
 
-            <!-- Form Factor filter -->
-            <div class="mb-5">
-              <div class="term-label mb-3">CATEGORY</div>
-              <div class="space-y-1">
-                <a href="?q={{ q }}&sort={{ sort }}" class="block px-3 py-1.5 rounded-md text-sm font-mono transition-all {% if not form_factor %}bg-primary/10 text-primary border border-primary/20{% else %}text-slate-500 hover:text-slate-300 hover:bg-slate-800/40{% endif %}">all</a>
+            <!-- Form factor -->
+            <div class="mb-3">
+              <div class="term-label mb-2 text-[9px]">CATEGORY</div>
+              <div class="space-y-0.5">
+                <a href="?q={{ q }}&sort={{ sort }}" class="block px-2.5 py-1 rounded text-[11px] font-mono transition-all {% if not form_factor %}bg-primary/8 text-primary border border-primary/15{% else %}text-slate-500 hover:text-slate-300 hover:bg-slate-800/30{% endif %}">all</a>
                 {% for val, label in form_factors %}
-                <a href="?q={{ q }}&form_factor={{ val }}&sort={{ sort }}" class="block px-3 py-1.5 rounded-md text-sm font-mono transition-all {% if form_factor == val %}bg-primary/10 text-primary border border-primary/20{% else %}text-slate-500 hover:text-slate-300 hover:bg-slate-800/40{% endif %}">{{ label|lower }}</a>
+                <a href="?q={{ q }}&form_factor={{ val }}&sort={{ sort }}" class="block px-2.5 py-1 rounded text-[11px] font-mono transition-all {% if form_factor == val %}bg-primary/8 text-primary border border-primary/15{% else %}text-slate-500 hover:text-slate-300 hover:bg-slate-800/30{% endif %}">{{ label|lower }}</a>
                 {% endfor %}
               </div>
             </div>
 
             <!-- Sort -->
-            <div class="mb-5">
-              <div class="term-label mb-3">SORT BY</div>
+            <div class="mb-3">
+              <div class="term-label mb-2 text-[9px]">SORT BY</div>
               <div class="relative">
-                <select name="sort" onchange="document.getElementById('filter-form').submit()" class="input-dark rounded-lg py-2 px-3 text-sm w-full font-mono">
+                <select name="sort" onchange="document.getElementById('filter-form').submit()" class="input-dark rounded-md py-1.5 px-2.5 text-[11px] w-full font-mono">
                   <option value="-report_count" {% if sort == '-report_count' %}selected{% endif %}>most reports</option>
                   <option value="-gold_count"   {% if sort == '-gold_count'   %}selected{% endif %}>most gold</option>
                   <option value="vendor"        {% if sort == 'vendor'        %}selected{% endif %}>vendor a–z</option>
                   <option value="model_name"    {% if sort == 'model_name'    %}selected{% endif %}>model a–z</option>
                 </select>
-                <i data-lucide="chevron-down" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 pointer-events-none"></i>
+                <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none"></i>
               </div>
             </div>
 
-            <button type="submit" class="btn-term w-full text-center text-sm">$ filter</button>
+            <button type="submit" class="btn-term w-full text-center text-[11px] py-1.5">$ filter</button>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- ── Right: Results Grid ────────────────────── -->
-    <div class="lg:col-span-9 fade-in" style="animation-delay:0.08s">
+    <!-- ── Right: Results ────────────────────────── -->
+    <div class="lg:col-span-9 fade-in" style="animation-delay:0.06s">
       <div class="term-window">
         <div class="term-titlebar">
           <div class="term-dots"><span></span><span></span><span></span></div>
-          <span class="term-pid">[2] DB</span>
+          <span class="term-pid">[DB] RESULTS</span>
           <span class="term-branch">≡ MASTER</span>
           <span class="term-path">~/db/results</span>
+          <span class="term-label-right">{{ total_count }} entries</span>
         </div>
-        <div class="px-5 py-3 font-mono text-xs text-slate-500" style="border-bottom:1px solid rgba(148,163,184,0.06);">
+        <div class="px-4 py-2 font-mono text-[10px] text-slate-500" style="border-bottom:1px solid rgba(148,163,184,0.05);">
           $ ls -la /db → <span class="text-primary font-bold">{{ total_count }}</span> results
         </div>
 
-        <div class="p-5">
-          <div class="grid md:grid-cols-2 gap-4" id="machine-grid">
+        <div class="p-3">
+          <!-- Dense 3-col grid on large, 2-col on medium -->
+          <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-2" id="machine-grid">
             {% for machine in machines %}
-            <a href="{% url 'registry:machine_detail' machine.slug %}" class="group block" style="animation-delay:{{ forloop.counter }}0ms">
-              <div class="rounded-lg relative overflow-hidden flex flex-col h-full p-5 transition-all hover:border-primary/20" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
+            <a href="{% url 'registry:machine_detail' machine.slug %}" class="group block">
+              <div class="rounded-md relative overflow-hidden flex flex-col h-full p-3 transition-all hover:border-primary/20" style="background:rgba(148,163,184,0.015);border:1px solid rgba(148,163,184,0.06);">
 
-                <!-- Top row: dots + category tag -->
-                <div class="flex justify-between items-center mb-3">
-                  <div class="flex gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full" style="background:#f87171;"></span>
-                    <span class="w-2.5 h-2.5 rounded-full" style="background:#fbbf24;"></span>
-                    <span class="w-2.5 h-2.5 rounded-full" style="background:#34d399;"></span>
+                <!-- Top row -->
+                <div class="flex justify-between items-center mb-2">
+                  <div class="flex gap-1">
+                    <span class="w-2 h-2 rounded-full" style="background:#f87171;"></span>
+                    <span class="w-2 h-2 rounded-full" style="background:#fbbf24;"></span>
+                    <span class="w-2 h-2 rounded-full" style="background:#00ff88;"></span>
                   </div>
                   {% if machine.form_factor %}
-                  <span class="font-mono text-[10px] text-slate-500 px-2 py-0.5 rounded" style="background:rgba(148,163,184,0.06);">[{{ machine.get_form_factor_display|lower }}]</span>
+                  <span class="font-mono text-[9px] text-slate-600 px-1.5 py-0.5 rounded" style="background:rgba(148,163,184,0.05);">[{{ machine.get_form_factor_display|lower }}]</span>
                   {% endif %}
                 </div>
 
                 <!-- Device name -->
-                <h3 class="text-sm font-bold mb-0.5 group-hover:text-primary transition-colors">{{ machine.model_name }}</h3>
-                <div class="text-xs text-slate-600 mb-1">{{ machine.vendor }} · kernel any</div>
+                <h3 class="text-xs font-bold mb-0.5 group-hover:text-primary transition-colors truncate">{{ machine.model_name }}</h3>
+                <div class="text-[10px] text-slate-600 mb-1 font-mono truncate">{{ machine.vendor }}</div>
 
                 {% if machine.spec.cpu_name %}
-                <p class="text-xs text-slate-500 mb-4 leading-relaxed flex-grow">{{ machine.spec.cpu_name }}</p>
+                <p class="text-[10px] text-slate-500 mb-2 leading-relaxed flex-grow font-mono truncate">{{ machine.spec.cpu_name }}</p>
                 {% else %}
-                <div class="flex-grow min-h-4"></div>
+                <div class="flex-grow min-h-0"></div>
                 {% endif %}
 
-                <!-- Bottom: distro tags + status -->
-                <div class="flex items-center justify-between gap-2 pt-3" style="border-top:1px solid rgba(148,163,184,0.06);">
-                  <div class="flex gap-1.5 flex-wrap">
-                    <span class="distro-tag">{{ machine.report_count }} report{{ machine.report_count|pluralize }}</span>
-                  </div>
+                <!-- Bottom: status -->
+                <div class="flex items-center justify-between gap-1 pt-2" style="border-top:1px solid rgba(148,163,184,0.05);">
+                  <span class="distro-tag text-[9px]">{{ machine.report_count }} report{{ machine.report_count|pluralize }}</span>
                   {% if machine.gold_count > 0 %}
-                  <span class="badge-works px-2 py-0.5 rounded-full">● WORKS</span>
+                  <span class="badge-works px-1.5 py-0.5 rounded text-[9px]">WORKS</span>
                   {% elif machine.report_count > 0 %}
-                  <span class="badge-partial px-2 py-0.5 rounded-full">● PARTIAL</span>
+                  <span class="badge-partial px-1.5 py-0.5 rounded text-[9px]">PARTIAL</span>
                   {% endif %}
                 </div>
               </div>
             </a>
             {% empty %}
-            <div class="col-span-full text-center py-20 rounded-lg" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.06);">
-              <i data-lucide="search-x" class="w-10 h-10 text-slate-700 mx-auto mb-3"></i>
-              <p class="text-slate-600 text-sm">No machines found matching your filters.</p>
+            <div class="col-span-full text-center py-12 rounded-md font-mono text-xs text-slate-600" style="background:rgba(148,163,184,0.02);border:1px solid rgba(148,163,184,0.05);">
+              <i data-lucide="search-x" class="w-8 h-8 text-slate-700 mx-auto mb-2"></i>
+              No machines found.
             </div>
             {% endfor %}
           </div>
 
-          <!-- ── Pagination ──────────────────────────── -->
+          <!-- Pagination -->
           {% if machines.has_other_pages %}
-          <div class="flex justify-center items-center gap-2 mt-8">
+          <div class="flex justify-center items-center gap-2 mt-4">
             {% if machines.has_previous %}
             <a href="?page={{ machines.previous_page_number }}&q={{ q }}&sort={{ sort }}&form_factor={{ form_factor }}"
-               class="btn-ghost w-9 h-9 flex items-center justify-center rounded-lg">
-              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+               class="btn-ghost w-7 h-7 flex items-center justify-center rounded">
+              <i data-lucide="chevron-left" class="w-3 h-3"></i>
             </a>
             {% endif %}
-            <span class="px-4 h-9 flex items-center rounded-lg text-sm text-slate-500 font-mono font-medium" style="background:rgba(148,163,184,0.04);border:1px solid rgba(148,163,184,0.08);">
+            <span class="px-3 h-7 flex items-center rounded text-[11px] text-slate-500 font-mono" style="background:rgba(148,163,184,0.03);border:1px solid rgba(148,163,184,0.07);">
               {{ machines.number }} / {{ machines.paginator.num_pages }}
             </span>
             {% if machines.has_next %}
             <a href="?page={{ machines.next_page_number }}&q={{ q }}&sort={{ sort }}&form_factor={{ form_factor }}"
-               class="btn-ghost w-9 h-9 flex items-center justify-center rounded-lg">
-              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+               class="btn-ghost w-7 h-7 flex items-center justify-center rounded">
+              <i data-lucide="chevron-right" class="w-3 h-3"></i>
             </a>
             {% endif %}
           </div>
