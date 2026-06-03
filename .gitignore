@@ -26,3 +26,8 @@ seed_data_d.py
 backend_test.py
 check_db.py
 "about project 14 april"
+
+# Database dumps
+db_export.json
+db_dump.json
+*.json.bak

@@ -103,14 +103,25 @@ if _db_url:
         )
     }
 else:
+    db_port = config('DB_PORT', default='5432')
+    db_engine = config('DB_ENGINE', default='')
+    
+    # Auto-detect engine based on port or DB_ENGINE env var
+    if db_port == '3306' or db_engine.lower() == 'mysql':
+        engine = 'django.db.backends.mysql'
+        default_user = 'root'
+    else:
+        engine = 'django.db.backends.postgresql'
+        default_user = 'postgres'
+
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': engine,
             'NAME': config('DB_NAME', default='silicon_registry'),
-            'USER': config('DB_USER', default='postgres'),
+            'USER': config('DB_USER', default=default_user),
             'PASSWORD': config('DB_PASSWORD', default=''),
             'HOST': config('DB_HOST', default='127.0.0.1'),
-            'PORT': config('DB_PORT', default='5432'),
+            'PORT': db_port,
         }
     }
 
