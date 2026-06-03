@@ -92,13 +92,17 @@ WSGI_APPLICATION = 'silicon_registry.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-_db_url = os.environ.get('DATABASE_URL', '')
+_db_url = os.environ.get('DATABASE_URL', '').strip('\'" ')
 
 if _db_url:
-    # If the prefix was accidentally missed during copy-paste (e.g. started from '://')
+    # Auto-correct common copy-paste errors
     if _db_url.startswith('://'):
         _db_url = 'postgresql' + _db_url
-        os.environ['DATABASE_URL'] = _db_url
+    elif _db_url.startswith('//'):
+        _db_url = 'postgresql:' + _db_url
+        
+    # Update the environment variable so dj_database_url.config reads the cleaned value
+    os.environ['DATABASE_URL'] = _db_url
         
     DATABASES = {
         'default': dj_database_url.config(
