@@ -98,6 +98,7 @@ if _db_url:
     # If the prefix was accidentally missed during copy-paste (e.g. started from '://')
     if _db_url.startswith('://'):
         _db_url = 'postgresql' + _db_url
+        os.environ['DATABASE_URL'] = _db_url
         
     DATABASES = {
         'default': dj_database_url.config(
