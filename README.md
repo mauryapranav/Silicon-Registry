@@ -4,7 +4,7 @@
 
 Silicon Registry is a community-driven platform for tracking, reporting, and improving Linux hardware compatibility across laptops, desktops, mini PCs, and individual components. The goal is a reliable, transparent, and up-to-date registry that helps users find the best hardware for their Linux experience.
 
-> 🌐 **Live at** [[silicon-registry-production.up.railway.app](https://silicon-registry.up.railway.app)](https://silicon-registry-production.up.railway.app/)
+> 🌐 **Live at** [[https://silicon-registry.onrender.com/](https://silicon-registry.onrender.com/)](https://silicon-registry.onrender.com//)
 
 ---
 
@@ -33,7 +33,7 @@ Silicon Registry is a community-driven platform for tracking, reporting, and imp
 | Frontend | HTML5, Tailwind CSS (CDN), HTMX, Lucide Icons |
 | Database | MySQL (utf8mb4) |
 | Auth | django-allauth (GitHub OAuth) |
-| Deployment | Railway / PaaS |
+| Deployment | Render |
 
 ---
 
